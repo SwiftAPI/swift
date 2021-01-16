@@ -1,0 +1,17 @@
+imports:
+  - { resource: src/swift/Application/services.yaml}
+
+parameters:
+# ...
+
+services:
+  _defaults:
+    autowire: true
+    autoconfigure: true
+    public: true
+
+  Swift\:
+    resource: 'src/swift/*'
+    exclude: [ 'Monolog/Logger' ]
+
+  Doctrine\Common\Annotations\AnnotationReader: ~

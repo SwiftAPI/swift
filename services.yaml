@@ -1,0 +1,14 @@
+imports:
+  - { resource: src/swift/services.yaml }
+
+parameters:
+  # ...
+
+services:
+  _defaults:
+    autowire: true
+    autoconfigure: true
+    public: true
+
+  Honeywell\:
+    resource: 'app/Honeywell/*'

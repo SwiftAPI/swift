@@ -1,0 +1,8 @@
+{
+    "require": {
+        "henrivantsant/henri": "^1.05",
+        "webonyx/graphql-php": "^14.4",
+        "myclabs/php-enum": "^1.7",
+        "phpdocumentor/reflection-docblock": "^5.2"
+    }
+}

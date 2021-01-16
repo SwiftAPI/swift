@@ -1,0 +1,19 @@
+#!/usr/bin/env php
+<?php
+/**
+ * Copyright © Henri, Inc. All rights reserved.
+ * See COPYING.txt for license details.
+ */
+
+if (!defined('INCLUDE_DIR')) {
+    define('INCLUDE_DIR', dirname(__DIR__, 1));
+}
+
+require INCLUDE_DIR . '/vendor/autoload.php';
+require_once INCLUDE_DIR . '/src/swift/Console/CLIApplication.php';
+require_once INCLUDE_DIR . '/src/swift/Application/Bootstrap\Autoloading\Autoloader.php';
+
+use Swift\Console\CLIApplication;
+
+$CLIApplication = new CLIApplication();
+$CLIApplication->run();
