@@ -1,0 +1,12 @@
+.idea
+config.yaml
+!/app/config.yaml
+!/app/honeywell/config.yaml
+composer.lock
+composer.phar
+/var/*
+/vendor/*
+!/vendor/henri
+docs
+.phpdoc
+phpDocumentor.phar
