@@ -2,7 +2,6 @@
 
 namespace Swift\Router\Exceptions;
 
-use RuntimeException;
 use Throwable;
 use Swift\Kernel\Attributes\DI;
 
@@ -11,7 +10,7 @@ use Swift\Kernel\Attributes\DI;
  * @package Swift\Router\Exceptions
  */
 #[DI(exclude: true)]
-class AccessDeniedException extends RuntimeException {
+class AccessDeniedException extends \Swift\HttpFoundation\Exception\AccessDeniedException {
 
     protected $code = 403;
 

@@ -1,27 +1,37 @@
 <?php declare(strict_types=1);
 
+/*
+ * This file is part of the Swift Framework
+ *
+ * (c) Henri van 't Sant <henri@henrivantsant.com>
+ *
+ * For the full copyright and license information, please view the LICENSE file that was distributed with this source code.
+ */
 
 namespace Swift\GraphQl\Resolvers;
 
 
 use Closure;
 use GraphQL\Type\Definition\ResolveInfo;
-use Swift\Kernel\ContainerService\ContainerService;
+use Swift\Kernel\Attributes\Autowire;
+use Swift\Kernel\ServiceLocatorInterface;
 
+/**
+ * Class FieldResolver
+ * @package Swift\GraphQl\Resolvers
+ */
+#[Autowire]
 class FieldResolver {
 
 
     /**
      * FieldResolver constructor.
      *
-     * @param ContainerService|null $container
+     * @param ServiceLocatorInterface $serviceLocator
      */
     public function __construct(
-        private ?ContainerService $container = null,
+        private ServiceLocatorInterface $serviceLocator,
     ) {
-        global $containerBuilder;
-
-        $this->container = $containerBuilder;
     }
 
     public function resolve( $value, $args, $context, ResolveInfo $info ) {
@@ -36,7 +46,7 @@ class FieldResolver {
         //var_dump(array_keys($info->fieldDefinition->config));
 
         $resolver = array_key_exists(key: 'declaration', array: $info->fieldDefinition->config) ?
-            $this->container->get($info->fieldDefinition->config['declaration']->declaringClass) : null;
+            $this->serviceLocator->get($info->fieldDefinition->config['declaration']->declaringClass) : null;
 
         if ($resolver && method_exists(object_or_class: $resolver, method: $info->fieldDefinition->config['declaration']->resolve)) {
             return $resolver?->{$info->fieldDefinition->config['declaration']->resolve}(...$args);

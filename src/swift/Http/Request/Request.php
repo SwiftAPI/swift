@@ -1,12 +1,26 @@
 <?php declare(strict_types=1);
 
+/*
+ * This file is part of the Swift Framework
+ *
+ * (c) Henri van 't Sant <henri@henrivantsant.com>
+ *
+ * For the full copyright and license information, please view the LICENSE file that was distributed with this source code.
+ */
+
 namespace Swift\Http\Request;
 
 use Swift\Configuration\Configuration;
 use Swift\Http\Request\Exceptions\RequestFailed;
 use Swift\Http\Request\Method;
+use Swift\Kernel\Attributes\Autowire;
 use Unirest\Request as UnirestRequest;
 
+/**
+ * Class Request
+ * @package Swift\Http\Request
+ */
+#[Autowire]
 class Request {
     
     private $jsonOpts = array();

@@ -15,23 +15,12 @@ use Swift\GraphQl\Attributes\Type;
 use Swift\GraphQl\LoaderInterface;
 use Swift\GraphQl\TypeRegistryInterface;
 use Swift\GraphQl\Types\ObjectType;
-use Swift\Kernel\ContainerService\ContainerService;
+use Swift\Kernel\ContainerAwareTrait;
 use Swift\Model\Attributes\DBField;
 
 class TypeLoader implements LoaderInterface {
 
-    /**
-     * TypeLoader constructor.
-     *
-     * @param ContainerService|null $container
-     */
-    public function __construct(
-        private ContainerService|null $container = null,
-    ) {
-        global $containerBuilder;
-
-        $this->container = $containerBuilder;
-    }
+    use ContainerAwareTrait;
 
     public function load( TypeRegistryInterface $typeRegistry ): void {
         $types = $this->container->getDefinitionsByTag(tag: 'graphql.type');

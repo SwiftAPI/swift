@@ -10,7 +10,7 @@ use Swift\Kernel\Attributes\DI;
  * @package Swift\Router\Exceptions
  */
 #[DI(exclude: true)]
-class NotAuthorizedException extends RuntimeException {
+class NotAuthorizedException extends \Swift\HttpFoundation\Exception\NotAuthorizedException {
 
     protected $code = 401;
 

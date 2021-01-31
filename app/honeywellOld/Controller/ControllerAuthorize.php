@@ -2,8 +2,10 @@
 
 namespace HoneywellOld\Controller;
 
+use JetBrains\PhpStorm\Deprecated;
 use Swift\Configuration\Configuration;
 use Swift\Controller\Controller;
+use Swift\HttpFoundation\Request;
 use Swift\Router\HTTPRequest;
 use Swift\Router\Types\RouteTypesEnum;
 use HoneywellOld\Helper\Authentication;
@@ -33,9 +35,9 @@ class ControllerAuthorize extends Controller
      */
     #[Route(type: 'GET|POST', route: '/honeywell/authorization/', authRequired: false)]
 	public function __construct(
-			HTTPRequest $HTTPRequest,
-			Authentication $helperAuthentication,
-            Configuration $configuration) {
+        #[Deprecated( replacement: Request::class )] HTTPRequest $HTTPRequest,
+        Authentication $helperAuthentication,
+        Configuration $configuration) {
 		parent::__construct($HTTPRequest);
 
 		$this->authenticationHelper = $helperAuthentication;

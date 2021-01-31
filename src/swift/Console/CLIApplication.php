@@ -1,5 +1,12 @@
 <?php declare(strict_types=1);
 
+/*
+ * This file is part of the Swift Framework
+ *
+ * (c) Henri van 't Sant <henri@henrivantsant.com>
+ *
+ * For the full copyright and license information, please view the LICENSE file that was distributed with this source code.
+ */
 
 namespace Swift\Console;
 
@@ -12,9 +19,13 @@ require_once INCLUDE_DIR . '/vendor/autoload.php';
 use Exception;
 use Swift\Application\Bootstrap\Autoloading\Autoloader;
 use Swift\Application\Bootstrap\DependencyInjection\DependencyInjection;
-use Swift\Console\Console;
+use Swift\Kernel\ServiceLocator;
 
-class CLIApplication {
+/**
+ * Class CLIApplication
+ * @package Swift\Console
+ */
+final class CLIApplication {
 
     /**
      * Bootstrap CLI Application
@@ -40,8 +51,8 @@ class CLIApplication {
 
         try {
             // Build to application
-            global $containerBuilder;
-            $app = $containerBuilder->get( Console::class );
+            $serviceLocator = new ServiceLocator();
+            $app = $serviceLocator->get( Application::class );
             $app->run();
         } catch (Exception $e) {
             while($e) {

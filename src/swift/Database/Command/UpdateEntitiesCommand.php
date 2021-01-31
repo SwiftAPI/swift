@@ -3,11 +3,11 @@
 namespace Swift\Database\Command;
 
 use Swift\Console\Command\Command;
+use Swift\Kernel\ContainerAwareTrait;
 use Swift\Model\Entity;
 use Symfony\Component\Console\Input\InputInterface;
 use Symfony\Component\Console\Output\OutputInterface;
 use Symfony\Component\Console\Input\InputArgument;
-use Swift\Kernel\ContainerService\ContainerService;
 use Symfony\Component\Console\Style\SymfonyStyle;
 
 /**
@@ -16,26 +16,14 @@ use Symfony\Component\Console\Style\SymfonyStyle;
  */
 class UpdateEntitiesCommand extends Command {
 
+    use ContainerAwareTrait;
+
 	/**
 	 * the name of the command (the part after "bin/henri")
 	 * @var string $defaultName
 	 */
 	protected static $defaultName = 'database:entities:update';
 
-
-    /**
-     * GetClientCommand constructor.
-     *
-     * @param ContainerService|null $container
-     */
-	public function __construct(
-	    private ?ContainerService $container,
-    ) {
-		global $containerBuilder;
-		$this->container = $containerBuilder;
-
-		parent::__construct();
-	}
 
 	/**
 	 * Method to set command configuration

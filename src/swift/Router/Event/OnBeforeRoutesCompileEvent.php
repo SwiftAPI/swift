@@ -1,10 +1,19 @@
 <?php declare(strict_types=1);
 
+/*
+ * This file is part of the Swift Framework
+ *
+ * (c) Henri van 't Sant <henri@henrivantsant.com>
+ *
+ * For the full copyright and license information, please view the LICENSE file that was distributed with this source code.
+ */
 
 namespace Swift\Router\Event;
 
 use Swift\Kernel\Attributes\DI;
+use Swift\Router\MatchTypes\MatchTypeInterface;
 use Swift\Router\Route;
+use Swift\Router\RouteInterface;
 use Symfony\Contracts\EventDispatcher\Event;
 
 /**
@@ -17,8 +26,8 @@ class OnBeforeRoutesCompileEvent extends Event {
     /**
      * OnBeforeRoutesCompile constructor.
      *
-     * @param array $routes
-     * @param array $matchTypes
+     * @param RouteInterface[] $routes
+     * @param MatchTypeInterface[] $matchTypes
      */
     public function __construct(
         private array $routes,
@@ -27,47 +36,46 @@ class OnBeforeRoutesCompileEvent extends Event {
     }
 
     /**
-     * @param Route $route
+     * @param RouteInterface $route
      */
-    public function addRoute(Route $route): void {
+    public function addRoute(RouteInterface $route): void {
         $this->routes[] = $route;
     }
 
     /**
-     * @return array
+     * @return RouteInterface[]
      */
     public function getRoutes(): array {
         return $this->routes;
     }
 
     /**
-     * @param array $routes
+     * @param RouteInterface[] $routes
      */
     public function setRoutes( array $routes ): void {
         $this->routes = $routes;
     }
 
     /**
-     * @param string $identifier
-     * @param string $regex
+     * @param MatchTypeInterface $matchType
      */
-    public function addMatchType(string $identifier, string $regex): void {
-        if (array_key_exists($identifier, $this->matchTypes)) {
-            throw new \InvalidArgumentException(sprintf('Match type %s is already declared', $identifier));
+    public function addMatchType(MatchTypeInterface $matchType): void {
+        if (array_key_exists($matchType->getIdentifier(), $this->matchTypes)) {
+            throw new \InvalidArgumentException(sprintf('Match type %s is already declared', $matchType->getIdentifier()));
         }
 
-        $this->matchTypes[$identifier] = $regex;
+        $this->matchTypes[$matchType->getIdentifier()] = $matchType;
     }
 
     /**
-     * @return array
+     * @return MatchTypeInterface[]
      */
     public function getMatchTypes(): array {
         return $this->matchTypes;
     }
 
     /**
-     * @param array $matchTypes
+     * @param MatchTypeInterface[] $matchTypes
      */
     public function setMatchTypes( array $matchTypes ): void {
         $this->matchTypes = $matchTypes;

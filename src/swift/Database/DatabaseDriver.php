@@ -1,16 +1,29 @@
 <?php declare(strict_types=1);
 
+/*
+ * This file is part of the Swift Framework
+ *
+ * (c) Henri van 't Sant <henri@henrivantsant.com>
+ *
+ * For the full copyright and license information, please view the LICENSE file that was distributed with this source code.
+ */
+
 namespace Swift\Database;
 
 use Dibi\Connection;
 use Dibi\Exception;
 use Swift\Configuration\Configuration;
+use Swift\Kernel\Attributes\Autowire;
 use Swift\Model\Exceptions\DatabaseException;
 
-class DatabaseDriver extends Connection
-{
-	/** @var Configuration $configuation */
-	protected Configuration $configuation;
+/**
+ * Class DatabaseDriver
+ * @package Swift\Database
+ */
+#[Autowire]
+class DatabaseDriver extends Connection {
+	/** @var Configuration $configuration */
+	protected Configuration $configuration;
 
 	/** @var string|null $prefix  table prefix */
 	protected string|null $prefix;
@@ -24,7 +37,7 @@ class DatabaseDriver extends Connection
 	public function __construct(
 		Configuration $configuration
 	) {
-		$this->configuation = $configuration;
+		$this->configuration = $configuration;
 		$this->prefix       = $configuration->get('database.prefix');
 		$config = array(
 				'driver'    => $configuration->get('database.driver'),

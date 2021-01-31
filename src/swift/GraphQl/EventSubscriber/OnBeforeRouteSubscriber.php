@@ -1,16 +1,29 @@
 <?php declare(strict_types=1);
 
+/*
+ * This file is part of the Swift Framework
+ *
+ * (c) Henri van 't Sant <henri@henrivantsant.com>
+ *
+ * For the full copyright and license information, please view the LICENSE file that was distributed with this source code.
+ */
 
 namespace Swift\GraphQl\EventSubscriber;
 
 
-use Swift\Authentication\Types\AuthenticationLevelsEnum;
+use Swift\AuthenticationDeprecated\Types\AuthenticationLevelsEnum;
 use Swift\Events\EventDispatcher;
 use Swift\GraphQl\Kernel;
+use Swift\Kernel\Attributes\Autowire;
 use Swift\Router\Event\OnBeforeRoutesCompileEvent;
 use Swift\Router\Route;
 use Symfony\Component\EventDispatcher\EventSubscriberInterface;
 
+/**
+ * Class OnBeforeRouteSubscriber
+ * @package Swift\GraphQl\EventSubscriber
+ */
+#[Autowire]
 class OnBeforeRouteSubscriber implements EventSubscriberInterface {
 
     /**
@@ -43,14 +56,15 @@ class OnBeforeRouteSubscriber implements EventSubscriberInterface {
      * @param EventDispatcher $eventDispatcher
      */
     public function onBeforeRoutesCompile( OnBeforeRoutesCompileEvent $event, string $eventClassName, EventDispatcher $eventDispatcher ): void {
-        $event->addRoute(new Route(array(
+        $event->addRoute(new Route(...array(
             'name' => 'graphql',
             'regex' => 'graphql',
             'methods' => array('POST'),
             'controller' => Kernel::class,
+            'controllerBase' => '',
             'action' => 'run',
             'authRequired' => false,
-            'authLevel' => AuthenticationLevelsEnum::NONE,
+            'authLevels' => array(AuthenticationLevelsEnum::NONE),
         )));
     }
 

@@ -20,6 +20,7 @@ class DI {
      * @param bool $shared
      * @param bool $exclude
      * @param bool $autowire
+     * @param array $aliases
      */
     public function __construct(
         public string|null $name = null,
@@ -27,6 +28,7 @@ class DI {
         public bool $shared = true,
         public bool $exclude = false,
         public bool $autowire = true,
+        public array $aliases = array(),
     ) {
     }
 }

@@ -2,8 +2,10 @@
 
 namespace HoneywellOld\Controller;
 
+use JetBrains\PhpStorm\Deprecated;
 use Swift\Controller\Controller;
 use Swift\Http\Response\JSONResponse;
+use Swift\HttpFoundation\Request;
 use Swift\Router\HTTPRequest;
 use HoneywellOld\Helper\Authentication;
 use HoneywellOld\Model\ModelThermostat;
@@ -31,9 +33,9 @@ class ControllerThermostat extends Controller
 	 */
 	#[Route(type: "GET|POST", route: "/honeywell/thermostat/", authRequired: false, authLevel: "login")]
 	public function __construct(
-			HTTPRequest $HTTPRequest,
-			Authentication $helperAuthentication,
-			ModelThermostat $honeywellModelThermostat) {
+        #[Deprecated( replacement: Request::class )] HTTPRequest $HTTPRequest,
+        Authentication $helperAuthentication,
+        ModelThermostat $honeywellModelThermostat) {
 		parent::__construct($HTTPRequest);
 
 		$this->authenticationHelper = $helperAuthentication;

@@ -16,26 +16,17 @@ use Swift\GraphQl\Attributes\Mutation;
 use Swift\GraphQl\LoaderInterface;
 use Swift\GraphQl\TypeRegistryInterface;
 use Swift\GraphQl\Types\ObjectType;
-use Swift\Kernel\ContainerService\ContainerService;
+use Swift\Kernel\Attributes\Autowire;
+use Swift\Kernel\ContainerAwareTrait;
 
 /**
  * Class MutationLoader
  * @package Swift\GraphQl\Loaders
  */
+#[Autowire]
 class MutationLoader implements LoaderInterface {
 
-    /**
-     * MutationLoader constructor.
-     *
-     * @param ContainerService|null $container
-     */
-    public function __construct(
-        private ContainerService|null $container = null,
-    ) {
-        global $containerBuilder;
-
-        $this->container = $containerBuilder;
-    }
+    use ContainerAwareTrait;
 
 
     /**

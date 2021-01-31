@@ -1,14 +1,25 @@
 <?php declare(strict_types=1);
 
+/*
+ * This file is part of the Swift Framework
+ *
+ * (c) Henri van 't Sant <henri@henrivantsant.com>
+ *
+ * For the full copyright and license information, please view the LICENSE file that was distributed with this source code.
+ */
+
 namespace Swift\Router;
 
+use JetBrains\PhpStorm\Deprecated;
 
+/**
+ * Class Input
+ * @package Swift\Router
+ */
+#[Deprecated]
 class Input {
 
-	/**
-	 * @var array $input
-	 */
-	protected $input = array();
+	protected array $input = array();
 
 	/**
 	 * Input constructor.
@@ -48,11 +59,13 @@ class Input {
 		$this->input = array_merge($this->input, $input);
 	}
 
-	/**
-	 * Method to get specific input
-	 *
-	 * @return mixed  input value on found. false on input not found
-	 */
+    /**
+     * Method to get specific input
+     *
+     * @param string $key
+     *
+     * @return mixed  input value on found. false on input not found
+     */
 	public function get(string $key) {
 		if (!array_key_exists($key, $this->input)) {
 			return false;

@@ -16,7 +16,7 @@ use Swift\GraphQl\Attributes\Query;
 use Swift\GraphQl\LoaderInterface;
 use Swift\GraphQl\TypeRegistryInterface;
 use Swift\GraphQl\Types\ObjectType;
-use Swift\Kernel\ContainerService\ContainerService;
+use Swift\Kernel\ContainerAwareTrait;
 
 /**
  * Class QueryLoader
@@ -24,18 +24,7 @@ use Swift\Kernel\ContainerService\ContainerService;
  */
 class QueryLoader implements LoaderInterface {
 
-    /**
-     * QueryLoader constructor.
-     *
-     * @param ContainerService|null $container
-     */
-    public function __construct(
-        private ContainerService|null $container = null,
-    ) {
-        global $containerBuilder;
-
-        $this->container = $containerBuilder;
-    }
+    use ContainerAwareTrait;
 
     public function load( TypeRegistryInterface $typeRegistry ): void {
         $queries = $this->container->getDefinitionsByTag('graphql.query');

@@ -1,10 +1,17 @@
 <?php declare(strict_types=1);
 
+/*
+ * This file is part of the Swift Framework
+ *
+ * (c) Henri van 't Sant <henri@henrivantsant.com>
+ *
+ * For the full copyright and license information, please view the LICENSE file that was distributed with this source code.
+ */
 
 namespace Swift\Kernel\Event;
 
-use Swift\Http\Response\Response;
-use Swift\Router\HTTPRequest;
+use Psr\Http\Message\ServerRequestInterface;
+use Swift\HttpFoundation\ResponseInterface;
 use Symfony\Contracts\EventDispatcher\Event;
 use Swift\Kernel\Attributes\DI;
 
@@ -18,22 +25,28 @@ class KernelOnBeforeShutdown extends Event {
     /**
      * KernelRequest constructor.
      *
-     * @param $request
+     * @param ServerRequestInterface $request
+     * @param ResponseInterface $response
      */
     public function __construct(
-        public HTTPRequest $request,
-        public Response $response,
+        public ServerRequestInterface $request,
+        public ResponseInterface $response,
     ) {
     }
 
     /**
-     * @return HTTPRequest
+     * @return ServerRequestInterface
      */
-    public function getRequest(): HTTPRequest {
+    public function getRequest(): ServerRequestInterface {
         return $this->request;
     }
 
-    public function getResponse( Response $response ): Response {
+    /**
+     * @param ResponseInterface $response
+     *
+     * @return ResponseInterface
+     */
+    public function getResponse( ResponseInterface $response ): ResponseInterface {
         return $this->response;
     }
 

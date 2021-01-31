@@ -1,20 +1,30 @@
 <?php declare(strict_types=1);
 
+/*
+ * This file is part of the Swift Framework
+ *
+ * (c) Henri van 't Sant <henri@henrivantsant.com>
+ *
+ * For the full copyright and license information, please view the LICENSE file that was distributed with this source code.
+ */
+
 namespace Swift\Database\Command;
 
 use Swift\Console\Command\Command;
+use Swift\Kernel\Attributes\Autowire;
+use Swift\Kernel\ContainerAwareTrait;
 use Symfony\Component\Console\Input\InputInterface;
 use Symfony\Component\Console\Output\OutputInterface;
 use Symfony\Component\Console\Input\InputArgument;
-use \Swift\ContainerService\ContainerService;
 
-
+/**
+ * Class CreateEntityCommand
+ * @package Swift\Database\Command
+ */
+#[Autowire]
 class CreateEntityCommand extends Command {
 
-	/**
-	 * @var ContainerService $containerService
-	 */
-	private $containerService;
+	use ContainerAwareTrait;
 
 	/**
 	 * the name of the command (the part after "bin/henri")

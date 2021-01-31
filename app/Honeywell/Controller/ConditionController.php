@@ -16,13 +16,15 @@ use Honeywell\Types\ConditionType;
 use Honeywell\Types\ScheduleType;
 use JetBrains\PhpStorm\Pure;
 use stdClass;
-use Swift\Controller\Controller;
+use Swift\Controller\AbstractController;
 use Swift\GraphQl\Attributes\Argument;
 use Swift\GraphQl\Attributes\Mutation;
 use Swift\GraphQl\Attributes\Query;
 use Swift\GraphQl\Generators\EntityArgumentGenerator;
 use Swift\GraphQl\Generators\EntityInputGeneratorNew;
 use Swift\GraphQl\Generators\EntityInputGeneratorUpdate;
+use Swift\HttpFoundation\Request;
+use Swift\Kernel\Attributes\Autowire;
 use Swift\Kernel\TypeSystem\Defaults\Datetime\WeekdaysEnum;
 use Swift\Model\Entity\Arguments;
 use Swift\Router\HTTPRequest;
@@ -31,19 +33,16 @@ use Swift\Router\HTTPRequest;
  * Class ConditionController
  * @package Honeywell\Controller
  */
-class ConditionController extends Controller {
+class ConditionController extends AbstractController {
 
     /**
      * ConditionController constructor.
      *
-     * @param HTTPRequest $request
      * @param ConditionService $conditionService
      */
     #[Pure] public function __construct(
-        HTTPRequest $request,
         private ConditionService $conditionService,
     ) {
-        parent::__construct($request);
     }
 
     #[Mutation(name: 'addCondition', type: ConditionType::class )]

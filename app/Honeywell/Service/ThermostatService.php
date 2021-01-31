@@ -18,11 +18,13 @@ use Honeywell\Types\ScheduleTypesEnum;
 use Honeywell\Types\ThermostatState;
 use JetBrains\PhpStorm\Deprecated;
 use stdClass;
+use Swift\Kernel\Attributes\Autowire;
 
 /**
  * Class ThermostatService
  * @package Honeywell\Service
  */
+#[Autowire]
 class ThermostatService {
 
     /**

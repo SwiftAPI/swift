@@ -11,7 +11,8 @@ use RuntimeException;
 use stdClass;
 use Swift\Database\DatabaseDriver;
 use Swift\Events\EventDispatcher;
-use Swift\Kernel\ContainerService\ContainerService;
+use Swift\Kernel\Attributes\Autowire;
+use Swift\Kernel\Container\Container;
 use Swift\Kernel\DiTags;
 use Swift\Kernel\TypeSystem\Enum;
 use Swift\Model\Attributes\DB;
@@ -31,7 +32,7 @@ use Swift\Kernel\Attributes\DI;
  * Class Entity
  * @package Swift\Model\Entity
  */
-#[DI( tags: [ DiTags::ENTITY ] )]
+#[DI( tags: [ DiTags::ENTITY ] ), Autowire]
 abstract class Entity {
 
     /**
@@ -40,7 +41,7 @@ abstract class Entity {
      * @param DatabaseDriver $database
      * @param EventDispatcher $dispatcher
      * @param Query $helperQuery
-     * @param ContainerService|null $container
+     * @param Container|null $container
      * @param ReflectionClass|null $reflectionClass Reflection of current class
      * @param string|null $primaryKey the primary key in the table
      * @param array $propertyMap map of properties and their belonging name in the table
@@ -54,7 +55,7 @@ abstract class Entity {
         protected DatabaseDriver $database,
         protected EventDispatcher $dispatcher,
         protected Query $helperQuery,
-        protected ?ContainerService $container,
+        protected ?Container $container,
         protected ?ReflectionClass $reflectionClass = null,
         protected ?string $primaryKey = null,
         protected array $propertyMap = array(),

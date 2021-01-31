@@ -2,16 +2,19 @@
 
 namespace Swift\Users\Controller;
 
-use Swift\Controller\Controller;
+use JetBrains\PhpStorm\Deprecated;
+use JetBrains\PhpStorm\Pure;
+use Swift\Controller\AbstractController;
 use Swift\Http\Response\JSONResponse;
+use Swift\HttpFoundation\Request;
+use Swift\Kernel\ServiceLocator;
 use Swift\Router\HTTPRequest;
 use Swift\Users\Model\User as ModelUser;
-use Swift\Authentication\Auth;
+use Swift\AuthenticationDeprecated\Auth;
 use Swift\Users\Helper\User as HelperUser;
 use Swift\Router\Attributes\Route;
 
-class ControllerUser extends Controller
-{
+class ControllerUser extends AbstractController {
 	/**
 	 * @var ModelUser $modelUser
 	 */
@@ -27,25 +30,26 @@ class ControllerUser extends Controller
 	 */
 	private HelperUser $helperUser;
 
-	/**
-	 * ControllerUser constructor.
-	 *
-	 * @param HTTPRequest $HTTPRequest
-	 * @param ModelUser   $modelUser
-	 * @param Auth        $auth
-	 * @param HelperUser  $helperUser
-	 */
-	#[Route(type: 'GET|POST|PUT', route: '/users/user/', authRequired: true)]
+    /**
+     * ControllerUser constructor.
+     *
+     * @param Request $HTTPRequest $HTTPRequest
+     * @param ModelUser $modelUser
+     * @param Auth $auth
+     * @param HelperUser $helperUser
+     * @param ServiceLocator $serviceLocator
+     */
+	#[Pure] #[Route(type: 'GET|POST|PUT', route: '/users/user/', authRequired: true)]
 	public function __construct(
-			HTTPRequest $HTTPRequest,
-			ModelUser $modelUser,
-			Auth $auth,
-			HelperUser $helperUser
+        Request $HTTPRequest,
+        ModelUser $modelUser,
+        Auth $auth,
+        HelperUser $helperUser,
+        ServiceLocator $serviceLocator,
 	) {
 		$this->modelUser    = $modelUser;
 		$this->auth         = $auth;
 		$this->helperUser   = $helperUser;
-		parent::__construct($HTTPRequest);
 	}
 
 	/**

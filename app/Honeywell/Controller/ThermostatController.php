@@ -16,10 +16,12 @@ use Honeywell\Types\ScheduleType;
 use Honeywell\Types\ThermostatState;
 use JetBrains\PhpStorm\Pure;
 use stdClass;
-use Swift\Controller\Controller;
+use Swift\Controller\AbstractController;
 use Swift\GraphQl\Attributes\Argument;
 use Swift\GraphQl\Attributes\Mutation;
 use Swift\GraphQl\Attributes\Query;
+use Swift\HttpFoundation\Request;
+use Swift\HttpFoundation\ServerRequest;
 use Swift\Kernel\TypeSystem\Defaults\Datetime\WeekdaysEnum;
 use Swift\Router\HTTPRequest;
 
@@ -27,20 +29,16 @@ use Swift\Router\HTTPRequest;
  * Class ThermostatController
  * @package Honeywell\Controller
  */
-class ThermostatController extends Controller {
+class ThermostatController extends AbstractController {
 
     /**
      * Thermostat constructor.
      *
-     * @param HTTPRequest $request
      * @param ThermostatService $thermostatService
      */
     #[Pure] public function __construct(
-        private HTTPRequest $request,
         private ThermostatService $thermostatService,
     ) {
-
-        parent::__construct($this->request);
     }
 
     #[Query(name: 'thermostat', type: Thermostat::class)]

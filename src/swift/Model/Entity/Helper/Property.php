@@ -1,10 +1,25 @@
 <?php declare(strict_types=1);
 
+/*
+ * This file is part of the Swift Framework
+ *
+ * (c) Henri van 't Sant <henri@henrivantsant.com>
+ *
+ * For the full copyright and license information, please view the LICENSE file that was distributed with this source code.
+ */
+
 namespace Swift\Model\Entity\Helper;
 
 
+use stdClass;
+use Swift\Kernel\Attributes\Autowire;
 use Swift\Model\Types\FieldTypes;
 
+/**
+ * Class Property
+ * @package Swift\Model\Entity\Helper
+ */
+#[Autowire]
 class Property {
 
 	/**
@@ -26,12 +41,12 @@ class Property {
 	/**
 	 * Method to generate type and (optional) length property
 	 *
-	 * @param \stdClass $property
+	 * @param stdClass $property
 	 * @param string    $propertyString
 	 *
 	 * @return string
 	 */
-	private function appendTypeAndLenght(\stdClass $property, string $propertyString) : string {
+	private function appendTypeAndLenght( stdClass $property, string $propertyString) : string {
         $propertyString .= ' ' . $property->type;
 
         $property->length = (($property->type === FieldTypes::TEXT) && ($property->length < 1)) ? 255 : $property->length;
@@ -48,17 +63,17 @@ class Property {
 	/**
 	 * Method to append several SQL options
 	 *
-	 * @param \stdClass $property
+	 * @param stdClass $property
 	 * @param string    $propertyString
 	 *
 	 * @return string
 	 */
-	private function appendOther(\stdClass $property, string $propertyString) : string {
+	private function appendOther( stdClass $property, string $propertyString) : string {
 		if (!$property->empty) {
 			$propertyString .= ' NOT NULL';
 		}
 
-		if ($property->primary) {
+		if ($property->primary && (($property->type === FieldTypes::INT) || ($property->type === FieldTypes::FLOAT))) {
 			$propertyString .= ' AUTO_INCREMENT';
 		}
 

@@ -1,13 +1,26 @@
 <?php declare(strict_types=1);
 
+/*
+ * This file is part of the Swift Framework
+ *
+ * (c) Henri van 't Sant <henri@henrivantsant.com>
+ *
+ * For the full copyright and license information, please view the LICENSE file that was distributed with this source code.
+ */
 
 namespace Swift\Router\EventSubscriber;
 
+use Swift\Kernel\Attributes\Autowire;
 use Swift\Router\Event\OnBeforeRouteEnterEvent;
 use Swift\Router\HTTPRequest;
 use Symfony\Component\EventDispatcher\EventDispatcher;
 use Symfony\Component\EventDispatcher\EventSubscriberInterface;
 
+/**
+ * Class RouteSubscriber
+ * @package Swift\Router\EventSubscriber
+ */
+#[Autowire]
 class RouteSubscriber implements EventSubscriberInterface {
 
     /**

@@ -1,27 +1,39 @@
 <?php declare(strict_types=1);
 
+/*
+ * This file is part of the Swift Framework
+ *
+ * (c) Henri van 't Sant <henri@henrivantsant.com>
+ *
+ * For the full copyright and license information, please view the LICENSE file that was distributed with this source code.
+ */
+
 namespace Swift\Router\EventSubscriber;
 
 use Dibi\Exception;
+use Swift\HttpFoundation\ServerRequest;
+use Swift\Kernel\Attributes\Autowire;
 use Swift\Kernel\Event\KernelRequestEvent;
 use Swift\Router\Exceptions\BadRequestException;
-use Swift\Router\Helper\Validator;
 use Swift\Router\HTTPRequest;
 use Swift\Router\Model\Request as RequestModel;
 use Symfony\Component\EventDispatcher\EventDispatcher;
 use Symfony\Component\EventDispatcher\EventSubscriberInterface;
 
+/**
+ * Class RequestSubscriber
+ * @package Swift\Router\EventSubscriber
+ */
+#[Autowire]
 class RequestSubscriber implements EventSubscriberInterface {
 
     /**
      * RequestSubscriber constructor.
      *
-     * @param Validator $requestValidator
      * @param HTTPRequest $HTTPRequest
      * @param RequestModel $modelRequest
      */
     public function __construct(
-        private Validator $requestValidator,
         private HTTPRequest $HTTPRequest,
         private RequestModel $modelRequest
     ) {
@@ -60,30 +72,24 @@ class RequestSubscriber implements EventSubscriberInterface {
      * @throws Exception
      */
     public function onKernelRequest( KernelRequestEvent $event, string $eventClassName, EventDispatcher $eventDispatcher ): void {
-        $requestValid = $this->requestValidator->requestIsValid();
-
-        $this->logRequest($requestValid);
-
-        if (!$requestValid) {
-            throw new BadRequestException('Invalid request');
-        }
+        $this->logRequest($event->getRequest());
     }
 
     /**
      * Method to log a request
      *
-     * @param bool $isValidRequest
+     * @param ServerRequest $request
      *
-     * @throws Exception
+     * @throws \Exception
      */
-    private function logRequest(bool $isValidRequest): void {
-        $ip         = $this->HTTPRequest->request->getRequest()['REMOTE_ADDR'];
-        $origin     = $this->HTTPRequest->request->getRequest()['HTTP_HOST'] . $this->HTTPRequest->request->getUri();
+    private function logRequest(ServerRequest $request): void {
+        $ip         = $request->getClientIp();
+        $origin     = $request->getUri()->getPath();
         $time       = date('Y-m-d H:i:s' );
-        $method     = $this->HTTPRequest->request->getMethod();
-        $headers    = $this->HTTPRequest->request->getHeaders();
-        $body       = $this->HTTPRequest->request->input->getArray();
-        $code       = $isValidRequest ? 200 : 400;
+        $method     = $request->getMethod();
+        $headers    = $request->getHeaders()->all();
+        $body       = $request->getBody()->getContents();
+        $code       = 200;
 
         $this->modelRequest->logRequest($ip, $origin, $time, $method, $headers, $body, $code);
     }

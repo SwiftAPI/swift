@@ -1,5 +1,13 @@
 <?php declare( strict_types=1 );
 
+/*
+ * This file is part of the Swift Framework
+ *
+ * (c) Henri van 't Sant <henri@henrivantsant.com>
+ *
+ * For the full copyright and license information, please view the LICENSE file that was distributed with this source code.
+ */
+
 namespace Swift\GraphQl;
 
 use GraphQL\GraphQL;
@@ -12,6 +20,7 @@ use Swift\GraphQl\Loaders\QueryLoader;
 use Swift\GraphQl\Loaders\MutationLoader;
 use Swift\GraphQl\Resolvers\FieldResolver;
 use Swift\Http\Response\JSONResponse;
+use Swift\Kernel\Attributes\Autowire;
 use Swift\Router\HTTPRequest;
 use GraphQL\Error\DebugFlag;
 
@@ -19,6 +28,7 @@ use GraphQL\Error\DebugFlag;
  * Class Kernel
  * @package Swift\GraphQl
  */
+#[Autowire]
 class Kernel {
 
     /**

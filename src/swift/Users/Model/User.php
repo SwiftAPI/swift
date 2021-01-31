@@ -4,12 +4,14 @@ namespace Swift\Users\Model;
 
 use JetBrains\PhpStorm\Deprecated;
 use stdClass;
+use Swift\Kernel\Attributes\Autowire;
 use Swift\Model\Entity\EntityManagerList;
 use Swift\Model\Entity\EntityManagerSingle;
 use Swift\Model\HenriModelBase;
 use Swift\Users\Model\Entity\User as EntityUser;
 use Swift\Users\Helper\User as HelperUser;
 
+#[Autowire]
 class User extends HenriModelBase {
 
 	/**

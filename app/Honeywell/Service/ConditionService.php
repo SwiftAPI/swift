@@ -16,12 +16,14 @@ use Honeywell\Types\ConditionType;
 use Honeywell\Types\ConditionTypeEnum;
 use Honeywell\Types\ScheduleType;
 use stdClass;
+use Swift\Kernel\Attributes\Autowire;
 use Swift\Model\Entity\Arguments;
 
 /**
  * Class ConditionService
  * @package Honeywell\Service
  */
+#[Autowire]
 class ConditionService {
 
 

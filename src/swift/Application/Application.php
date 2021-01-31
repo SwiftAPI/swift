@@ -1,5 +1,13 @@
 <?php declare(strict_types=1);
 
+/*
+ * This file is part of the Swift Framework
+ *
+ * (c) Henri van 't Sant <henri@henrivantsant.com>
+ *
+ * For the full copyright and license information, please view the LICENSE file that was distributed with this source code.
+ */
+
 namespace Swift\Application;
 
 if (!defined('INCLUDE_DIR')) {
@@ -10,9 +18,12 @@ require_once 'Bootstrap/Bootstrap.php';
 
 use Exception;
 use Swift\Application\Bootstrap\Bootstrap;
-use Swift\Kernel\Application as Kernel;
+use Swift\Kernel\Kernel;
 
-
+/**
+ * Class Application
+ * @package Swift\Application
+ */
 class Application {
 
 	/**
@@ -25,11 +36,9 @@ class Application {
         $bootstrap->initialize();
 
         // Build to application
-        global $containerBuilder;
         /** @var Kernel $app */
-        $app = $containerBuilder->get( Kernel::class );
+        $app = $bootstrap->getContainer()->get( Kernel::class );
         $app->run();
 	}
-
 
 }

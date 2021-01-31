@@ -1,38 +1,55 @@
 <?php declare( strict_types=1 );
 
+/*
+ * This file is part of the Swift Framework
+ *
+ * (c) Henri van 't Sant <henri@henrivantsant.com>
+ *
+ * For the full copyright and license information, please view the LICENSE file that was distributed with this source code.
+ */
+
 namespace Swift\Router\Attributes;
 
 use Attribute;
-use Swift\Authentication\Types\AuthenticationLevelsEnum;
+use JetBrains\PhpStorm\Pure;
+use Swift\AuthenticationDeprecated\Types\AuthenticationLevelsEnum;
 use Swift\Router\Types\RouteTypesEnum;
 
 /**
  * Class Route
  * @package Swift\Annotations\Annotation
  */
-#[Attribute( Attribute::TARGET_METHOD )]
+#[Attribute( Attribute::TARGET_CLASS|Attribute::TARGET_METHOD )]
 class Route {
 
-
-    public function __construct(
-        /** @var string $type */
-        public string $type = '',
-
-        /** @var string|null $route */
+    /**
+     * Route constructor.
+     *
+     * @param string|array $type
+     * @param string|null $route
+     * @param string|null $name
+     * @param bool|null $authRequired
+     * @param array|string|null $authLevel
+     */
+    #[Pure] public function __construct(
+        public string|array $type = '',
         public string|null $route = null,
-
-        /** @var string|null $name */
         public string|null $name = null,
-
-        /** @var bool|null $authRequired */
         public bool|null $authRequired = false,
-
-        /** @var string|null */
-        public string|null $authLevel = null,
+        public array|string|null $authLevel = null,
     ) {
-        $routeType = new RouteTypesEnum($this->type);
-        $routeAuthLevel = new AuthenticationLevelsEnum($this->authLevel);
+        $this->type = is_array($this->type) ? $this->type : explode('|', $this->type);
+        foreach ($this->type as $typeItem) {
+            $routeType = new RouteTypesEnum($typeItem);
+        }
+        if (!is_null($this->authLevel)) {
+            $this->authLevel = is_array($this->authLevel) ? $this->authLevel : explode('|', $this->authLevel);
 
-        $this->authLevel ??= AuthenticationLevelsEnum::NONE;
+            foreach($this->authLevel as $authLevelItem) {
+                $routeAuthLevel = new AuthenticationLevelsEnum($authLevelItem);
+            }
+        }
+
+        $this->authLevel ??= array(AuthenticationLevelsEnum::NONE);
     }
 }

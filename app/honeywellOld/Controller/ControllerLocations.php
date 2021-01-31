@@ -2,8 +2,10 @@
 
 namespace HoneywellOld\Controller;
 
+use JetBrains\PhpStorm\Deprecated;
 use Swift\Controller\Controller;
 use Swift\Http\Response\JSONResponse;
+use Swift\HttpFoundation\Request;
 use Swift\Router\HTTPRequest;
 use HoneywellOld\Helper\Authentication;
 use HoneywellOld\Model\ModelLocations;
@@ -31,9 +33,9 @@ class ControllerLocations extends Controller
 	 */
 	#[Route(type: "GET|POST", route: "/honeywell/locations/")]
 	public function __construct(
-			HTTPRequest $HTTPRequest,
-			Authentication $helperAuthentication,
-			ModelLocations $modelLocations
+        #[Deprecated( replacement: Request::class )] HTTPRequest $HTTPRequest,
+        Authentication $helperAuthentication,
+        ModelLocations $modelLocations
 	) {
 		parent::__construct($HTTPRequest);
 

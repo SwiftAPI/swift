@@ -14,6 +14,8 @@ class FieldTypes extends Enum {
     public const FLOAT = 'float';
     public const DATETIME = 'datetime';
     public const TIME = 'time';
+    public const TIMESTAMP = 'timestamp';
     public const JSON = 'longtext';
+    public const BOOL = 'boolean';
 
 }

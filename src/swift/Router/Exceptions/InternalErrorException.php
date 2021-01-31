@@ -10,7 +10,7 @@ use Swift\Kernel\Attributes\DI;
  * @package Swift\Router\Exceptions
  */
 #[DI(exclude: true)]
-class InternalErrorException extends RuntimeException {
+class InternalErrorException extends \Swift\HttpFoundation\Exception\InternalErrorException {
 
     protected $code = 500;
 

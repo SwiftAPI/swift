@@ -14,10 +14,10 @@ interface RouterInterface {
     /**
      * Retrieve current active route
      *
-     * @return Route|null
+     * @return RouteInterface|null
      * @throws NotFoundException
      */
-    public function getCurrentRoute(): ?Route;
+    public function getCurrentRoute(): ?RouteInterface;
 
     /**
      * Retrieve array of all available routes
@@ -69,9 +69,9 @@ interface RouterInterface {
      * @param string|null $requestUrl
      * @param string|null $requestMethod
      *
-     * @return Route|null Matched Route object with information on success, false on failure (no match).
+     * @return RouteInterface|null Matched Route object with information on success, false on failure (no match).
      */
-    public function match(string $requestUrl = null, string $requestMethod = null): ?Route;
+    public function match(string $requestUrl = null, string $requestMethod = null): ?RouteInterface;
 
     /**
      * Compile the regex for a given route (EXPENSIVE)

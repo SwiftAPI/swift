@@ -14,34 +14,22 @@ use Swift\Model\Types\FieldTypes;
 #[DB(table: 'users')]
 class User extends Entity {
 
-	/**
-	 * @var int $id
-	 */
 	#[DBField( name: 'id', primary: true, type: FieldTypes::INT, length: 11 )]
 	protected int $id;
 
-	/**
-	 * @var string  $username
-	 */
-	#[DBField(name: 'username', type: FieldTypes::TEXT, length: 128)]
+	#[DBField(name: 'username', type: FieldTypes::TEXT, length: 128, unique: true)]
 	protected string $username;
 
-	/**
-	 * @var string  $name
-	 */
-	#[DBField(name: 'name', type: FieldTypes::TEXT, length: 255)]
-	protected string $name;
+	#[DBField(name: 'first_name', type: FieldTypes::TEXT, length: 255)]
+	protected string $firstName;
 
-	/**
-	 * @var string  $email
-	 */
-	#[DBField(name: 'email', type: FieldTypes::TEXT, length: 255)]
+	#[DBField(name: 'last_name', type: FieldTypes::TEXT, length: 255)]
+	protected string $lastName;
+
+	#[DBField(name: 'email', type: FieldTypes::TEXT, length: 255, unique: true)]
 	protected string $email;
 
-	/**
-	 * @var string  $password
-	 */
-	#[DBField(name: 'password', type: FieldTypes::TEXT, length: 255)]
+	#[DBField(name: 'password', type: FieldTypes::TEXT, length: 255, index: true)]
 	protected string $password;
 
 }

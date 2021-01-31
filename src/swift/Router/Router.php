@@ -1,21 +1,37 @@
 <?php declare(strict_types=1);
 
+/*
+ * This file is part of the Swift Framework
+ *
+ * (c) Henri van 't Sant <henri@henrivantsant.com>
+ *
+ * For the full copyright and license information, please view the LICENSE file that was distributed with this source code.
+ */
+
 namespace Swift\Router;
 
-
 use Exception;
+use Psr\Http\Message\RequestInterface;
 use Swift\Configuration\Configuration;
 use Swift\Events\EventDispatcher;
+use Swift\Kernel\Attributes\Autowire;
 use Swift\Router\Event\OnBeforeRoutesCompileEvent;
 use Swift\Router\Exceptions\NotFoundException;
 use RuntimeException;
+use Swift\Router\MatchTypes\MatchTypeInterface;
 
+/**
+ * Class Router
+ * @package Swift\Router
+ */
+#[Autowire]
 class Router implements RouterInterface {
 
+    /** @var RouteInterface[] $routeHarvest */
 	protected array $routeHarvest = array();
 
     /**
-     * @var array Array of all routes (incl. named routes).
+     * @var RouteInterface[] Array of all routes (incl. named routes).
      */
     protected array $routes = [];
 
@@ -30,30 +46,23 @@ class Router implements RouterInterface {
     protected string $basePath = '';
 
     /**
-     * @var array Array of default match types (regex helpers)
+     * @var MatchTypeInterface[] Array of default match types (regex helpers)
      */
-    protected array $matchTypes = [
-        'i'  => '[0-9]++',
-        'a'  => '[0-9A-Za-z]++',
-        'h'  => '[0-9A-Fa-f]++',
-        '*'  => '.+?',
-        '**' => '.++',
-        ''   => '[^/\.]++'
-    ];
+    protected array $matchTypes = array();
 
     /**
      * Router constructor.
      *
      * @param Harvester $harvester
-     * @param HTTPRequest $HTTPRequest
+     * @param RequestInterface $request
      * @param Configuration $configuration
      * @param EventDispatcher $dispatcher
      */
     public function __construct(
         private Harvester $harvester,
-        private HTTPRequest $HTTPRequest,
+        private RequestInterface $request,
         private Configuration $configuration,
-        private EventDispatcher $dispatcher
+        private EventDispatcher $dispatcher,
     ) {
     }
 
@@ -68,6 +77,8 @@ class Router implements RouterInterface {
 		}
 
 		foreach ($this->routeHarvest as $route) {
+		    $route->setMatchTypes($this->matchTypes);
+		    $route->setRequest($this->request);
 			$this->addRoute($route);
 		}
 	}
@@ -75,15 +86,13 @@ class Router implements RouterInterface {
 	/**
 	 * Get route from current url
 	 *
-	 * @return Route
+	 * @return RouteInterface
 	 * @throws Exception
 	 */
-	public function getCurrentRoute(): Route {
+	public function getCurrentRoute(): RouteInterface {
 		$this->routeHarvest = $this->harvester->harvestRoutes();
 
-        /**
-         * @var OnBeforeRoutesCompileEvent $onBeforeCompileRoutes
-         */
+        /** @var OnBeforeRoutesCompileEvent $onBeforeCompileRoutes */
 		$onBeforeCompileRoutes = $this->dispatcher->dispatch( new OnBeforeRoutesCompileEvent($this->routeHarvest, $this->matchTypes) );
 
         /**
@@ -108,76 +117,13 @@ class Router implements RouterInterface {
      * @param string|null $requestUrl
      * @param string|null $requestMethod
      *
-     * @return Route|null Matched Route object with information on success, false on failure (no match).
+     * @return RouteInterface|null Matched Route object with information on success, false on failure (no match).
      */
-	public function match(string $requestUrl = null, string $requestMethod = null): ?Route {
-		$params = [];
-
-		// set Request Url if it isn't passed as parameter
-		$requestUrl = is_null($requestUrl) ? trim($this->HTTPRequest->request->getRequest()['REQUEST_URI'], '/') : $requestUrl;
-
-		// strip base path from request url
-		$requestUrl = substr($requestUrl, strlen($this->basePath));
-        $requestUrl = str_replace( array( $this->configuration->get( 'routing.baseurl' ), '/api' ), '', $requestUrl );
-
-		// Strip query string (?a=b) from Request Url
-		if (($strpos = strpos($requestUrl, '?')) !== false) {
-			$requestUrl = substr($requestUrl, 0, $strpos);
-		}
-
-		// Remove trailing slash if not root url
-		if ($requestUrl !== '/' && substr($requestUrl, -1) === '/') {
-			$requestUrl = substr($requestUrl, 0, -1);
-		}
-		$requestUrl = trim($requestUrl, '/');
-
-		$lastRequestUrlChar = $requestUrl[strlen($requestUrl) - 1];
-
-		// set Request Method if it isn't passed as a parameter
-		$requestMethod = is_null($requestMethod) ? $this->HTTPRequest->request->getMethod() : $requestMethod;
-
+	public function match(string $requestUrl = null, string $requestMethod = null): ?RouteInterface {
 		foreach ($this->routes as $handler) {
-			$method_match = $handler->methodApplies($requestMethod);
-
-			// Method did not match, continue to next route.
-			if (!$method_match) {
-				continue;
-			}
-
-			if ($handler->getFullRegex() === '*') {
-				// * wildcard (matches all)
-				$match = true;
-			} elseif (isset($handler->getFullRegex()[0]) && $handler->getFullRegex()[0] === '@') {
-				// @ regex delimiter
-				$pattern = '`' . substr($handler->getFullRegex(), 1) . '`u';
-				$match   = preg_match($pattern, $requestUrl, $params) === 1;
-			} elseif (($position = strpos($handler->getFullRegex(), '[')) === false) {
-				// No params in url, do string comparison
-				$match = strcmp(trim($requestUrl, '/'), trim($handler->getFullRegex(), '/')) === 0;
-			} else {
-				// Compare longest non-param string with url before moving on to regex
-				// Check if last character before param is a slash, because it could be optional if param is optional too (see https://github.com/dannyvankooten/AltoRouter/issues/241)
-				if (strncmp($requestUrl, $handler->getFullRegex(), $position) !== 0 && ($lastRequestUrlChar === '/' || $handler->getFullRegex()[$position - 1] !== '/')) {
-					continue;
-				}
-
-				$regex = $this->compileRoute($handler->getFullRegex());
-				$match = preg_match($regex, $requestUrl, $params) === 1;
-			}
-
-			if ($match) {
-				if ($params) {
-					foreach ($params as $key => $value) {
-						if (is_numeric($key)) {
-							unset($params[$key]);
-						}
-					}
-				}
-
-				$handler->params = $params;
-
-				return $handler;
-			}
+            if ($handler->matchesRequest($this->request)) {
+                return $handler;
+            }
 		}
 
 		return null;
@@ -211,11 +157,11 @@ class Router implements RouterInterface {
     public function addRoute( Route $route ): void {
         $this->routes[] = $route;
 
-        if ($route->name) {
-            if (isset($this->namedRoutes[$route->name])) {
-                throw new RuntimeException("Can not redeclare route '{$route->name}'");
+        if ($route->getName()) {
+            if (isset($this->namedRoutes[$route->getName()])) {
+                throw new RuntimeException("Can not redeclare route '{$route->getName()}'");
             }
-            $this->namedRoutes[$route->name] = $route;
+            $this->namedRoutes[$route->getName()] = $route;
         }
     }
 
@@ -257,6 +203,8 @@ class Router implements RouterInterface {
      * @param array $params @params Associative array of parameters to replace placeholders with.
      *
      * @return Route The Route object. If params are provided it will include the route with named parameters in place.
+     *
+     * @TODO: Make this method reverse route based on route name and params
      */
     public function generate( string $routeName, array $params = array() ): Route {
         // Check if named route exists
@@ -331,5 +279,12 @@ class Router implements RouterInterface {
             }
         }
         return "`^$route$`u";
+    }
+
+    #[Autowire]
+    public function populateMatchTypes( #[Autowire(tag: DiTags::MATCH_TYPES)] iterable $matchTypes ): void {
+        foreach ($matchTypes as /** @var MatchTypeInterface */$matchType) {
+            $this->matchTypes[$matchType->getIdentifier()] = $matchType;
+        }
     }
 }

@@ -3,9 +3,9 @@ parameters:
 
 services:
   _defaults:
-    autowire: true
+    autowire: false
     autoconfigure: true
-    public: true
+    public: false
 
   Swift\Application\:
     resource: 'src/swift/Application/*'

@@ -13,6 +13,10 @@ namespace Swift\GraphQl;
 
 use Swift\Kernel\TypeSystem\Enum;
 
+/**
+ * Class ObjectTypes
+ * @package Swift\GraphQl
+ */
 class ObjectTypes extends Enum {
 
     public const INPUT_TYPE = 'inputtypes';

@@ -1,60 +1,62 @@
 <?php declare(strict_types=1);
 
+/*
+ * This file is part of the Swift Framework
+ *
+ * (c) Henri van 't Sant <henri@henrivantsant.com>
+ *
+ * For the full copyright and license information, please view the LICENSE file that was distributed with this source code.
+ */
 
 namespace Swift\Controller;
 
 
+use Psr\Http\Message\RequestInterface;
+use Swift\HttpFoundation\ServerRequest;
+use Swift\Kernel\Attributes\Autowire;
 use Swift\Kernel\DiTags;
-use Swift\Router\HTTPRequest;
-use Swift\Router\Route;
 use Swift\Kernel\Attributes\DI;
+use Swift\Router\RouteInterface;
 
 /**
  * Class AbstractController
  * @package Swift\Controller
  */
-#[DI(tags: [DiTags::CONTROLLER])]
+#[DI(tags: [DiTags::CONTROLLER]), Autowire]
 abstract class AbstractController implements ControllerInterface {
 
-    /**
-     * @var Route $route
-     */
-    protected Route $route;
+    protected RouteInterface $route;
+    protected RequestInterface $request;
 
     /**
-     * @var HTTPRequest $HTTPRequest
+     * @return RouteInterface
      */
-    protected HTTPRequest $HTTPRequest;
-
-    /**
-     * AbstractController constructor.
-     *
-     * @param HTTPRequest $HTTPRequest
-     */
-    public function __construct(
-        HTTPRequest $HTTPRequest
-    ) {
-        $this->HTTPRequest = $HTTPRequest;
-    }
-
-    /**
-     * @return Route
-     */
-    public function getRoute(): Route {
+    public function getRoute(): RouteInterface {
         return $this->route;
     }
 
     /**
-     * @param Route $route
+     * @param RouteInterface $route
      */
-    public function setRoute( Route $route ): void {
+    public function setRoute( RouteInterface $route ): void {
         $this->route = $route;
     }
 
     /**
-     * @return HTTPRequest
+     * @param RequestInterface $serverRequest
      */
-    public function getHTTPRequest(): HTTPRequest {
-        return $this->HTTPRequest;
+    #[Autowire]
+    public function setRequest( #[Autowire(serviceId: ServerRequest::class)] RequestInterface $serverRequest ): void {
+        var_dump('here');
+        $this->request = $serverRequest;
+    }
+
+    /**
+     * Get current request
+     *
+     * @return RequestInterface
+     */
+    public function getRequest(): RequestInterface {
+        return $this->request;
     }
 }

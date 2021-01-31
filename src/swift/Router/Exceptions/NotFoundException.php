@@ -10,7 +10,7 @@ use Swift\Kernel\Attributes\DI;
  * @package Swift\Router\Exceptions
  */
 #[DI(exclude: true)]
-class NotFoundException extends RuntimeException {
+class NotFoundException extends \Swift\HttpFoundation\Exception\NotFoundException {
 
     protected $code = 404;
 

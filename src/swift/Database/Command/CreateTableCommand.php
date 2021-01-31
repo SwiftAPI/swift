@@ -1,15 +1,28 @@
 <?php declare(strict_types=1);
 
+/*
+ * This file is part of the Swift Framework
+ *
+ * (c) Henri van 't Sant <henri@henrivantsant.com>
+ *
+ * For the full copyright and license information, please view the LICENSE file that was distributed with this source code.
+ */
+
 namespace Swift\Database\Command;
 
 use Swift\Console\Command\Command;
 use Swift\Database\DatabaseDriver;
+use Swift\Kernel\Attributes\Autowire;
 use Symfony\Component\Console\Input\InputInterface;
 use Symfony\Component\Console\Output\OutputInterface;
 use Symfony\Component\Console\Question\ConfirmationQuestion;
 use Symfony\Component\Console\Question\Question;
 
-
+/**
+ * Class CreateTableCommand
+ * @package Swift\Database\Command
+ */
+#[Autowire]
 class CreateTableCommand extends Command {
 
 	/**
