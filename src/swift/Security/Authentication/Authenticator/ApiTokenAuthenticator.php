@@ -17,19 +17,20 @@ use Swift\HttpFoundation\ResponseInterface;
 use Swift\Security\Authentication\Exception\AuthenticationException;
 use Swift\Security\Authentication\Passport\Passport;
 use Swift\Security\Authentication\Passport\PassportInterface;
+use Swift\Security\Authentication\Token\Token;
 use Swift\Security\Authentication\Token\TokenInterface;
 
 /**
  * Class ApiTokenAuthenticator
  * @package Swift\Security\Authentication\Authenticator
  */
-class ApiTokenAuthenticator implements AuthenticatorInterface {
+final class ApiTokenAuthenticator implements AuthenticatorInterface {
 
     /**
      * @inheritDoc
      */
     public function supports( RequestInterface $request ): bool {
-        return true;
+        return false;
     }
 
     /**
@@ -39,6 +40,13 @@ class ApiTokenAuthenticator implements AuthenticatorInterface {
         var_dump($request->getHeaders());
 
         return new Passport();
+    }
+
+    /**
+     * @inheritDoc
+     */
+    public function createAuthenticatedToken( PassportInterface $passport ): TokenInterface {
+        return new Token();
     }
 
     /**

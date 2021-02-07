@@ -13,6 +13,8 @@ namespace Swift\Security;
 use Psr\Http\Message\RequestInterface;
 use Swift\Configuration\Configuration;
 use Swift\Kernel\Attributes\Autowire;
+use Swift\Security\Authentication\AuthenticationManager;
+use Swift\Security\Authorization\AccessDecisionManagerInterface;
 
 /**
  * Class Guard
@@ -25,15 +27,20 @@ class Guard implements GuardInterface {
      * Guard constructor.
      *
      * @param Configuration $configuration
+     * @param AuthenticationManager $authenticationManager
+     * @param AccessDecisionManagerInterface $accessDecisionManager
      */
     public function __construct(
         private Configuration $configuration,
+        private AuthenticationManager $authenticationManager,
+        private AccessDecisionManagerInterface $accessDecisionManager,
     ) {
     }
 
     public function guard( RequestInterface $request ): void {
-        var_dump($request->getUri());
+        $userPassport = $this->authenticationManager->authenticate($request);
 
+        var_dump($this->accessDecisionManager);
     }
 
 

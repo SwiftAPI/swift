@@ -10,7 +10,8 @@
 
 namespace Swift\Security\Authentication\Passport;
 
-use Swift\Security\Authentication\Token\TokenInterface;
+use Swift\Security\Authentication\Passport\Stamp\StampInterface;
+use Swift\Security\User\UserInterface;
 
 /**
  * Interface PassportInterface
@@ -18,6 +19,39 @@ use Swift\Security\Authentication\Token\TokenInterface;
  */
 interface PassportInterface {
 
-    public function getToken(): TokenInterface;
+    /**
+     * Get associated user
+     *
+     * @return UserInterface
+     */
+    public function getUser(): UserInterface;
+
+    /**
+     * Retrieve stamps
+     *
+     * @return StampInterface[]
+     */
+    public function getStamps(): array;
+
+    /**
+     * @param string $stamp
+     *
+     * @return StampInterface|null
+     */
+    public function getStamp( string $stamp ): ?StampInterface;
+
+    /**
+     * @param string $stamp
+     *
+     * @return bool
+     */
+    public function hasStamp( string $stamp ): bool;
+
+    /**
+     * Get attributes
+     *
+     * @return AttributesBag
+     */
+    public function getAttributes(): AttributesBag;
 
 }

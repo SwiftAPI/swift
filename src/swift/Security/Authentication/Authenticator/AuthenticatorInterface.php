@@ -46,6 +46,15 @@ interface AuthenticatorInterface {
     public function authenticate( RequestInterface $request ): PassportInterface;
 
     /**
+     * Create an authenticated token based on given passport
+     *
+     * @param PassportInterface $passport
+     *
+     * @return TokenInterface
+     */
+    public function createAuthenticatedToken( PassportInterface $passport ): TokenInterface;
+
+    /**
      * Called when successfully authenticated.
      *
      * @param RequestInterface $request

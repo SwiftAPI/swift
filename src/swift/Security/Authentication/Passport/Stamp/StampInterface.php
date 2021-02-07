@@ -8,12 +8,12 @@
  * For the full copyright and license information, please view the LICENSE file that was distributed with this source code.
  */
 
-namespace Swift\Security\Authentication\Passport;
+namespace Swift\Security\Authentication\Passport\Stamp;
 
 /**
- * Class AnonymousUser
- * @package Swift\Security\Authentication\Passport
+ * Interface StampInterface
+ * @package Swift\Security\Authentication\Passport\Stamp
  */
-class AnonymousUser implements UserInterface {
+interface StampInterface {
 
 }

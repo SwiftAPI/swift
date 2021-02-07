@@ -10,17 +10,12 @@
 
 namespace Swift\Security\Authentication\Passport;
 
+use Swift\HttpFoundation\ParameterBag;
+
 /**
- * Interface UserInterface
+ * Class AttributesBag
  * @package Swift\Security\Authentication\Passport
  */
-interface UserInterface {
-
-    /**
-     * Get credentials belonging to user
-     *
-     * @return string
-     */
-    public function getCredential(): string;
+class AttributesBag extends ParameterBag {
 
 }

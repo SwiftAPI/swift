@@ -1,9 +1,21 @@
 <?php declare(strict_types=1);
 
+/*
+ * This file is part of the Swift Framework
+ *
+ * (c) Henri van 't Sant <henri@henrivantsant.com>
+ *
+ * For the full copyright and license information, please view the LICENSE file that was distributed with this source code.
+ */
+
 namespace Swift\Database\Command;
 
 use Swift\Console\Command\Command;
+use Swift\Kernel\Attributes\Autowire;
+use Swift\Kernel\Attributes\DI;
+use Swift\Kernel\Container\Container;
 use Swift\Kernel\ContainerAwareTrait;
+use Swift\Kernel\DiTags;
 use Swift\Model\Entity;
 use Symfony\Component\Console\Input\InputInterface;
 use Symfony\Component\Console\Output\OutputInterface;
@@ -14,18 +26,32 @@ use Symfony\Component\Console\Style\SymfonyStyle;
  * Class UpdateEntitiesCommand
  * @package Swift\Database\Command
  */
+#[Autowire]
 class UpdateEntitiesCommand extends Command {
 
-    use ContainerAwareTrait;
+    //use ContainerAwareTrait;
+    private Container $container;
 
-	/**
+    /** @var Entity[] */
+    private array $entities;
+
+    /**
 	 * the name of the command (the part after "bin/henri")
 	 * @var string $defaultName
 	 */
 	protected static $defaultName = 'database:entities:update';
 
+    /**
+     * UpdateEntitiesCommand constructor.
+     */
+    public function __construct() {
+        global $container;
+        $this->container = $container;
+        parent::__construct();
+    }
 
-	/**
+
+    /**
 	 * Method to set command configuration
 	 */
 	protected function configure() {
@@ -50,9 +76,7 @@ class UpdateEntitiesCommand extends Command {
 		$removeNonExistingColumns   = strtolower($removeNonExistingColumns) === 'remove_non_existing';
 		$dropTableIfExists          = !is_null($input->getArgument('drop_table_if_exists')) && strtolower($input->getArgument('drop_table_if_exists')) === 'drop_table';
 
-		$entities   = $this->container->getDefinitionsByTag('kernel.entity');
-
-		foreach ($entities as $entity) {
+		foreach ($this->entities as $entity) {
 			try {
 				$this->updateEntity($io, $entity, $removeNonExistingColumns, $dropTableIfExists);
 			} catch (\Exception $exception) {
@@ -63,21 +87,9 @@ class UpdateEntitiesCommand extends Command {
 		return 0;
 	}
 
-	private function updateEntity(SymfonyStyle $io, string $entityName, bool $removeNonExistingColumns, bool $dropTableIfExists) {
-		if (!$this->container->has($entityName)) {
-			$io->writeln('Entity ' . $entityName . ' is not found. Is it registered in the Container?');
-			return 0;
-		}
-
-		if (!is_subclass_of($entityName, Entity::class, true)) {
-			$io->writeln($entityName . ' is not a valid entity');
-			return 0;
-		}
-
-        $entity = $this->container->get($entityName);
-
+	private function updateEntity(SymfonyStyle $io, Entity $entity, bool $removeNonExistingColumns, bool $dropTableIfExists) {
 		try {
-			$io->writeln('Updating table ' . $entity->getTableName() . ' for entity ' . $entityName);
+			$io->writeln('Updating table ' . $entity->getTableName() . ' for entity ' . $entity::class);
 			$nonExistingColumns = $entity->updateTable($removeNonExistingColumns, $dropTableIfExists);
 			$io->writeln('Updated ' . $entity->getTableName() . ' successfully');
 
@@ -92,5 +104,17 @@ class UpdateEntitiesCommand extends Command {
 		} catch (\Exception $exception) {
 			$io->error($exception->getMessage());
 		}
+	}
+
+    /**
+     * Autowire entities to class
+     *
+     * @param iterable $entities
+     */
+	#[Autowire]
+    public function setEntities( #[Autowire(tag: DiTags::ENTITY)] iterable $entities ): void {
+        foreach ($entities as $entity) {
+            $this->entities[$entity::class] = $entity;
+        }
 	}
 }

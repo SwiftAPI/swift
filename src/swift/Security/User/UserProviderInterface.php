@@ -1,0 +1,40 @@
+<?php declare(strict_types=1);
+
+/*
+ * This file is part of the Swift Framework
+ *
+ * (c) Henri van 't Sant <henri@henrivantsant.com>
+ *
+ * For the full copyright and license information, please view the LICENSE file that was distributed with this source code.
+ */
+
+namespace Swift\Security\User;
+
+use Swift\Kernel\Attributes\DI;
+
+/**
+ * Interface UserProviderInterface
+ * @package Swift\Security\Authentication
+ */
+#[DI(tags: [DiTags::SECURITY_USER_PROVIDER])]
+interface UserProviderInterface {
+
+    /**
+     * Fetch user by username
+     *
+     * @param string $username
+     *
+     * @return UserInterface|null
+     */
+    public function getUserByUsername(string $username): ?UserInterface;
+
+    /**
+     * Fetch user by id
+     *
+     * @param int $id
+     *
+     * @return UserInterface|null
+     */
+    public function getUserById( int $id ): ?UserInterface;
+
+}

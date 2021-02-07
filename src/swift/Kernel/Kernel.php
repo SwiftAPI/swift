@@ -21,6 +21,7 @@ use Swift\HttpFoundation\ResponseInterface;
 use Swift\HttpFoundation\ServerRequest;
 use Swift\HttpFoundation\Event\BeforeResponseEvent;
 use Swift\Kernel\Attributes\Autowire;
+use Swift\Kernel\Container\Container;
 use Swift\Kernel\Event\KernelOnBeforeShutdown;
 use Swift\Kernel\Event\KernelRequestEvent;
 use Swift\Router\Event\OnBeforeRouteEnterEvent;
@@ -30,13 +31,17 @@ use Swift\HttpFoundation\Exception\NotAuthorizedException;
 use Swift\HttpFoundation\Exception\NotFoundException;
 use Swift\Router\Route;
 use Swift\Router\Router;
+use Swift\Security\Security;
+use Swift\Security\User\UserInterface;
 
 /**
  * Class Application
  * @package Swift\Kernel
  */
 #[Autowire]
-class Kernel {
+final class Kernel {
+
+    private Container $container;
 
     /**
      * Application constructor.
@@ -45,14 +50,14 @@ class Kernel {
      * @param Configuration $configuration
      * @param ServerRequest $request
      * @param EventDispatcher $dispatcher
-     * @param ServiceLocatorInterface $serviceLocator
+     * @param Security $security
      */
     public function __construct(
         private Router $router,
         private Configuration $configuration,
         private ServerRequest $request,
         private EventDispatcher $dispatcher,
-        private ServiceLocatorInterface $serviceLocator,
+        private Security $security,
     ) {
     }
 
@@ -101,15 +106,16 @@ class Kernel {
         /** @var Route $route */
         $route = ( $this->dispatcher->dispatch( new OnBeforeRouteEnterEvent( $route ) ) )->getRoute();
 
-        if ( ! $this->serviceLocator->has( $route->getController() ) ) {
+        if ( ! $this->container->has( $route->getController() ) ) {
             throw new NotFoundException( 'Not found' );
         }
 
         /** @var ControllerInterface $controller */
-        $controller = $this->serviceLocator->get( $route->getController() );
+        $controller = $this->container->get( $route->getController() );
 
         if ( $controller instanceof ControllerInterface ) {
             $controller->setRoute( $route );
+            $controller->setCurrentUser( $this->security->getUser() );
         }
 
         if ( empty( $route->getAction() ) || ! method_exists( $controller, $route->getAction() ) ) {
@@ -132,6 +138,7 @@ class Kernel {
      */
     #[NoReturn]
     public function finalize( ResponseInterface $response ): void {
+        $response->send();
         $this->shutdown($response);
     }
 
@@ -153,4 +160,10 @@ class Kernel {
     private function isDebug(): bool {
         return $this->configuration->get('app.debug', 'root');
     }
+
+    #[Autowire]
+    public function setContainer( #[Autowire(serviceId: 'service_container')] Container $container): void {
+        $this->container = $container;
+    }
+
 }

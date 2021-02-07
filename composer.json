@@ -8,6 +8,7 @@
         "guzzlehttp/guzzle": "^7.2",
         "symfony/mime": "^5.2",
         "symfony/rate-limiter": "^5.2",
-        "symfony/cache": "^5.2"
+        "symfony/cache": "^5.2",
+      "ext-mcrypt": "*"
     }
 }

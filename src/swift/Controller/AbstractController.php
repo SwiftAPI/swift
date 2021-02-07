@@ -17,6 +17,7 @@ use Swift\Kernel\Attributes\Autowire;
 use Swift\Kernel\DiTags;
 use Swift\Kernel\Attributes\DI;
 use Swift\Router\RouteInterface;
+use Swift\Security\User\UserInterface;
 
 /**
  * Class AbstractController
@@ -27,6 +28,7 @@ abstract class AbstractController implements ControllerInterface {
 
     protected RouteInterface $route;
     protected RequestInterface $request;
+    protected UserInterface $user;
 
     /**
      * @return RouteInterface
@@ -47,7 +49,6 @@ abstract class AbstractController implements ControllerInterface {
      */
     #[Autowire]
     public function setRequest( #[Autowire(serviceId: ServerRequest::class)] RequestInterface $serverRequest ): void {
-        var_dump('here');
         $this->request = $serverRequest;
     }
 
@@ -58,5 +59,19 @@ abstract class AbstractController implements ControllerInterface {
      */
     public function getRequest(): RequestInterface {
         return $this->request;
+    }
+
+    /**
+     * @param UserInterface $user
+     */
+    public function setCurrentUser( UserInterface $user ): void {
+        $this->user = $user;
+    }
+
+    /**
+     * @return UserInterface|null
+     */
+    public function getCurrentUser(): ?UserInterface {
+        return $this->user;
     }
 }

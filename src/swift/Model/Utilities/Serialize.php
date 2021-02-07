@@ -21,7 +21,7 @@ use Swift\Kernel\Attributes\Autowire;
  * @package Swift\Model\Utilities
  */
 #[Autowire]
-class Serialize {
+final class Serialize {
 
 	/**
 	 * Translate constructor.
@@ -129,7 +129,22 @@ class Serialize {
 	 *
 	 * @return string
 	 */
-	public function time($value, bool $toDb) : string {
+	public function time($value, bool $toDb): string {
 		return date('H:i:s', strtotime($value));
+	}
+
+    /**
+     * @param mixed $value
+     * @param bool $toDb
+     *
+     * @return \DateTime|int
+     */
+    public function timestamp( mixed $value, bool $toDb ): \DateTime|int {
+        if ($value instanceof DateTime) {
+            $value = $value->__toString();
+        }
+
+        return $value instanceof \DateTime ? $value : new \DateTime($value);
+
 	}
 }

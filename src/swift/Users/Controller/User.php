@@ -11,15 +11,13 @@
 namespace Swift\Users\Controller;
 
 use Swift\Controller\AbstractController;
-use Swift\Controller\ControllerInterface;
 use Swift\HttpFoundation\JsonResponse;
-use Swift\HttpFoundation\ServerRequest;
 use Swift\Kernel\Attributes\Autowire;
 use Swift\Kernel\Container\Provider\ControllersAwareTrait;
-use Swift\Kernel\DiTags;
-use Swift\Kernel\ServiceLocator;
 use Swift\Router\Attributes\Route;
 use Swift\Router\Types\RouteTypesEnum;
+use Swift\Security\Authorization\Attributes\IsGranted;
+use Swift\Security\Authorization\AuthorizationRolesEnum;
 
 /**
  * Class User
@@ -30,13 +28,10 @@ class User extends AbstractController {
 
     use ControllersAwareTrait;
 
-
     #[Route( type: RouteTypesEnum::POST, route: '/[i:device_id]/create/[create|edit:action]/', name: 'users.create' )]
+    #[IsGranted([AuthorizationRolesEnum::LOGGED_IN])]
     public function create( array $params ): JsonResponse {
-        var_dump(array_keys($this->controllers));
         return new JsonResponse(['testing']);
     }
-
-
 
 }

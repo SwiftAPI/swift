@@ -13,6 +13,7 @@ namespace Swift\Database\Command;
 use Swift\Console\Command\Command;
 use Swift\Kernel\Attributes\Autowire;
 use Swift\Kernel\ContainerAwareTrait;
+use Swift\Kernel\DiTags;
 use Swift\Model\Entity;
 use Symfony\Component\Console\Input\InputInterface;
 use Symfony\Component\Console\Output\OutputInterface;
@@ -25,7 +26,8 @@ use Symfony\Component\Console\Input\InputArgument;
 #[Autowire]
 class UpdateEntityCommand extends Command {
 
-    use ContainerAwareTrait;
+    /** @var Entity[] */
+    private array $entities;
 
 	/**
 	 * the name of the command (the part after "bin/henri")
@@ -61,12 +63,12 @@ class UpdateEntityCommand extends Command {
 			return 0;
 		}
 
-		if (!$this->container->has($entityName)) {
+		if (!array_key_exists($entityName, $this->entities)) {
 			$output->writeln('Entity ' . $entityName . ' is not found. Is it registered in the Container?');
 			return 0;
 		}
 
-		$entity = $this->container->get($entityName);
+		$entity = $this->entities[$entityName];
 		if (!is_subclass_of($entity, Entity::class)) {
 			$output->writeln($entityName . ' is not a valid entity');
 			return 0;
@@ -91,5 +93,17 @@ class UpdateEntityCommand extends Command {
 
 		return 0;
 	}
+
+    /**
+     * Autowire entities to class
+     *
+     * @param iterable $entities
+     */
+    #[Autowire]
+    public function setEntities( #[Autowire(tag: DiTags::ENTITY)] iterable $entities ): void {
+        foreach ($entities as $entity) {
+            $this->entities[$entity::class] = $entity;
+        }
+    }
 
 }

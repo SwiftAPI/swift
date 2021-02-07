@@ -9,6 +9,7 @@ use Swift\Kernel\Container\Container;
 use Swift\Kernel\Container\TaggedServices;
 use Swift\Kernel\ServiceLocator;
 use Swift\Kernel\ServiceLocatorInterface;
+use Swift\Security\Authentication\Entity\AccessTokenEntity;
 use Swift\Users\Controller\User;
 use Symfony\Component\DependencyInjection\Argument\TaggedIteratorArgument;
 use Symfony\Component\DependencyInjection\Reference;
@@ -217,8 +218,15 @@ class DependencyInjectionCompilerPass implements CompilerPassInterface {
             $paramType            = $reflectionAttributes['serviceId'] ?? $reflectionParameter->getType()?->getName();
 
             // Check if the type can be resolved as a service
-            if ( ($paramType !== TaggedServices::class) && $container->has( $paramType ) ) {
+            if ( $container->has( $paramType ) ) {
                 $parameters[] = new Reference($paramType);
+                $definition->addMethodCall( $reflectionMethod->getName(), $parameters );
+                continue;
+            }
+
+            // Check if the type can be resolved as a service
+            if ( $container->has( $paramType . ' $' . $reflectionParameter->getName() ) ) {
+                $parameters[] = new Reference($paramType . ' $' . $reflectionParameter->getName());
                 $definition->addMethodCall( $reflectionMethod->getName(), $parameters );
                 continue;
             }

@@ -8,12 +8,19 @@
  * For the full copyright and license information, please view the LICENSE file that was distributed with this source code.
  */
 
-namespace Swift\AuthenticationDeprecated;
+namespace Swift\Security\User;
 
 /**
- * Class Authenticator
- * @package Swift\AuthenticationDeprecated
+ * Interface UserInterface
+ * @package Swift\Security\User
  */
-class Authenticator {
+interface UserInterface {
+
+    /**
+     * Get credentials belonging to user
+     *
+     * @return string
+     */
+    public function getCredential(): string;
 
 }

@@ -10,9 +10,10 @@
 
 namespace Swift\Security\Authentication\Passport;
 
+use JetBrains\PhpStorm\Pure;
 use Swift\Security\Authentication\Passport\Credentials\CredentialsInterface;
-use Swift\Security\Authentication\Token\Token;
-use Swift\Security\Authentication\Token\TokenInterface;
+use Swift\Security\Authentication\Passport\Stamp\StampInterface;
+use Swift\Security\User\UserInterface;
 
 /**
  * Class Passport
@@ -20,20 +21,65 @@ use Swift\Security\Authentication\Token\TokenInterface;
  */
 class Passport implements PassportInterface {
 
+    private array $stamps = array();
+    public AttributesBag $attributes;
+
     /**
      * Passport constructor.
      *
      * @param UserInterface $user
      * @param CredentialsInterface $credentials
+     * @param array $stamps
+     * @param array $attributes
      */
     public function __construct(
         private UserInterface $user,
         private CredentialsInterface $credentials,
+        array $stamps = array(),
+        array $attributes = array(),
     ) {
         $this->credentials->validateCredentials();
+        $this->attributes = new AttributesBag($attributes);
+
+        foreach ($stamps as $stamp) {
+            $this->stamps[get_class($stamp)] = $stamp;
+        }
     }
 
-    public function getToken(): TokenInterface {
-        return new Token();
+    /**
+     * @inheritDoc
+     */
+    public function getUser(): UserInterface {
+        return $this->user;
     }
+
+    /**
+     * @inheritDoc
+     */
+    public function getStamps(): array {
+        return $this->stamps;
+    }
+
+    /**
+     * @inheritDoc
+     */
+    public function getStamp( string $stamp ): ?StampInterface {
+        return $this->stamps[$stamp] ?? null;
+    }
+
+    /**
+     * @inheritDoc
+     */
+    #[Pure] public function hasStamp( string $stamp ): bool {
+        return array_key_exists($stamp, $this->stamps);
+    }
+
+    /**
+     * @inheritDoc
+     */
+    public function getAttributes(): AttributesBag {
+        return $this->attributes;
+    }
+
+
 }

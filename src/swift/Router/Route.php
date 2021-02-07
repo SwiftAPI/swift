@@ -27,7 +27,7 @@ class Route implements RouteInterface {
     private RequestInterface $request;
 
     /** @var RouteParameter[] $params */
-    private array $params;
+    private array $params = array();
 
     /** @var MatchTypeInterface[] */
     private array $matchTypes = array();
@@ -147,7 +147,7 @@ class Route implements RouteInterface {
     public function getFullRegex( array $matchTypes = array() ): ?string {
         $route      = $this->getFullPath();
 
-        foreach ( $this->getParamsFromPath( true, $matchTypes ) as $parameter ) {
+        foreach ( $this->getParamsFromPath( true ) as $parameter ) {
             $type = $parameter->type;
 
             if ( $parameter->type instanceof MatchTypeInterface ) {

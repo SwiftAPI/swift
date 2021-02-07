@@ -25,6 +25,7 @@ class DBField {
      * @param int $length
      * @param bool $empty whether field is nullable (defaults to false)
      * @param bool $unique whether to add a unique constraint to the field
+     * @param bool $index
      * @param string|null $enum optional enum to validate
      */
     public function __construct(

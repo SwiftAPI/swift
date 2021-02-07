@@ -1,10 +1,19 @@
 <?php declare( strict_types=1 );
 
+/*
+ * This file is part of the Swift Framework
+ *
+ * (c) Henri van 't Sant <henri@henrivantsant.com>
+ *
+ * For the full copyright and license information, please view the LICENSE file that was distributed with this source code.
+ */
+
 namespace Swift\Model;
 
 use Exception;
 use InvalidArgumentException;
 use JetBrains\PhpStorm\ArrayShape;
+use JetBrains\PhpStorm\Deprecated;
 use JetBrains\PhpStorm\Pure;
 use ReflectionClass;
 use RuntimeException;
@@ -14,7 +23,6 @@ use Swift\Events\EventDispatcher;
 use Swift\Kernel\Attributes\Autowire;
 use Swift\Kernel\Container\Container;
 use Swift\Kernel\DiTags;
-use Swift\Kernel\TypeSystem\Enum;
 use Swift\Model\Attributes\DB;
 use Swift\Model\Attributes\DBField;
 use Swift\Model\Entity\EntityManager;
@@ -33,7 +41,7 @@ use Swift\Kernel\Attributes\DI;
  * @package Swift\Model\Entity
  */
 #[DI( tags: [ DiTags::ENTITY ] ), Autowire]
-abstract class Entity {
+abstract class Entity implements EntityInterface {
 
     /**
      * Entity constructor.
@@ -80,7 +88,7 @@ abstract class Entity {
      * @return stdClass|null
      */
     public function findOne( array|stdClass $state, bool $exceptionOnNotFound = false ): ?stdClass {
-        $result = $this->find( $state, new Arguments( limit: 1 ), $exceptionOnNotFound );
+        $result = $this->findMany( $state, new Arguments( limit: 1 ), $exceptionOnNotFound );
 
         return $result[0] ?? null;
     }
@@ -94,7 +102,7 @@ abstract class Entity {
      *
      * @return array
      */
-    public function find( array|stdClass $state, Arguments|null $arguments = null, bool $exceptionOnNotFound = false ): array {
+    public function findMany( array|stdClass $state, Arguments|null $arguments = null, bool $exceptionOnNotFound = false ): array {
         $state = (array) $state;
         $query = $this->database->select( '[*]' )->from( '[' . $this->tableNamePrefixed . ']' );
 
@@ -139,11 +147,25 @@ abstract class Entity {
     }
 
     /**
+     * Fetch all rows matching the given state and arguments
+     *
+     * @param array|stdClass $state
+     * @param Arguments|null $arguments
+     * @param bool $exceptionOnNotFound
+     *
+     * @return array
+     */
+    #[Deprecated( reason: 'Improve naming consistency by renaming method to findMany', replacement: 'Replaced by findMany()' )]
+    public function find( array|stdClass $state, Arguments|null $arguments = null, bool $exceptionOnNotFound = false ): array {
+        return $this->findMany($state, $arguments, $exceptionOnNotFound);
+    }
+
+    /**
      * Method to save/update based on the current state
      *
      * @param array|stdClass $state
      *
-     * @return void
+     * @return stdClass
      */
     public function save( array|stdClass $state ): stdClass {
         $state = (array) $state;
@@ -427,6 +449,14 @@ abstract class Entity {
 
                 if ($propertyProps->index) {
                     $this->indexes[] = $propertyProps->name;
+                }
+
+                // Add default serializations
+                if (($propertyProps->type === FieldTypes::TIMESTAMP) && ! in_array( FieldTypes::TIMESTAMP, $propertyProps->serialize, true ) ) {
+                    if (!isset($this->propertyActions['serialize'][$property->name])) {
+                        $this->propertyActions['serialize'][$property->name] = array();
+                    }
+                    $this->propertyActions['serialize'][$property->name][] = FieldTypes::TIMESTAMP;
                 }
             }
 

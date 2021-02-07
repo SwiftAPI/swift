@@ -18,7 +18,7 @@ use Swift\Kernel\Container\Container;
  */
 trait ContainerAwareTrait {
 
-    private Container $container;
+    protected Container $container;
 
     /**
      * ContainerAwareTrait constructor.

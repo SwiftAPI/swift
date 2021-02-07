@@ -8,12 +8,21 @@
  * For the full copyright and license information, please view the LICENSE file that was distributed with this source code.
  */
 
-namespace Swift\Security\Authorization;
+namespace Swift\Security\User;
 
 /**
- * Interface RoleInterface
- * @package Swift\Security\Authentication
+ * Class AnonymousUser
+ * @package Swift\Security\User
  */
-interface RoleInterface {
+class AnonymousUser implements UserInterface {
+
+
+    /**
+     * @inheritDoc
+     */
+    public function getCredential(): string {
+        // TODO: Implement getCredential() method.
+    }
+
 
 }

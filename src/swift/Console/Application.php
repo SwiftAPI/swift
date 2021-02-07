@@ -10,6 +10,8 @@
 
 namespace Swift\Console;
 
+use Swift\Console\Command\HelloWorld;
+use Swift\Database\Command\UpdateEntitiesCommand;
 use Swift\Kernel\Attributes\Autowire;
 use Swift\Kernel\ServiceLocatorInterface;
 use Symfony\Component\Console\Input\InputInterface;
@@ -22,7 +24,6 @@ use Symfony\Component\Console\Output\OutputInterface;
 #[Autowire]
 final class Application extends \Symfony\Component\Console\Application {
 
-
     /**
      * Application constructor.
      *
@@ -34,6 +35,12 @@ final class Application extends \Symfony\Component\Console\Application {
         parent::__construct();
     }
 
+    /**
+     * @param InputInterface|null $input
+     * @param OutputInterface|null $output
+     *
+     * @throws \Exception
+     */
     public function run(InputInterface $input = null, OutputInterface $output = null): void {
         $this->registerCommands();
 

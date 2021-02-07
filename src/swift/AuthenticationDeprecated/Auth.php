@@ -23,11 +23,6 @@ use Swift\Router\HTTPRequest;
 class Auth {
 
 	/**
-	 * @var Authenticator $authenticator
-	 */
-	private Authenticator $authenticator;
-
-	/**
 	 * @var JwtEncoder $jwtEncoder
 	 */
 	private JwtEncoder $jwtEncoder;
@@ -47,18 +42,15 @@ class Auth {
 	/**
 	 * Auth constructor.
 	 *
-	 * @param Authenticator $authenticator
 	 * @param JwtEncoder    $jwtEncoder
 	 * @param Client        $modelClient
 	 * @param HTTPRequest   $HTTPRequest
 	 */
 	public function __construct(
-		Authenticator   $authenticator,
 		JwtEncoder      $jwtEncoder,
 		Client          $modelClient,
 		HTTPRequest     $HTTPRequest
 	) {
-		$this->authenticator    = $authenticator;
 		$this->jwtEncoder       = $jwtEncoder;
 		$this->modelClient      = $modelClient;
 		$this->httpRequest      = $HTTPRequest;

@@ -22,10 +22,7 @@ use Swift\Kernel\Attributes\Autowire;
 #[Autowire]
 class Configuration {
 
-	/**
-	 * @var stdClass $database
-	 */
-	private $database;
+	private stdClass $database;
 
 	/**
 	 * @var stdClass $routing

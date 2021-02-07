@@ -11,13 +11,13 @@
 namespace Swift\Security\Authentication\Passport\Credentials;
 
 use Swift\Security\Authentication\Exception\InvalidCredentialsException;
-use Swift\Security\Authentication\Passport\UserInterface;
+use Swift\Security\User\UserInterface;
 
 /**
  * Class ApiTokenCredentials
  * @package Swift\Security\Authentication\Passport\Credentials
  */
-class ApiTokenCredentials implements CredentialsInterface {
+final class ApiTokenCredentials implements CredentialsInterface {
 
     /**
      * ApiTokenCredentials constructor.
