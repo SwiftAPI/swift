@@ -31,12 +31,12 @@ final class RouteParameter {
      * @param mixed|null $value
      */
     public function __construct(
-        public string $block,
-        public string $pre,
-        public MatchTypeInterface|string $type,
-        public string $param,
-        public string $optional,
-        public mixed $value = null,
+        private string $block,
+        private string $pre,
+        private MatchTypeInterface|string $type,
+        private string $param,
+        private string $optional,
+        private mixed $value = null,
     ) {
     }
 
@@ -46,4 +46,54 @@ final class RouteParameter {
     public function __toString(): string {
         return $this->value ?? '';
     }
+
+    /**
+     * @return string
+     */
+    public function getBlock(): string {
+        return $this->block;
+    }
+
+    /**
+     * @return string
+     */
+    public function getPre(): string {
+        return $this->pre;
+    }
+
+    /**
+     * @return string|MatchTypeInterface
+     */
+    public function getType(): string|MatchTypeInterface {
+        return $this->type;
+    }
+
+    /**
+     * @return string
+     */
+    public function getParam(): string {
+        return $this->param;
+    }
+
+    /**
+     * @return string
+     */
+    public function getOptional(): string {
+        return $this->optional;
+    }
+
+    /**
+     * @param mixed $value
+     */
+    public function setValue( mixed $value ): void {
+        $this->value = $value;
+    }
+
+    /**
+     * @return mixed
+     */
+    public function getValue(): mixed {
+        return $this->value;
+    }
+
 }

@@ -148,20 +148,20 @@ class Route implements RouteInterface {
         $route      = $this->getFullPath();
 
         foreach ( $this->getParamsFromPath( true ) as $parameter ) {
-            $type = $parameter->type;
+            $type = $parameter->getType();
 
-            if ( $parameter->type instanceof MatchTypeInterface ) {
+            if ( $parameter->getType() instanceof MatchTypeInterface ) {
                 $type = $type->getRegex();
             }
 
 
-            $pre = $parameter->pre;
-            if ( $parameter->pre === '.' ) {
+            $pre = $parameter->getPre();
+            if ( $parameter->getPre() === '.' ) {
                 $pre = '\.';
             }
 
-            $optional = $parameter->optional !== '' ? '?' : null;
-            $param    = $parameter->param;
+            $optional = $parameter->getOptional() !== '' ? '?' : null;
+            $param    = $parameter->getParam();
 
             //Older versions of PCRE require the 'P' in (?P<named>)
             $pattern = '(?:'
@@ -174,7 +174,7 @@ class Route implements RouteInterface {
                        . ')'
                        . $optional;
 
-            $route = str_replace( $parameter->block, $pattern, $route );
+            $route = str_replace( $parameter->getBlock(), $pattern, $route );
         }
 
         return "`^$route$`u";
@@ -203,7 +203,7 @@ class Route implements RouteInterface {
     private function updateParams( array $params ): array {
         foreach (Utils::formatRouteParams( $params ) as $name => $value) {
             if (array_key_exists($name, $this->params)) {
-                $this->params[$name]->value = $this->params[$name]->type->parseValue($value, $this->request);
+                $this->params[$name]->setValue($this->params[$name]->getType()->parseValue($value, $this->request));
             }
         }
 
