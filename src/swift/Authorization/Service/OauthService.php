@@ -35,15 +35,15 @@ class OauthService {
     public function __construct(
         private Configuration $configuration,
     ) {
-        $prefix = $this->configuration->get('database.prefix', 'root');
+        $prefix = $this->configuration->get('connection.prefix', 'database');
         $this->storage = new Pdo(array(
             'dsn' => sprintf('mysql:dbname=%s;host=%s',
                 //$this->configuration->get('database.driver', 'root'),
-                $this->configuration->get('database.database', 'root'),
-                $this->configuration->get('database.host', 'root')
+                $this->configuration->get('connection.database', 'database'),
+                $this->configuration->get('connection.host', 'database')
             ),
-            'username' => $this->configuration->get('database.username', 'root'),
-            'password' =>     $this->configuration->get('database.password', 'root'),
+            'username' => $this->configuration->get('connection.username', 'database'),
+            'password' =>     $this->configuration->get('connection.password', 'database'),
         ), array(
             'client_table' => $prefix . 'oauth_clients',
             'access_token_table' => $prefix . 'oauth_access_tokens',

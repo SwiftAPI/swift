@@ -10,6 +10,7 @@
 
 namespace Swift\Authorization\Model;
 
+use Swift\Kernel\Attributes\DI;
 use Swift\Model\Attributes\DB;
 use Swift\Model\Attributes\DBField;
 use Swift\Model\Entity;
@@ -19,7 +20,7 @@ use Swift\Model\Types\FieldTypes;
  * Class OauthRefreshTokens
  * @package Swift\Authorization\Model
  */
-#[DB(table: 'oauth_refresh_tokens')]
+#[DB(table: 'oauth_refresh_tokens'), DI(exclude: true)]
 final class OauthRefreshTokens extends Entity {
 
     #[DBField( name: 'refresh_token', primary: true, type: FieldTypes::TEXT, length: 40, empty: false )]

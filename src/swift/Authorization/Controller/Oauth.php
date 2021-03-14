@@ -15,39 +15,40 @@ use OAuth2\Request;
 use Swift\Authorization\Service\OauthService;
 use Swift\Controller\AbstractController;
 use Swift\HttpFoundation\JsonResponse;
-use Swift\HttpFoundation\ServerRequest;
 use Swift\Kernel\Attributes\Autowire;
 use Swift\Router\Attributes\Route;
-use Swift\Router\Types\RouteTypesEnum;
+use Swift\Router\RouteParameter;
+use Swift\Router\Types\RouteMethodEnum;
 
 /**
  * Class Oauth
  * @package Swift\Authorization\Controller
  */
+#[Autowire]
 class Oauth extends AbstractController {
 
-    /**
-     * Oauth constructor.
-     *
-     * @param OauthService $oauthService
-     */
-    #[Pure] #[Route(type: RouteTypesEnum::POST, route: '/auth/')]
-    public function __construct(
-        protected OauthService $oauthService,
-    ) {
-    }
-
-    /**
-     * @param array $params
-     *
-     * @return JsonResponse
-     *
-     * @see https://bshaffer.github.io/oauth2-server-php-docs/cookbook/
-     */
-    #[Route( type: RouteTypesEnum::POST, route: '/token/', name: 'auth.token' )]
-    public function token( array $params ): JsonResponse {
-        return new JsonResponse(data: $this->oauthService->server->handleTokenRequest(Request::createFromGlobals())->getResponseBody(), json: true);
-    }
-
+//    /**
+//     * Oauth constructor.
+//     *
+//     * @param OauthService $oauthService
+//     */
+//    #[Pure] #[Route(method: [RouteMethodEnum::POST], route: '/auth/', name: 'authorization.oauth')]
+//    public function __construct(
+//        protected OauthService $oauthService,
+//    ) {
+//    }
+//
+//    /**
+//     * @param RouteParameter[] $params
+//     *
+//     * @return JsonResponse
+//     *
+//     * @see https://bshaffer.github.io/oauth2-server-php-docs/cookbook/
+//     */
+//    #[Route( method: [RouteMethodEnum::POST], route: '/token/', name: 'auth.token' )]
+//    public function token( array $params ): JsonResponse {
+//        return new JsonResponse(data: $this->oauthService->server->handleTokenRequest(Request::createFromGlobals())->getResponseBody(), json: true);
+//    }
+//
 
 }

@@ -11,6 +11,7 @@
 namespace Swift\Authorization\Model;
 
 
+use Swift\Kernel\Attributes\DI;
 use Swift\Model\Attributes\DB;
 use Swift\Model\Attributes\DBField;
 use Swift\Model\Entity;
@@ -20,7 +21,7 @@ use Swift\Model\Types\FieldTypes;
  * Class OauthClient
  * @package Swift\Authentication\Model
  */
-#[DB(table: 'oauth_clients')]
+#[DB(table: 'oauth_clients'), DI(exclude: true)]
 final class OauthClients extends Entity {
 
     #[DBField( name: 'client_id', primary: true, type: FieldTypes::TEXT, length: 80, empty: false )]

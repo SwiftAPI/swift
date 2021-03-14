@@ -1,4 +1,4 @@
-# henri
+# swift
 
 ## Looking for contributors!
 
@@ -6,9 +6,9 @@
 This is a simple, fast and basic PHP framework meant to write API's or simple programs in a fast and easy way. This is a not meant as a replacement for other frameworks,
 under the hood it uses a lot of the magic from [Symfony](https://symfony.com/), [Dibi](https://github.com/dg/dibi), [Unirest](https://github.com/Kong/unirest-php), [Monolog](https://github.com/Seldaek/monolog) and [Firebase](https://github.com/firebase/php-jwt).
 
-Get it from Composer https://packagist.org/packages/henrivantsant/henri.
+Get it from Composer https://packagist.org/packages/henrivantsant/swift.
 ```php
-composer require henrivantsant/henri
+composer require henrivantsant/swift
 ```
 
 ### Purpose  
@@ -16,7 +16,7 @@ This framework is not intended for building websites or big applications. The pu
 - Simple webservice
 - API proxy to bundle several APIs endpoints into one
 - Data caching layer
-- API endpoint for React/Vue front-ends
+- REST/GraphQl API endpoint for React/Vue front-ends
 - Logging service
 - CDN
 

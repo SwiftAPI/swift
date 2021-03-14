@@ -1,5 +1,12 @@
 <?php declare(strict_types=1);
 
+/*
+ * This file is part of the Swift Framework
+ *
+ * (c) Henri van 't Sant <henri@henrivantsant.com>
+ *
+ * For the full copyright and license information, please view the LICENSE file that was distributed with this source code.
+ */
 
 namespace Swift\Kernel\Attributes;
 
@@ -15,7 +22,6 @@ class DI {
     /**
      * DI constructor.
      *
-     * @param string|null $name
      * @param array $tags
      * @param bool $shared
      * @param bool $exclude
@@ -23,7 +29,6 @@ class DI {
      * @param array $aliases
      */
     public function __construct(
-        public string|null $name = null,
         public array $tags = array(),
         public bool $shared = true,
         public bool $exclude = false,

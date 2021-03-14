@@ -15,6 +15,7 @@ use GraphQL\GraphQL;
 use GraphQL\Type\Definition\ResolveInfo;
 use GraphQL\Validator\Rules\DisableIntrospection;
 use Swift\Configuration\Configuration;
+use Swift\Configuration\ConfigurationInterface;
 use Swift\GraphQl\Resolvers\FieldResolver;
 use Swift\HttpFoundation\JsonResponse;
 use Swift\HttpFoundation\RequestInterface;
@@ -32,13 +33,13 @@ class Kernel {
      * Kernel constructor.
      *
      * @param RequestInterface $request
-     * @param Configuration $configuration
+     * @param ConfigurationInterface $configuration
      * @param Schema $schema
      * @param FieldResolver $fieldResolver
      */
     public function __construct(
         private RequestInterface $request,
-        private Configuration $configuration,
+        private ConfigurationInterface $configuration,
         private Schema $schema,
         private FieldResolver $fieldResolver,
     ) {
