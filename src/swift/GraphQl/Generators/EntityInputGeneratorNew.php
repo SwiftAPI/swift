@@ -11,32 +11,69 @@
 namespace Swift\GraphQl\Generators;
 
 
+use GraphQL\Type\Definition\IDType;
 use GraphQL\Type\Definition\InputObjectType;
+use GraphQL\Type\Definition\StringType;
 use GraphQL\Type\Definition\Type;
 use Swift\GraphQl\TypeRegistry;
+use Swift\GraphQl\TypeRegistryInterface;
 use Swift\GraphQl\Types\ObjectType;
+use Swift\Kernel\ServiceLocator;
+use Swift\Kernel\ServiceLocatorInterface;
 use Swift\Model\Entity;
+use Symfony\Component\Console\Input\Input;
 
+/**
+ * Class EntityInputGeneratorNew
+ * @package Swift\GraphQl\Generators
+ */
 class EntityInputGeneratorNew implements GeneratorInterface {
+
+    private ServiceLocatorInterface $serviceLocator;
+    private TypeRegistryInterface $inputTypeRegistry;
+    private TypeRegistryInterface $outputTypeRegistry;
+
+    /**
+     * EntityInputGeneratorNew constructor.
+     */
+    public function __construct() {
+        $serviceLocator = new ServiceLocator();
+        /** @var TypeRegistryInterface $this */
+        $this->inputTypeRegistry = $serviceLocator->get( TypeRegistry\InputTypeRegistry::class );
+        /** @var TypeRegistryInterface $this */
+        $this->outputTypeRegistry = $serviceLocator->get( TypeRegistry\OutputTypeRegistry::class );
+    }
 
     /**
      * @inheritDoc
      */
-    public function generate( ObjectType $type, TypeRegistry $typeRegistry ): Type {
-        $typeDefinition = $typeRegistry->getTypeByClass($type->type);
-        $fields = array();
+    public function generate( ObjectType $type, TypeRegistryInterface $typeRegistry ): Type {
+        $typeDefinition = $this->inputTypeRegistry->getTypeByClass($type->type);
 
-        foreach ($typeDefinition->fields as $field) {
-            if ($field->type === 'id' || $field->name === 'id') {
+        $fields = array();
+        foreach ($typeDefinition->fields as $key => $field) {
+            if (($field->type === 'id') || ($field->name === 'id')) {
                 continue;
             }
-            $fieldType = $typeRegistry->createObject($field);
-            $fields[$field->name] = $field->nullable ? $fieldType : Type::nonNull($fieldType);
+
+            $compiled = $this->inputTypeRegistry->createObject($field);
+
+            if ($type->isList) {
+                $compiled = Type::listOf($compiled);
+            }
+
+            $fields[$field->name] = $compiled;
         }
 
-        return new InputObjectType(array(
-            'name' => $type->name,
+        $name   = $type->declaringMethod . 'Input';
+        $object = $this->inputTypeRegistry->getCompiled()->get( $name ) ?? new InputObjectType(array(
+            'name' => ucfirst($name),
             'fields' => $fields,
+            'alias'  => $type->name,
         ));
+        $this->inputTypeRegistry->getCompiled()->set( $name, $object );
+
+        return \Swift\GraphQl\Types\Type::nonNull($object);
     }
+
 }

@@ -11,6 +11,7 @@
 namespace Swift\Security\Authentication\Passport\Credentials;
 
 
+use DateTime;
 use stdClass;
 use Swift\HttpFoundation\Response;
 use Swift\Security\Authentication\Exception\InvalidCredentialsException;
@@ -25,11 +26,9 @@ final class AccessTokenCredentials implements CredentialsInterface {
     /**
      * ApiTokenCredentials constructor.
      *
-     * @param UserInterface $user
      * @param stdClass $providedCredential
      */
     public function __construct(
-        private UserInterface $user,
         private stdClass $providedCredential,
     ) {
     }
@@ -44,8 +43,8 @@ final class AccessTokenCredentials implements CredentialsInterface {
     /**
      * @inheritDoc
      */
-    public function validateCredentials(): void {
-        /** @var \DateTime $expires */
+    public function validateCredentials( UserInterface $user ): void {
+        /** @var DateTime $expires */
         $expires = $this->providedCredential->expires;
         if (!$this->providedCredential->accessToken || ($expires->getTimestamp() < time())) {
             throw new InvalidCredentialsException('Token has expired', Response::HTTP_UNAUTHORIZED);

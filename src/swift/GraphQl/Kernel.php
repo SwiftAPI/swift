@@ -10,18 +10,15 @@
 
 namespace Swift\GraphQl;
 
+use GraphQL\Error\FormattedError;
 use GraphQL\GraphQL;
 use GraphQL\Type\Definition\ResolveInfo;
-use GraphQL\Type\Schema;
+use GraphQL\Validator\Rules\DisableIntrospection;
 use Swift\Configuration\Configuration;
-use Swift\GraphQl\Loaders\BatchLoader;
-use Swift\GraphQl\Loaders\TypeLoader;
-use Swift\GraphQl\Loaders\QueryLoader;
-use Swift\GraphQl\Loaders\MutationLoader;
 use Swift\GraphQl\Resolvers\FieldResolver;
-use Swift\Http\Response\JSONResponse;
+use Swift\HttpFoundation\JsonResponse;
+use Swift\HttpFoundation\RequestInterface;
 use Swift\Kernel\Attributes\Autowire;
-use Swift\Router\HTTPRequest;
 use GraphQL\Error\DebugFlag;
 
 /**
@@ -34,67 +31,62 @@ class Kernel {
     /**
      * Kernel constructor.
      *
-     * @param HTTPRequest $request
+     * @param RequestInterface $request
      * @param Configuration $configuration
-     * @param BatchLoader $batchLoader
-     * @param TypeLoader $typeLoader
-     * @param QueryLoader $queryLoader
-     * @param MutationLoader $mutationLoader
-     * @param TypeRegistry $typeRegistry
+     * @param Schema $schema
      * @param FieldResolver $fieldResolver
      */
     public function __construct(
-        private HTTPRequest $request,
+        private RequestInterface $request,
         private Configuration $configuration,
-        private BatchLoader $batchLoader,
-        private TypeLoader $typeLoader,
-        private QueryLoader $queryLoader,
-        private MutationLoader $mutationLoader,
-        private TypeRegistry $typeRegistry,
+        private Schema $schema,
         private FieldResolver $fieldResolver,
     ) {
     }
 
-    public function run(): JSONResponse {
-        $this->batchLoader->setLoaders(array(
-            $this->typeLoader,
-            $this->queryLoader,
-            $this->mutationLoader,
-        ));
-        $this->batchLoader->load($this->typeRegistry);
-
-        $this->typeRegistry->compile();
-        //var_dump($this->typeRegistry);
-
+    public function run(): JsonResponse {
         // @TODO: Compile type registry
         // @TODO: Generate root query
         // @TODO: Apply resolver logic
 
-        return new JSONResponse( $this->execute() );
+        return new JsonResponse( $this->execute() );
     }
 
     private function execute(): array {
         $fieldResolver = $this->fieldResolver;
-        $schema = new Schema( array(
-            'query' => $this->typeRegistry->getRootQuery(),
-            'mutation' => $this->typeRegistry->getRootMutation(),
-            ) );
 
-        $schema->assertValid();
-
-        $result = GraphQL::executeQuery(
-            schema: $schema,
-            source: $this->request->request->input->get( key: 'query' ) ?: null,
-            variableValues: $this->request->request->input->get( key: 'variables' ) ?: null,
-            fieldResolver: function ( $value, $args, $context, ResolveInfo $info) use ($fieldResolver) {
+        try {
+            $result = GraphQL::executeQuery(
+                schema: $this->schema->getSchema(),
+                source: $this->request->getContent()->get( key: 'query' ) ?: null,
+                variableValues: $this->request->getContent()->get( key: 'variables' ) ?: null,
+                fieldResolver: function ( $value, $args, $context, ResolveInfo $info) use ($fieldResolver) {
                 return $fieldResolver->resolve($value, $args, $context, $info);
-            }
-        );
+            },
+                validationRules: $this->getValidationRules()
+            );
 
-        $debug = ($this->configuration->get(settingName: 'app.debug', scope: 'root') || ($this->configuration->get(settingName: 'app.mode', scope: 'root') === 'develop')) ?
-            DebugFlag::INCLUDE_DEBUG_MESSAGE | DebugFlag::INCLUDE_TRACE : DebugFlag::NONE;
+            $debug = ($this->configuration->get(identifier: 'app.debug', scope: 'root') || ($this->configuration->get(identifier: 'app.mode', scope: 'root') === 'develop')) ?
+                DebugFlag::INCLUDE_DEBUG_MESSAGE | DebugFlag::INCLUDE_TRACE : DebugFlag::NONE;
 
-        return $result->toArray($debug);
+            return $result->toArray($debug);
+        } catch(\Exception $exception) {
+            throw $exception;
+            return array('errors' => [FormattedError::createFromException($exception)]);
+        }
+    }
+
+    /**
+     * @return array
+     */
+    private function  getValidationRules(): array {
+        $rules = array();
+
+        if (!$this->configuration->get('graphql.enable_introspection', 'app')) {
+            $rules[] = new DisableIntrospection();
+        }
+
+        return $rules;
     }
 
 }

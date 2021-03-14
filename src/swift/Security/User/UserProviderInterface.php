@@ -37,4 +37,17 @@ interface UserProviderInterface {
      */
     public function getUserById( int $id ): ?UserInterface;
 
+    /**
+     * Store new user
+     *
+     * @param string $username
+     * @param string $password
+     * @param string $email
+     * @param string $firstname
+     * @param string $lastname
+     *
+     * @return UserInterface
+     */
+    public function storeUser( string $username, string $password, string $email, string $firstname, string $lastname ): UserInterface;
+
 }

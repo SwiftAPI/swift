@@ -11,6 +11,7 @@
 namespace Swift\Security\Authentication\Passport\Credentials;
 
 use Swift\Security\Authentication\Exception\InvalidCredentialsException;
+use Swift\Security\User\UserInterface;
 
 /**
  * Interface CredentialsInterface
@@ -28,8 +29,10 @@ interface CredentialsInterface {
     /**
      * Validate whether given credentials match
      *
+     * @param UserInterface $user
+     *
      * @throws InvalidCredentialsException
      */
-    public function validateCredentials(): void;
+    public function validateCredentials( UserInterface $user ): void;
 
 }

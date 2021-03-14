@@ -10,13 +10,17 @@
 
 namespace Swift\GraphQl;
 
+use GraphQL\Type\Definition\Directive;
 use GraphQL\Type\Definition\EnumType;
+use GraphQL\Type\Definition\InputObjectType;
+use Honeywell\Types\ConditionType;
 use Swift\GraphQl\Exceptions\InvalidTypeException;
 use Swift\GraphQl\Generators\GeneratorInterface;
 use Swift\GraphQl\Types\ObjectType;
 use GraphQL\Type\Definition\ObjectType as GraphQlObjectType;
 use Swift\GraphQl\Types\Type;
 use Swift\Kernel\TypeSystem\Enum;
+use Swift\Security\User\Type\LoginInputType;
 use TypeError;
 
 /**
@@ -33,6 +37,7 @@ class TypeRegistry implements TypeRegistryInterface {
      * @param ObjectType[] $extensions
      * @param ObjectType[] $queries
      * @param ObjectType[] $mutations
+     * @param array $directives
      * @param array $fqcnToNameMapping
      * @param GeneratorInterface[] $generators
      */
@@ -49,15 +54,11 @@ class TypeRegistry implements TypeRegistryInterface {
         private array $extensions = array(),
         private array $queries = array(),
         private array $mutations = array(),
+        private array $directives = array(),
         private array $fqcnToNameMapping = array(),
         private array $generators = array(),
     ) {
         foreach (Type::getStandardTypes() as $name => $type) {
-//            $this->addType(new ObjectType(
-//                name: $name,
-//                declaringClass: $type::class,
-//                type: $type::class,
-//            ));
             $this->definitions[ObjectTypes::OUTPUT_TYPE][$name] = $type;
         }
     }
@@ -199,6 +200,10 @@ class TypeRegistry implements TypeRegistryInterface {
         ));
     }
 
+    public function getCompiledTypes(): array {
+        return $this->definitions['types'];
+    }
+
 
     /**
      * Compile added types
@@ -224,7 +229,7 @@ class TypeRegistry implements TypeRegistryInterface {
     }
 
     public function createObject(ObjectType|\GraphQL\Type\Definition\Type $type, ?string $identifier = null): \GraphQL\Type\Definition\Type {
-        if ($type instanceof \GraphQL\Type\Definition\Type) {
+        if (is_a(object_or_class: $type, class: \GraphQL\Type\Definition\Type::class, allow_string: false)) {
             return $type;
         }
 
@@ -282,6 +287,8 @@ class TypeRegistry implements TypeRegistryInterface {
             return $args;
         }
 
+        $login = $type->name === 'login';
+
         foreach ( $type->args as $arg ) {
             if (is_null($arg->type)) {
                 throw new TypeError(sprintf('Could not resolve typing of argument in method "%s" in class "%s". This is required for GraphQl usage', $arg->name, $arg->declaringClass));
@@ -293,6 +300,21 @@ class TypeRegistry implements TypeRegistryInterface {
                 $resolved = $this->createObject($arg);
             } else {
                 $resolved = $this->getCompiledType(type: $arg->type);
+
+                if (!$resolved && ($typeDefinition = $this->getTypeByClass(LoginInputType::class))) {
+                    $fields = array();
+
+                    foreach ($typeDefinition->fields as $field) {
+                        $fieldType = $this->createObject($field);
+                        $fields[$field->name] = $field->nullable ? $fieldType : \GraphQL\Type\Definition\Type::nonNull($fieldType);
+                    }
+
+                    $resolved = new InputObjectType(array(
+                        'name' => $type->name,
+                        'fields' => $fields,
+                    ));
+                }
+
             }
             $resolved = $arg->nullable ? $resolved : Type::nonNull($resolved);
 
@@ -300,6 +322,21 @@ class TypeRegistry implements TypeRegistryInterface {
         }
 
         return $args;
+    }
+
+    /**
+     * @inheritDoc
+     */
+    public function addDirectives( array $directives ): void {
+        $this->directives = array_merge($directives);
+    }
+
+
+    /**
+     * @inheritDoc
+     */
+    public function getDirectives(): array {
+        return $this->directives;
     }
 
 

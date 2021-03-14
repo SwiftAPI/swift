@@ -14,7 +14,6 @@ use Dibi\Exception;
 use Swift\HttpFoundation\ServerRequest;
 use Swift\Kernel\Attributes\Autowire;
 use Swift\Kernel\Event\KernelRequestEvent;
-use Swift\Router\Exceptions\BadRequestException;
 use Swift\Router\HTTPRequest;
 use Swift\Router\Model\Request as RequestModel;
 use Symfony\Component\EventDispatcher\EventDispatcher;
@@ -83,6 +82,7 @@ class RequestSubscriber implements EventSubscriberInterface {
      * @throws \Exception
      */
     private function logRequest(ServerRequest $request): void {
+
         $ip         = $request->getClientIp();
         $origin     = $request->getUri()->getPath();
         $time       = date('Y-m-d H:i:s' );

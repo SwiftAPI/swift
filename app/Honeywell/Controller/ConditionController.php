@@ -12,6 +12,7 @@ namespace Honeywell\Controller;
 
 use Honeywell\Model\Condition;
 use Honeywell\Service\ConditionService;
+use Honeywell\Types\ConditionInputType;
 use Honeywell\Types\ConditionType;
 use Honeywell\Types\ScheduleType;
 use JetBrains\PhpStorm\Pure;
@@ -46,12 +47,12 @@ class ConditionController extends AbstractController {
     }
 
     #[Mutation(name: 'addCondition', type: ConditionType::class )]
-    public function graphqlAddCondition( #[Argument(type: ConditionType::class, generator: EntityInputGeneratorNew::class)] $condition ): ConditionType {
+    public function graphqlAddCondition( #[Argument(type: ConditionInputType::class, generator: EntityInputGeneratorNew::class)] $condition ): ConditionType {
         return $this->conditionService->addCondition(...$condition);
     }
 
     #[Mutation(name: 'updateCondition', type: ConditionType::class)]
-    public function graphqlUpdateCondition( #[Argument(type: ConditionType::class, generator: EntityInputGeneratorUpdate::class)] array|null $condition ): ConditionType {
+    public function graphqlUpdateCondition( #[Argument(type: ConditionInputType::class, generator: EntityInputGeneratorUpdate::class)] array|null $condition ): ConditionType {
         return $this->conditionService->updateCondition($condition);
     }
 

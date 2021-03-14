@@ -23,6 +23,7 @@ interface VoterInterface {
 
     public const ACCESS_GRANTED = 'ACCESS_GRANTED';
     public const ACCESS_DENIED = 'ACCESS_DENIED';
+    public const ACCESS_ABSTAIN = 'ACCESS_ABSTAIN';
 
     /**
      * Vote
@@ -31,7 +32,7 @@ interface VoterInterface {
      * @param mixed $subject
      * @param array $attributes
      *
-     * @return string ACCESS_GRANTED || ACCESS_DENIED
+     * @return string ACCESS_GRANTED || ACCESS_DENIED || ACCESS_ABSTAIN
      */
     public function vote( TokenInterface $token, mixed $subject, array $attributes ): string;
 

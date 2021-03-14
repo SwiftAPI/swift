@@ -10,6 +10,7 @@
 
 namespace Swift\Model;
 
+use Dibi\UniqueConstraintViolationException;
 use Exception;
 use InvalidArgumentException;
 use JetBrains\PhpStorm\ArrayShape;
@@ -30,6 +31,7 @@ use Swift\Model\Entity\Helper\Query;
 use Swift\Model\Events\EntityOnFieldSerializeEvent;
 use Swift\Model\Events\EntityOnFieldUnSerializeEvent;
 use Swift\Model\Exceptions\DatabaseException;
+use Swift\Model\Exceptions\DuplicateEntryException;
 use Swift\Model\Exceptions\InvalidConfigurationException;
 use Swift\Model\Exceptions\NoResultException;
 use Swift\Model\Types\FieldTypes;
@@ -174,7 +176,8 @@ abstract class Entity implements EntityInterface {
         $isNew = empty( $state[ $this->primaryKey ] );
 
         try {
-            if ( $isNew ) { // Insert
+            if ( $isNew ) {
+                // Insert
                 $this->database->query( 'INSERT INTO ' . $this->tableNamePrefixed, $this->getValuesForDatabase( $state ) );
 
                 return $this->findOne( array( $this->primaryKey => $this->database->getInsertId() ) );
@@ -187,8 +190,10 @@ abstract class Entity implements EntityInterface {
                 'WHERE ' . $this->primaryKey . ' = ?', $state[ $this->primaryKey ]
             );
             return $this->findOne( array( $this->primaryKey => $state[ $this->primaryKey ] ) );
+        } catch(UniqueConstraintViolationException $exception) {
+            throw new DuplicateEntryException($exception->getMessage(), $exception->getCode());
         } catch ( \Dibi\Exception $exception ) {
-            throw new DatabaseException( $exception->getMessage(), $exception->getCode(), $exception );
+            throw new DatabaseException( $exception->getMessage(), $exception->getCode() );
         }
     }
 
@@ -458,6 +463,12 @@ abstract class Entity implements EntityInterface {
                     }
                     $this->propertyActions['serialize'][$property->name][] = FieldTypes::TIMESTAMP;
                 }
+                if (($propertyProps->type === FieldTypes::DATETIME) && ! in_array( FieldTypes::DATETIME, $propertyProps->serialize, true ) ) {
+                    if (!isset($this->propertyActions['serialize'][$property->name])) {
+                        $this->propertyActions['serialize'][$property->name] = array();
+                    }
+                    $this->propertyActions['serialize'][$property->name][] = FieldTypes::DATETIME;
+                }
             }
 
             if ( isset( $property->name, $annotation->serialize ) && $annotation && ! empty( $annotation->serialize ) ) {
@@ -611,10 +622,6 @@ abstract class Entity implements EntityInterface {
                 $query .= ', DROP INDEX ';
                 $query .= $index;
             }
-        }
-
-        if ($this->tableName === 'user_settings') {
-            var_dump($query);
         }
 
         $this->database->query( $query );

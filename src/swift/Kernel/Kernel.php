@@ -16,6 +16,8 @@ use Swift\Configuration\Configuration;
 use Swift\Controller\ControllerInterface;
 use Swift\Events\EventDispatcher;
 use Swift\HttpFoundation\Exception\BadRequestException;
+use Swift\HttpFoundation\JsonResponse;
+use Swift\HttpFoundation\RequestInterface;
 use Swift\HttpFoundation\Response;
 use Swift\HttpFoundation\ResponseInterface;
 use Swift\HttpFoundation\ServerRequest;
@@ -30,6 +32,7 @@ use Swift\HttpFoundation\Exception\InternalErrorException;
 use Swift\HttpFoundation\Exception\NotAuthorizedException;
 use Swift\HttpFoundation\Exception\NotFoundException;
 use Swift\Router\Route;
+use Swift\Router\RouteInterface;
 use Swift\Router\Router;
 use Swift\Security\Security;
 use Swift\Security\User\UserInterface;
@@ -42,6 +45,7 @@ use Swift\Security\User\UserInterface;
 final class Kernel {
 
     private Container $container;
+    private bool $isRunning = false;
 
     /**
      * Application constructor.
@@ -67,26 +71,30 @@ final class Kernel {
      * @throws Exception
      */
     public function run(): void {
+        if ($this->isRunning) {
+            throw new \RuntimeException('Application is already running');
+        }
+
         try {
             $route = ($this->dispatcher->dispatch( new KernelRequestEvent( $this->request, $this->router->getCurrentRoute() ) ))->getRoute();
 
             $response = $this->dispatch( $route );
-        } catch ( NotFoundException ) {
-            $response = new Response(status: Response::HTTP_NOT_FOUND);
+        } catch ( NotFoundException $exception ) {
+            $response = new JsonResponse(['message' => $exception->getMessage() ?: Response::$reasonPhrases[Response::HTTP_NOT_FOUND], 'code' => $exception->getCode()], status: Response::HTTP_NOT_FOUND);
         } catch( BadRequestException $exception) {
-            $response = new Response($exception->getMessage(), status: Response::HTTP_BAD_REQUEST);
-        } catch ( NotAuthorizedException ) {
-            $response = new Response(status: Response::HTTP_UNAUTHORIZED);
-        } catch ( InternalErrorException ) {
-            $response = new Response(status: Response::HTTP_INTERNAL_SERVER_ERROR);
+            $response = new JsonResponse(['message' => $exception->getMessage(), 'code' => $exception->getCode()], status: Response::HTTP_BAD_REQUEST);
+        } catch ( NotAuthorizedException $exception ) {
+            $response = new JsonResponse(['message' => $exception->getMessage() ?: Response::$reasonPhrases[Response::HTTP_UNAUTHORIZED], 'code' => $exception->getCode()], status: Response::HTTP_UNAUTHORIZED);
+        } catch ( InternalErrorException $exception ) {
+            $response = new JsonResponse(['message' => $this->isDebug() ? $exception->getMessage() : Response::$reasonPhrases[Response::HTTP_INTERNAL_SERVER_ERROR], 'code' => $exception->getCode()], status: Response::HTTP_INTERNAL_SERVER_ERROR);
         } catch ( AccessDeniedException $exception ) {
-            $response = new Response($exception->getMessage(), Response::HTTP_FORBIDDEN);
+            $response = new JsonResponse(['message' => $exception->getMessage(), 'code' => $exception->getCode()], Response::HTTP_FORBIDDEN);
         } catch ( Exception $exception ) {
             if ( $this->isDebug() ) {
                 throw $exception;
             }
 
-            $response = new Response(status: Response::HTTP_INTERNAL_SERVER_ERROR);
+            $response = new JsonResponse(['message' => $this->isDebug() ? $exception->getMessage() : Response::$reasonPhrases[Response::HTTP_INTERNAL_SERVER_ERROR], 'code' => $exception->getCode()], status: Response::HTTP_INTERNAL_SERVER_ERROR);
         }
 
         $response->send();
@@ -96,13 +104,12 @@ final class Kernel {
     /**
      * Method to dispatch requested route
      *
-     * @param Route $route
+     * @param RouteInterface $route
      *
-     * @return Response
+     * @return ResponseInterface
      * @throws Exception
      */
-    public function dispatch( Route $route ): Response {
-
+    private function dispatch( RouteInterface $route ): ResponseInterface {
         /** @var Route $route */
         $route = ( $this->dispatcher->dispatch( new OnBeforeRouteEnterEvent( $route ) ) )->getRoute();
 
@@ -115,7 +122,6 @@ final class Kernel {
 
         if ( $controller instanceof ControllerInterface ) {
             $controller->setRoute( $route );
-            $controller->setCurrentUser( $this->security->getUser() );
         }
 
         if ( empty( $route->getAction() ) || ! method_exists( $controller, $route->getAction() ) ) {

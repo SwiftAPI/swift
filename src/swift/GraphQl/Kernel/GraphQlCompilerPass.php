@@ -1,7 +1,17 @@
 <?php declare(strict_types=1);
 
+/*
+ * This file is part of the Swift Framework
+ *
+ * (c) Henri van 't Sant <henri@henrivantsant.com>
+ *
+ * For the full copyright and license information, please view the LICENSE file that was distributed with this source code.
+ */
+
 namespace Swift\GraphQl\Kernel;
 
+use Swift\GraphQl\Attributes\InputType;
+use Swift\GraphQl\Attributes\InterfaceType;
 use Swift\GraphQl\Attributes\Mutation;
 use Swift\GraphQl\Attributes\Query;
 use Swift\GraphQl\Attributes\Type;
@@ -26,6 +36,10 @@ class GraphQlCompilerPass implements CompilerPassInterface {
 
             if (!empty($classReflection?->getAttributes(name: Type::class))) {
                 $definition->addTag(name: 'graphql.type');
+            }
+
+            if (!empty($classReflection?->getAttributes(name: InputType::class))) {
+                $definition->addTag( name: 'graphql.input_type' );
             }
 
             foreach ($classReflection?->getMethods() as $reflectionMethod) {

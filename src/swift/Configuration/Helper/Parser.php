@@ -10,6 +10,9 @@
 
 namespace Swift\Configuration\Helper;
 
+use JetBrains\PhpStorm\ArrayShape;
+use stdClass;
+
 /**
  * Class Parser
  * @package Swift\Configuration\Helper
@@ -23,11 +26,12 @@ class Parser {
 	 *
 	 * @return array
 	 */
-	public function parseConfig(array $config): array {
-		$configuration  = new \stdClass();
-		$configuration->general = new \stdClass();
-		$configuration->scoped  = new \stdClass();
-		$map = new \stdClass();
+	#[ArrayShape( [ 'config' => stdClass::class, 'map' => stdClass::class ] )]
+    public function parseConfig( array $config): array {
+		$configuration  = new stdClass();
+		$configuration->general = new stdClass();
+		$configuration->scoped  = new stdClass();
+		$map = new stdClass();
 		$map->general = array();
 		$map->scoped = array();
 
@@ -44,7 +48,7 @@ class Parser {
 				}
 
 				if (!property_exists($configuration->scoped, $scope->scope)) {
-					$configuration->scoped->{$scope->scope} = new \stdClass();
+					$configuration->scoped->{$scope->scope} = new stdClass();
 				}
 				if (!array_key_exists($scope->scope, $map->scoped)) {
 				    $map->scoped[$scope->scope] = array();
@@ -65,18 +69,16 @@ class Parser {
 	 *
 	 * @param string $scopePath
 	 *
-	 * @return \stdClass
+	 * @return stdClass
 	 */
-	public function parseScope(string $scopePath) : \stdClass {
-		$scopeArea = str_replace(INCLUDE_DIR, '', $scopePath);
-		$scopeArea = str_replace('config.yaml', '', $scopeArea);
-		$scopeArea = str_replace('tokens.yaml', '', $scopeArea);
+	public function parseScope(string $scopePath) : stdClass {
+        $scopeArea = str_replace( array( INCLUDE_DIR, 'config.yaml', 'tokens.yaml' ), '', $scopePath );
 
-		$scope  = new \stdClass();
+		$scope  = new stdClass();
 		$scope->path    = $scopePath;
 		$scope->name    = $scopeArea === '/' ? 'root' : trim($scopeArea, '/');
-		$scope->name    = substr($scope->name, 0, 12) === 'vendor/swift' ? 'framework' : $scope->name;
-		$scope->name    = substr($scope->name, 0, 9) === 'src/swift' ? 'framework' : $scope->name;
+		$scope->name    = str_starts_with( $scope->name, 'vendor/swift' ) ? 'framework' : $scope->name;
+		$scope->name    = str_starts_with( $scope->name, 'src/swift' ) ? 'framework' : $scope->name;
 		$scope->scope   = $scope->name;
 
 		$explode = explode('/', $scope->scope);
@@ -88,15 +90,15 @@ class Parser {
 	/**
 	 * Method to parse settings mapping
 	 *
-	 * @param \stdClass $baseClass
+	 * @param stdClass $baseClass
 	 * @param string    $settingName
 	 * @param array $settings
 	 *
-	 * @return \stdClass
+	 * @return stdClass
 	 */
-	private function appendSettings(\stdClass $baseClass, string $settingName, $settings) : \stdClass {
+	private function appendSettings( stdClass $baseClass, string $settingName, $settings) : stdClass {
         if (!property_exists($baseClass, $settingName)) {
-            $baseClass->{$settingName}  = new \stdClass();
+            $baseClass->{$settingName}  = new stdClass();
         }
 
         if (empty($settings) || !is_array($settings)) {
@@ -113,11 +115,11 @@ class Parser {
     /**
      * Method to append settings
      *
-     * @param \stdClass $baseClass
+     * @param stdClass $baseClass
      * @param string    $settingName
      * @param array $settings
      *
-     * @return \stdClass
+     * @return stdClass
      */
     private function appendMapping(array $base, string $settingName, $settings, string $scopePath) : array {
         if (empty($settings) || !is_array($settings)) {

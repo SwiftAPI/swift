@@ -69,7 +69,7 @@ final class Stream implements StreamInterface {
     /** @var array|mixed|void|null */
     private $uri;
     /** @var int|null */
-    private ?int $size;
+    private ?int $size = null;
 
     private function __construct() {
     }
@@ -105,6 +105,10 @@ final class Stream implements StreamInterface {
         }
 
         throw new \InvalidArgumentException( 'First argument to Stream::create() must be a string, resource or StreamInterface.' );
+    }
+
+    public function getResource(): mixed {
+        return $this->stream;
     }
 
     public function getMetadata( $key = null ) {

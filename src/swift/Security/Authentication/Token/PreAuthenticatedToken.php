@@ -21,7 +21,7 @@ use Swift\Security\User\UserInterface;
  * @package Swift\Security\Authentication\Token
  */
 #[DI(autowire: false)]
-class PreAuthenticatedToken extends Token {
+class PreAuthenticatedToken extends AbstractToken {
 
     /**
      * Token constructor.
@@ -41,7 +41,7 @@ class PreAuthenticatedToken extends Token {
             }
         }
 
-        parent::__construct($user, $token->accessToken, $isAuthenticated);
+        parent::__construct($user, $token->scope, $token->accessToken, $isAuthenticated);
     }
 
 }

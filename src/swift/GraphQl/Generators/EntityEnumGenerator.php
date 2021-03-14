@@ -14,7 +14,10 @@ use GraphQL\Type\Definition\EnumType;
 use GraphQL\Type\Definition\Type;
 use ReflectionClass;
 use Swift\GraphQl\TypeRegistry;
+use Swift\GraphQl\TypeRegistryInterface;
 use Swift\GraphQl\Types\ObjectType;
+use Swift\Kernel\ServiceLocator;
+use Swift\Kernel\ServiceLocatorInterface;
 use Swift\Model\Attributes\DBField;
 use Swift\Model\Entity;
 
@@ -26,10 +29,25 @@ use Swift\Model\Entity;
  */
 class EntityEnumGenerator implements GeneratorInterface {
 
+    private ServiceLocatorInterface $serviceLocator;
+    private TypeRegistryInterface $inputTypeRegistry;
+    private TypeRegistryInterface $outputTypeRegistry;
+
+    /**
+     * EntityArgumentGenerator constructor.
+     */
+    public function __construct() {
+        $serviceLocator = new ServiceLocator();
+        /** @var TypeRegistryInterface $this */
+        $this->inputTypeRegistry = $serviceLocator->get(TypeRegistry\InputTypeRegistry::class);
+        /** @var TypeRegistryInterface $this */
+        $this->outputTypeRegistry = $serviceLocator->get(TypeRegistry\OutputTypeRegistry::class);
+    }
+
     /**
      * @inheritDoc
      */
-    public function generate( ObjectType $type, TypeRegistry $typeRegistry ): Type {
+    public function generate( ObjectType $type, TypeRegistryInterface $typeRegistry ): Type {
         $classReflection = new ReflectionClass($type->type);
 
         if (!is_a(object_or_class: $type->type, class: Entity::class, allow_string: true)) {
@@ -44,13 +62,22 @@ class EntityEnumGenerator implements GeneratorInterface {
             }
         }
 
-        $object = $typeRegistry->getCompiledType(type: $type->name) ?? new EnumType(array(
-                'name' => $type->name,
+        $object = $this->get($type->name) ?? new EnumType(array(
+                'name' => ucfirst($type->name . 'Enum'),
                 'values' => $values,
             ));
-
-        $typeRegistry->definitions['types'][$object->name] = $object;
+        $this->inputTypeRegistry->getCompiled()->set($type->name, $object);
 
         return $object;
+    }
+
+
+    private function get( string $type ) {
+        if ($this->inputTypeRegistry->getCompiled()->has($type)) {
+            return $this->inputTypeRegistry->getCompiled()->get($type);
+        }
+
+        return $this->outputTypeRegistry->getCompiled()->has($type) ?
+            $this->outputTypeRegistry->getCompiled()->get($type) : null;
     }
 }

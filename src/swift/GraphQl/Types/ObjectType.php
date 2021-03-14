@@ -21,11 +21,12 @@ class ObjectType {
      * @param array $fields
      * @param string|null $resolve
      * @param array|null $args
-     * @param string|null $type
+     * @param string|array|null $type
      * @param bool $nullable
      * @param bool $isList
      * @param string|null $generator
      * @param array $generatorArguments
+     * @param array $interfaces
      */
     public function __construct(
         public string $name,
@@ -34,11 +35,12 @@ class ObjectType {
         public array $fields = array(),
         public string|null $resolve = null,
         public array|null $args = null,
-        public string|null $type = null,
+        public string|array|null $type = null,
         public bool $nullable = true,
         public bool $isList = false,
         public string|null $generator = null,
         public array $generatorArguments = array(),
+        public array $interfaces = array(),
     ) {
     }
 }

@@ -12,6 +12,7 @@ namespace Swift\Security\Authentication\Passport\Credentials;
 
 
 use Swift\Security\Authentication\Exception\InvalidCredentialsException;
+use Swift\Security\User\UserInterface;
 
 /**
  * Class NullCredentials
@@ -29,5 +30,5 @@ class NullCredentials implements CredentialsInterface {
     /**
      * @inheritDoc
      */
-    public function validateCredentials(): void {}
+    public function validateCredentials( UserInterface $user ): void {}
 }

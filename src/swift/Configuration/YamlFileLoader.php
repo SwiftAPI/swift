@@ -21,26 +21,16 @@ use RuntimeException;
 #[Autowire]
 class YamlFileLoader {
 
-	/**
-	 * @var Yaml $yaml
-	 */
-	private $yaml;
-
-	/**
-	 * @var array $imported paths that have been imported
-	 */
-	private $imported = array();
-
-	/**
-	 * FileLoader constructor.
-	 *
-	 * @param $yaml
-	 */
+    /**
+     * FileLoader constructor.
+     *
+     * @param Yaml $yaml
+     * @param array $imported paths that have been imported
+     */
 	public function __construct(
-		Yaml $yaml
+		private Yaml $yaml,
+        private array $imported = array(),
 	) {
-		$this->yaml = $yaml;
-
 		$this->loadFiles();
 	}
 
@@ -59,34 +49,6 @@ class YamlFileLoader {
 	 * @throws RuntimeException
 	 */
 	public function loadFiles() : void {
-		// General config
-		$path   = INCLUDE_DIR . '/config.yaml';
-		if (!$this->fileExists($path)) {
-			throw new RuntimeException($path . ' does not exist', 500);
-		}
-		$config = $this->yaml->parseFile($path, 4);
-
-		$this->imported[$path]  = $config;
-
-		if (!empty($config['imports'])) {
-			$this->parseSubConfig($config['imports']);
-		}
-
-		// Framework config
-		$path   = INCLUDE_DIR . '/vendor/henrivantsant/swift/config.yaml';
-		$fallback = INCLUDE_DIR . '/src/swift/config.yaml';
-		if (!$this->fileExists($path) && !$this->fileExists($fallback)) {
-			throw new RuntimeException($path . ' does not exist', 500);
-		}
-		$path = $this->fileExists($path) ? $path : $fallback;
-		$config = $this->yaml->parseFile($path, 4);
-
-		$this->imported[$path]  = $config;
-
-		if (!empty($config['imports'])) {
-			$this->parseSubConfig($config['imports']);
-		}
-
 		// App config
 		$path   = INCLUDE_DIR . '/app/config.yaml';
 		if ($this->fileExists($path)) {

@@ -7,6 +7,7 @@
 
 namespace Swift\Router;
 
+use Swift\HttpFoundation\RequestInterface;
 use Swift\Router\Exceptions\NotFoundException;
 
 interface RouterInterface {
@@ -36,9 +37,9 @@ interface RouterInterface {
     /**
      * Add a route
      *
-     * @param Route $route
+     * @param RouteInterface $route
      */
-    public function addRoute(Route $route): void;
+    public function addRoute(RouteInterface $route): void;
 
     /**
      * Set the base path.
@@ -66,12 +67,11 @@ interface RouterInterface {
     /**
      * Match a given Request Url against stored routes
      *
-     * @param string|null $requestUrl
-     * @param string|null $requestMethod
+     * @param RequestInterface $request
      *
      * @return RouteInterface|null Matched Route object with information on success, false on failure (no match).
      */
-    public function match(string $requestUrl = null, string $requestMethod = null): ?RouteInterface;
+    public function match(RequestInterface $request): ?RouteInterface;
 
     /**
      * Compile the regex for a given route (EXPENSIVE)
@@ -81,5 +81,14 @@ interface RouterInterface {
      * @return string
      */
     public function compileRoute(string $route): string;
+
+    /**
+     * Get all routes containing provided tag
+     *
+     * @param string $tag
+     *
+     * @return array
+     */
+    public function getTaggedRoutes( string $tag ): array;
 
 }

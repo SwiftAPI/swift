@@ -19,6 +19,9 @@ use Swift\Security\User\UserInterface;
  */
 interface TokenInterface {
 
+    public const SCOPE_ACCESS_TOKEN = 'SCOPE_ACCESS_TOKEN';
+    public const SCOPE_REFRESH_TOKEN = 'SCOPE_REFRESH_TOKEN';
+
     /**
      * @return UserInterface
      */
@@ -37,6 +40,8 @@ interface TokenInterface {
      * @return \DateTimeInterface
      */
     public function expiresAt(): \DateTimeInterface;
+
+    public function getTokenString(): string;
 
     /**
      * Check whether token is authenticated

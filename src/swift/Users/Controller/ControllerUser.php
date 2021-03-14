@@ -58,34 +58,34 @@ class ControllerUser extends AbstractController {
 	 * @return JSONResponse
 	 * @throws \Exception
 	 */
-	#[Route(type: 'POST', route: '/login/')]
-	public function login(): JSONResponse {
-		$data       = $this->auth->decode('secret', $this->HTTPRequest->request->input->get('payload'));
-
-		$username   = !empty($data['username']) ? $data['username'] : false;
-		$password   = !empty($data['password']) ? $data['password'] : false;
-
-		if (!$username || !$password || !$this->modelUser->userMayLogin($username, $password)) {
-			// User not allowed to log in
-			$response   = new JSONResponse();
-			$response::notAuthorized();
-			return $response;
-		}
-
-		$user = $this->modelUser->getPopulatedUser();
-
-		// Update token
-		$token  = $this->auth->getToken();
-		$token->userID  = $user->id;
-		$token->level   = 'login';
-		$this->auth->updateToken($token);
-
-		$response   = new JSONResponse(array(
-			'state' => 'logged in',
-		));
-
-		return $response;
-	}
+//	#[Route(type: 'POST', route: '/login/')]
+//	public function login(): JSONResponse {
+//		$data       = $this->auth->decode('secret', $this->HTTPRequest->request->input->get('payload'));
+//
+//		$username   = !empty($data['username']) ? $data['username'] : false;
+//		$password   = !empty($data['password']) ? $data['password'] : false;
+//
+//		if (!$username || !$password || !$this->modelUser->userMayLogin($username, $password)) {
+//			// User not allowed to log in
+//			$response   = new JSONResponse();
+//			$response::notAuthorized();
+//			return $response;
+//		}
+//
+//		$user = $this->modelUser->getPopulatedUser();
+//
+//		// Update token
+//		$token  = $this->auth->getToken();
+//		$token->userID  = $user->id;
+//		$token->level   = 'login';
+//		$this->auth->updateToken($token);
+//
+//		$response   = new JSONResponse(array(
+//			'state' => 'logged in',
+//		));
+//
+//		return $response;
+//	}
 
 	/**
 	 * @return JSONResponse

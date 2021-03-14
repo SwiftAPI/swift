@@ -4,6 +4,7 @@
 namespace Swift\Kernel\Container\CompilerPass;
 
 use Honeywell\Controller\ConditionController;
+use Swift\Event\Attribute\ListenTo;
 use Swift\Kernel\Attributes\Autowire;
 use Swift\Kernel\Container\Container;
 use Swift\Kernel\Container\TaggedServices;

@@ -10,7 +10,7 @@
 
 namespace Swift\Router\MatchTypes;
 
-use Psr\Http\Message\RequestInterface;
+use Swift\HttpFoundation\RequestInterface;
 
 /**
  * Class Wildcard

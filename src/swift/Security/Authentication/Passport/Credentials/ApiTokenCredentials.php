@@ -22,11 +22,9 @@ final class ApiTokenCredentials implements CredentialsInterface {
     /**
      * ApiTokenCredentials constructor.
      *
-     * @param UserInterface|string $user
      * @param CredentialEncoderInterface|string $providedCredential
      */
     public function __construct(
-        private UserInterface|string $user,
         private CredentialEncoderInterface|string $providedCredential,
     ) {
     }
@@ -41,8 +39,8 @@ final class ApiTokenCredentials implements CredentialsInterface {
     /**
      * @inheritDoc
      */
-    public function validateCredentials(): void {
-        $userCredential = $this->user instanceof UserInterface ? $this->user->getCredential() : $this->user;
+    public function validateCredentials(UserInterface $user): void {
+        $userCredential = $user->getCredential();
         $providedCredentials = $this->providedCredential instanceof CredentialEncoderInterface ? $this->providedCredential->getEncoded() : $this->providedCredential;
 
         if ($userCredential !== $providedCredentials) {

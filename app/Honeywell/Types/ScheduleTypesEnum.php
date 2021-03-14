@@ -13,6 +13,10 @@ namespace Honeywell\Types;
 
 use Swift\Kernel\TypeSystem\Enum;
 
+/**
+ * Class ScheduleTypesEnum
+ * @package Honeywell\Types
+ */
 class ScheduleTypesEnum extends Enum {
 
     public const DEFAULT = 'DEFAULT';

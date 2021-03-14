@@ -20,7 +20,6 @@ use Swift\GraphQl\TypeRegistryInterface;
  */
 class BatchLoader implements LoaderInterface {
 
-
     /**
      * BatchLoader constructor.
      *

@@ -10,7 +10,6 @@
 
 namespace Swift\HttpFoundation;
 
-use Psr\Http\Message\RequestInterface;
 use Swift\Kernel\Attributes\DI;
 
 /**

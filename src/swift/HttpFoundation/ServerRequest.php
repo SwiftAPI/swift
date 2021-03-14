@@ -10,22 +10,13 @@
 
 namespace Swift\HttpFoundation;
 
-use Psr\Http\Message\{RequestInterface, ServerRequestInterface, StreamInterface, UploadedFileInterface, UriInterface};
+use Psr\Http\Message\{RequestInterface as PsrRequestInterface, ServerRequestInterface, StreamInterface, UploadedFileInterface, UriInterface};
 use Swift\HttpFoundation\Exception\ConflictingHeadersException;
 use Swift\HttpFoundation\Exception\JsonException;
 use Swift\HttpFoundation\Exception\SuspiciousOperationException;
 use Swift\HttpFoundation\Session\SessionInterface;
 use Swift\Kernel\Attributes\DI;
 use function in_array;
-
-// Help opcache.preload discover always-needed symbols
-class_exists( AcceptHeader::class );
-class_exists( FileBag::class );
-class_exists( HeaderBag::class );
-class_exists( HeaderUtils::class );
-class_exists( InputBag::class );
-class_exists( ParameterBag::class );
-class_exists( ServerBag::class );
 
 /**
  * ServerRequest represents an HTTP request.
@@ -40,7 +31,7 @@ class_exists( ServerBag::class );
  *
  * @author Fabien Potencier <fabien@symfony.com>
  */
-#[DI(aliases: [RequestInterface::class . ' $request', ServerRequestInterface::class . ' $request'])]
+#[DI(aliases: [RequestInterface::class . ' $request', PsrRequestInterface::class . ' $request', ServerRequestInterface::class . ' $request'])]
 class ServerRequest extends Request implements ServerRequestInterface {
 
     /** @var array */

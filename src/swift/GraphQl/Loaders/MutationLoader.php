@@ -14,10 +14,12 @@ namespace Swift\GraphQl\Loaders;
 use Swift\GraphQl\Attributes\Argument;
 use Swift\GraphQl\Attributes\Mutation;
 use Swift\GraphQl\LoaderInterface;
+use Swift\GraphQl\ResolveHelper;
 use Swift\GraphQl\TypeRegistryInterface;
 use Swift\GraphQl\Types\ObjectType;
 use Swift\Kernel\Attributes\Autowire;
 use Swift\Kernel\ContainerAwareTrait;
+use Swift\Kernel\ServiceLocatorInterface;
 
 /**
  * Class MutationLoader
@@ -26,8 +28,21 @@ use Swift\Kernel\ContainerAwareTrait;
 #[Autowire]
 class MutationLoader implements LoaderInterface {
 
-    use ContainerAwareTrait;
-
+    /**
+     * MutationLoader constructor.
+     *
+     * @param TypeRegistryInterface $inputTypeRegistry
+     * @param TypeRegistryInterface $mutationRegistry
+     * @param ServiceLocatorInterface $serviceLocator
+     * @param ResolveHelper $helper
+     */
+    public function __construct(
+        private TypeRegistryInterface $inputTypeRegistry,
+        private TypeRegistryInterface $mutationRegistry,
+        private ServiceLocatorInterface $serviceLocator,
+        private ResolveHelper $helper,
+    ) {
+    }
 
     /**
      * Load types into given type registry
@@ -35,10 +50,10 @@ class MutationLoader implements LoaderInterface {
      * @param TypeRegistryInterface $typeRegistry
      */
     public function load( TypeRegistryInterface $typeRegistry ): void {
-        $mutations = $this->container->getDefinitionsByTag('graphql.mutation');
+        $mutations = $this->serviceLocator->getServicesByTag('graphql.mutation');
 
         foreach ($mutations as $mutation) {
-            $classReflection = $this->container->getReflectionClass($mutation);
+            $classReflection = $this->serviceLocator->getReflectionClass($mutation);
 
             if (is_null($classReflection)) {
                 continue;
@@ -46,7 +61,8 @@ class MutationLoader implements LoaderInterface {
 
             foreach ($classReflection->getMethods() as $reflectionMethod) {
                 $methodAttributes = $reflectionMethod->getAttributes(name: Mutation::class);
-                $methodConfig = !empty($methodAttributes) ? $methodAttributes[0]->getArguments() : null;
+                /** @var Mutation $methodConfig */
+                $methodConfig = !empty($methodAttributes) ? $methodAttributes[0]->newInstance() : null;
 
                 if (is_null($methodConfig)) {
                     continue;
@@ -57,33 +73,35 @@ class MutationLoader implements LoaderInterface {
 
                 foreach ($methodParameters as $reflectionParameter) {
                     $parameterAttributes = $reflectionParameter->getAttributes(name: Argument::class);
-                    $parameterConfig = !empty($parameterAttributes) ? $parameterAttributes[0]->getArguments() : null;
-                    $argumentType = $parameterConfig['type'] ?? $reflectionParameter->getType()?->getName();
+                    /** @var Argument $parameterConfig */
+                    $parameterConfig = !empty($parameterAttributes) ? $parameterAttributes[0]->newInstance() : null;
+                    $argumentType = $this->helper->getArgumentType($parameterConfig?->type, $reflectionParameter?->getType());
                     $argumentName = $reflectionParameter->getName();
 
                     $arguments[$argumentName] = new ObjectType(
                         name: $argumentName,
                         declaringClass: $reflectionMethod->getDeclaringClass()->getName(),
-                        declaringMethod: $methodConfig['name'] ?? $reflectionMethod->getName(),
+                        declaringMethod: $methodConfig->name ?? $reflectionMethod->getName(),
                         type: $argumentType,
                         nullable: $reflectionParameter->isOptional(),
-                        generator: $parameterConfig['generator'] ?? null,
-                        generatorArguments: $parameterConfig['generatorArguments'] ?? array(),
+                        generator: $parameterConfig->generator ?? null,
+                        generatorArguments: $parameterConfig->generatorArguments ?? array(),
                     );
                 }
 
-                $queryName = $methodConfig['name'] ?? $reflectionMethod->getName();
-                $queryType = $methodConfig['type'] ?? $reflectionMethod->getReturnType()?->getName();
+                $queryName = $methodConfig->name ?? $reflectionMethod->getName();
+                //$queryType = $methodConfig->type ?? $reflectionMethod->getReturnType()?->getName();
+                $queryType = $this->helper->getReturnType($methodConfig?->type, $reflectionMethod?->getReturnType());
                 $objectType = new ObjectType(
-                    name: $queryName,
+                    name: ucfirst($queryName),
                     declaringClass: $reflectionMethod->getDeclaringClass()->getName(),
                     resolve: $reflectionMethod->getName(),
                     args: $arguments,
                     type: $queryType,
-                    isList: $methodConfig['isList'] ?? false,
+                    isList: $methodConfig->isList ?? false,
                 );
 
-                $typeRegistry->addMutation($objectType);
+                $this->mutationRegistry->addType($objectType);
             }
         }
     }

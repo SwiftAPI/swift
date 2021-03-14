@@ -23,4 +23,40 @@ interface UserInterface {
      */
     public function getCredential(): string;
 
+    /**
+     * @return int|null
+     */
+    public function getId(): ?int;
+
+    /**
+     * @return string
+     */
+    public function getUsername(): string;
+
+    /**
+     * @return string|null
+     */
+    public function getEmail(): ?string;
+
+    /**
+     * @return string|null
+     */
+    public function getFirstname(): ?string;
+
+    /**
+     * @return string|null
+     */
+    public function getLastname(): ?string;
+
+    /**
+     * @return string|null
+     */
+    public function getFullName(): ?string;
+
+    public function getCreated(): \DateTime;
+
+    public function getLastModified(): \DateTime;
+
+    public function getRoles(): UserRolesBag;
+
 }

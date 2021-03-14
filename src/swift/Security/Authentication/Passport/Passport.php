@@ -38,7 +38,7 @@ class Passport implements PassportInterface {
         array $stamps = array(),
         array $attributes = array(),
     ) {
-        $this->credentials->validateCredentials();
+        $this->credentials->validateCredentials($this->user);
         $this->attributes = new AttributesBag($attributes);
 
         foreach ($stamps as $stamp) {

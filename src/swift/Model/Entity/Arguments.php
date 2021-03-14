@@ -6,6 +6,7 @@ namespace Swift\Model\Entity;
 use Dibi\Fluent;
 use InvalidArgumentException;
 use Swift\GraphQl\Attributes\Field;
+use Swift\GraphQl\Attributes\InputType;
 use Swift\GraphQl\Attributes\Type;
 use Swift\GraphQl\Generators\EntityEnumGenerator;
 use Swift\Kernel\Attributes\DI;
@@ -16,7 +17,7 @@ use TypeError;
  * Class Arguments
  * @package Swift\Model\Entity
  */
-#[Type]
+#[InputType]
 class Arguments {
 
     /**

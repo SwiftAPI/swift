@@ -11,9 +11,10 @@
 namespace Swift\Router\Attributes;
 
 use Attribute;
+use JetBrains\PhpStorm\Deprecated;
 use JetBrains\PhpStorm\Pure;
-use Swift\AuthenticationDeprecated\Types\AuthenticationLevelsEnum;
-use Swift\Router\Types\RouteTypesEnum;
+use Swift\Router\Types\RouteMethodEnum;
+use Swift\Security\Authorization\AuthorizationTypesEnum;
 
 /**
  * Class Route
@@ -22,34 +23,44 @@ use Swift\Router\Types\RouteTypesEnum;
 #[Attribute( Attribute::TARGET_CLASS|Attribute::TARGET_METHOD )]
 class Route {
 
+    public const TAG_ENTRYPOINT = 'entrypoint';
+
     /**
      * Route constructor.
      *
-     * @param string|array $type
-     * @param string|null $route
-     * @param string|null $name
-     * @param bool|null $authRequired
-     * @param array|string|null $authLevel
+     * @param string|array $method
+     * @param string $route
+     * @param string $name
+     * @param string|array|null $type
+     * @param array|string|null $authType
+     * @param array|string|null $isGranted
+     * @param array $tags Route tags
      */
     #[Pure] public function __construct(
-        public string|array $type = '',
-        public string|null $route = null,
-        public string|null $name = null,
-        public bool|null $authRequired = false,
-        public array|string|null $authLevel = null,
+        public string|array $method,
+        public string $route,
+        public string $name,
+        #[Deprecated(replacement: 'Use "method" instead')] public string|array|null $type = null,
+        public array|string|null $authType = null,
+        public array|string|null $isGranted = null,
+        public array $tags = array(),
     ) {
         $this->type = is_array($this->type) ? $this->type : explode('|', $this->type);
-        foreach ($this->type as $typeItem) {
-            $routeType = new RouteTypesEnum($typeItem);
+        $this->method = is_array($this->method) ? $this->method : explode('|', $this->method);
+        if (!is_null($this->type)) {
+            $this->method = array_unique(array_merge($this->method, $this->type));
         }
-        if (!is_null($this->authLevel)) {
-            $this->authLevel = is_array($this->authLevel) ? $this->authLevel : explode('|', $this->authLevel);
+        foreach ($this->method as $method) {
+            $routeType = new RouteMethodEnum($method);
+        }
+        if (!is_null($this->authType)) {
+            $this->authType = is_array($this->authType) ? $this->authType : explode('|', $this->authType);
 
-            foreach($this->authLevel as $authLevelItem) {
-                $routeAuthLevel = new AuthenticationLevelsEnum($authLevelItem);
+            foreach($this->authType as $authLevelItem) {
+                $routeAuthLevel = new AuthorizationTypesEnum($authLevelItem);
             }
         }
 
-        $this->authLevel ??= array(AuthenticationLevelsEnum::NONE);
+        $this->authType ??= array(AuthorizationTypesEnum::PUBLIC_ACCESS);
     }
 }

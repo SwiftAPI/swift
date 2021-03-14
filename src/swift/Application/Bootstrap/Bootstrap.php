@@ -15,6 +15,7 @@ require_once 'DependencyInjection/DependencyInjection.php';
 use Swift\Application\Bootstrap\Autoloading\Autoloader;
 use Swift\Application\Bootstrap\DependencyInjection\DependencyInjection;
 use Swift\Kernel\Container\Container;
+use function Composer\Autoload\includeFile;
 
 /**
  * Class Bootstrap
@@ -44,6 +45,8 @@ class Bootstrap {
         $startMem  = memory_get_usage();
 
         date_default_timezone_set('Europe/Amsterdam');
+
+        include_once __DIR__ . '/Functions.php';
 
 
         // set up autoloading

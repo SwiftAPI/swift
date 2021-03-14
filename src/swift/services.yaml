@@ -13,5 +13,3 @@ services:
   Swift\:
     resource: 'src/swift/*'
     exclude: [ 'Monolog/Logger' ]
-
-  Doctrine\Common\Annotations\AnnotationReader: ~

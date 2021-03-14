@@ -11,7 +11,7 @@
 namespace Swift\Router\MatchTypes;
 
 
-use Psr\Http\Message\RequestInterface;
+use Swift\HttpFoundation\RequestInterface;
 use Swift\Router\Exceptions\UnexpectedValueException;
 
 /**

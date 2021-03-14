@@ -111,13 +111,16 @@ final class Serialize {
 	 */
 	public function datetime($value, bool $toDb) {
 		if ($value instanceof DateTime) {
-			$value = $value->__toString();
+			$value = date('Y-m-d H:i:s', strtotime($value->__toString()));
 		}
+		if ($value instanceof \DateTime) {
+            $value = $value->format('Y-m-d H:i:s');
+        }
 
 		if ($toDb) {
-			return date('Y-m-d H:i:s', strtotime($value));
+			return (new \DateTime($value))->format('Y-m-d H:i:s');
 		} else {
-			return date('d-m-Y H:i:s', strtotime($value));
+			return new \DateTime($value);
 		}
 	}
 

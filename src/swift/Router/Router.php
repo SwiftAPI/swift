@@ -11,7 +11,7 @@
 namespace Swift\Router;
 
 use Exception;
-use Psr\Http\Message\RequestInterface;
+use Swift\HttpFoundation\RequestInterface;
 use Swift\Configuration\Configuration;
 use Swift\Events\EventDispatcher;
 use Swift\Kernel\Attributes\Autowire;
@@ -26,6 +26,8 @@ use Swift\Router\MatchTypes\MatchTypeInterface;
  */
 #[Autowire]
 class Router implements RouterInterface {
+
+    private bool $isCompiled = false;
 
     /** @var RouteInterface[] $routeHarvest */
 	protected array $routeHarvest = array();
@@ -50,6 +52,9 @@ class Router implements RouterInterface {
      */
     protected array $matchTypes = array();
 
+    /** @var RouteInterface|null $currentRoute */
+    protected RouteInterface|null $currentRoute = null;
+
     /**
      * Router constructor.
      *
@@ -71,7 +76,7 @@ class Router implements RouterInterface {
 	 *
 	 * @throws Exception
 	 */
-	public function bindRoutes(): void {
+	private function bindRoutes(): void {
 		if (empty($this->routeHarvest)) {
 			return;
 		}
@@ -90,43 +95,59 @@ class Router implements RouterInterface {
 	 * @throws Exception
 	 */
 	public function getCurrentRoute(): RouteInterface {
-		$this->routeHarvest = $this->harvester->harvestRoutes();
+	    if (isset($this->currentRoute)) {
+	        return $this->currentRoute;
+        }
 
-        /** @var OnBeforeRoutesCompileEvent $onBeforeCompileRoutes */
-		$onBeforeCompileRoutes = $this->dispatcher->dispatch( new OnBeforeRoutesCompileEvent($this->routeHarvest, $this->matchTypes) );
+	    if (!$this->isCompiled) {
+	        $this->compile();
+        }
 
-        /**
-         * Reassign possibly changed routes and match types
-         */
-		$this->routeHarvest = $onBeforeCompileRoutes->getRoutes();
-		$this->matchTypes   = $onBeforeCompileRoutes->getMatchTypes();
+		$this->currentRoute = $this->match($this->request);
 
-		$this->bindRoutes();
-		$match = $this->match();
-
-		if (is_null($match)) {
+		if (is_null($this->currentRoute)) {
 			throw new NotFoundException('Not found');
 		}
 
-		return $match;
+		return $this->currentRoute;
 	}
 
     /**
      * Match a given Request Url against stored routes
      *
-     * @param string|null $requestUrl
-     * @param string|null $requestMethod
+     * @param RequestInterface $request
      *
      * @return RouteInterface|null Matched Route object with information on success, false on failure (no match).
      */
-	public function match(string $requestUrl = null, string $requestMethod = null): ?RouteInterface {
+	public function match(RequestInterface $request ): ?RouteInterface {
 		foreach ($this->routes as $handler) {
-            if ($handler->matchesRequest($this->request)) {
+            if ($handler->matchesRequest($request)) {
                 return $handler;
             }
 		}
 
 		return null;
+	}
+
+    /**
+     * Compile routes
+     *
+     * @throws Exception
+     */
+    private function compile(): void {
+        $this->routeHarvest = $this->harvester->harvestRoutes();
+
+        /** @var OnBeforeRoutesCompileEvent $onBeforeCompileRoutes */
+        $onBeforeCompileRoutes = $this->dispatcher->dispatch( new OnBeforeRoutesCompileEvent($this->routeHarvest, $this->matchTypes) );
+
+        /**
+         * Reassign possibly changed routes and match types
+         */
+        $this->routeHarvest = $onBeforeCompileRoutes->getRoutes();
+        $this->matchTypes   = $onBeforeCompileRoutes->getMatchTypes();
+
+        $this->bindRoutes();
+        $this->isCompiled = true;
 	}
 
     /**
@@ -152,9 +173,9 @@ class Router implements RouterInterface {
     /**
      * Add a route
      *
-     * @param Route $route
+     * @param RouteInterface $route
      */
-    public function addRoute( Route $route ): void {
+    public function addRoute( RouteInterface $route ): void {
         $this->routes[] = $route;
 
         if ($route->getName()) {
@@ -281,6 +302,26 @@ class Router implements RouterInterface {
         return "`^$route$`u";
     }
 
+    /**
+     * @inheritDoc
+     */
+    public function getTaggedRoutes( string $tag ): array {
+        $tagged = array();
+        foreach ($this->routes as $route) {
+            var_dump($route->getTags());
+            if ( in_array( $tag, $route->getTags(), true ) ) {
+                $tagged[] = $route;
+            }
+        }
+
+        return $tagged;
+    }
+
+    /**
+     * Setter injection for match types
+     *
+     * @param iterable $matchTypes
+     */
     #[Autowire]
     public function populateMatchTypes( #[Autowire(tag: DiTags::MATCH_TYPES)] iterable $matchTypes ): void {
         foreach ($matchTypes as /** @var MatchTypeInterface */$matchType) {

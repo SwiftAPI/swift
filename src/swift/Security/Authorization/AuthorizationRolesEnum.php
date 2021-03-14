@@ -19,10 +19,14 @@ use Swift\Kernel\TypeSystem\Enum;
  */
 class AuthorizationRolesEnum extends Enum {
 
-    public const NOT_LOGGED_IN = 'NOT_LOGGED_IN';
-    public const LOGGED_IN = 'LOGGED_IN';
+    // Main roles
+    public const ROLE_GUEST = 'ROLE_GUEST';
+    public const ROLE_USER = 'ROLE_USER';
+    public const ROLE_CLIENT = 'ROLE_CLIENT';
+    public const ROLE_ADMIN = 'ROLE_ADMIN';
+    public const ROLE_SUPER_ADMIN = 'ROLE_SUPER_ADMIN';
 
-    public const ACCESS_GRANTED = 'ACCESS_GRANTED';
-    public const ACCESS_DENIED = 'ACCESS_DENIED';
+    // Sub roles
+    public const ROLE_USERS_LIST = 'ROLE_USERS_LIST';
 
 }

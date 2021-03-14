@@ -17,6 +17,7 @@ use Swift\GraphQl\Kernel;
 use Swift\Kernel\Attributes\Autowire;
 use Swift\Router\Event\OnBeforeRoutesCompileEvent;
 use Swift\Router\Route;
+use Swift\Security\Authorization\AuthorizationTypesEnum;
 use Symfony\Component\EventDispatcher\EventSubscriberInterface;
 
 /**
@@ -61,10 +62,9 @@ class OnBeforeRouteSubscriber implements EventSubscriberInterface {
             'regex' => 'graphql',
             'methods' => array('POST'),
             'controller' => Kernel::class,
-            'controllerBase' => '',
             'action' => 'run',
-            'authRequired' => false,
-            'authLevels' => array(AuthenticationLevelsEnum::NONE),
+            'authType' => array(AuthorizationTypesEnum::PUBLIC_ACCESS),
+            'isGranted' => array(),
         )));
     }
 

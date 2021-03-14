@@ -16,28 +16,46 @@ use Swift\GraphQl\Attributes\Query;
 use Swift\GraphQl\LoaderInterface;
 use Swift\GraphQl\TypeRegistryInterface;
 use Swift\GraphQl\Types\ObjectType;
+use Swift\Kernel\Attributes\Autowire;
 use Swift\Kernel\ContainerAwareTrait;
+use Swift\Kernel\ServiceLocatorInterface;
 
 /**
  * Class QueryLoader
  * @package Swift\GraphQl
  */
+#[Autowire]
 class QueryLoader implements LoaderInterface {
 
-    use ContainerAwareTrait;
+    /**
+     * QueryLoader constructor.
+     *
+     * @param TypeRegistryInterface $inputTypeRegistry
+     * @param TypeRegistryInterface $outputTypeRegistry
+     * @param TypeRegistryInterface $queryRegistry
+     * @param ServiceLocatorInterface $serviceLocator
+     */
+    public function __construct(
+        private TypeRegistryInterface $inputTypeRegistry,
+        private TypeRegistryInterface $outputTypeRegistry,
+        private TypeRegistryInterface $queryRegistry,
+        private ServiceLocatorInterface $serviceLocator,
+    ) {
+    }
 
     public function load( TypeRegistryInterface $typeRegistry ): void {
-        $queries = $this->container->getDefinitionsByTag('graphql.query');
+        $queries = $this->serviceLocator->getServicesByTag('graphql.query');
 
         foreach ($queries as $query) {
-            $classReflection = $this->container->getReflectionClass($query);
+            $classReflection = $this->serviceLocator->getReflectionClass($query);
 
             if (is_null($classReflection)) {
                 continue;
             }
 
             foreach ($classReflection->getMethods() as $reflectionMethod) {
-                $methodConfig = !empty($reflectionMethod->getAttributes(name: Query::class)) ? $reflectionMethod->getAttributes(name: Query::class)[0]->getArguments() : null;
+                /** @var Query $methodConfig */
+                $methodConfig = !empty($reflectionMethod->getAttributes(name: Query::class)) ? $reflectionMethod->getAttributes(name: Query::class)[0]->newInstance() : null;
 
                 if (is_null($methodConfig)) {
                     continue;
@@ -47,35 +65,36 @@ class QueryLoader implements LoaderInterface {
                 $arguments = array();
 
                 foreach ($methodParameters as $reflectionParameter) {
-                    $parameterConfig = !empty($reflectionParameter->getAttributes(name: Argument::class)) ? $reflectionParameter->getAttributes(name: Argument::class)[0]->getArguments() : null;
-                    $argumentType = $parameterConfig['type'] ?? $reflectionParameter->getType()?->getName();
-                    $argumentName = $parameterConfig['name'] ?? $reflectionParameter->getName();
+                    /** @var Argument $parameterConfig */
+                    $parameterConfig = !empty($reflectionParameter->getAttributes(name: Argument::class)) ? $reflectionParameter->getAttributes(name: Argument::class)[0]->newInstance() : null;
+                    $argumentType = $parameterConfig->type ?? $reflectionParameter->getType()?->getName();
+                    $argumentName = $parameterConfig->name ?? $reflectionParameter->getName();
 
                     $arguments[$argumentName] = new ObjectType(
                         name: $argumentName,
                         declaringClass: $reflectionMethod->getDeclaringClass()->getName(),
-                        declaringMethod: $methodConfig['name'] ?? $reflectionMethod->getName(),
+                        declaringMethod: $methodConfig->name ?? $reflectionMethod->getName(),
                         type: $argumentType,
                         nullable: $reflectionParameter->isOptional(),
-                        generator: $parameterConfig['generator'] ?? null,
-                        generatorArguments: $parameterConfig['generatorArguments'] ?? array(),
+                        generator: $parameterConfig->generator ?? null,
+                        generatorArguments: $parameterConfig->generatorArguments ?? array(),
                     );
                 }
 
-                $queryName = $methodConfig['name'] ?? $reflectionMethod->getName();
-                $queryType = $methodConfig['type'] ?? $reflectionMethod->getReturnType()?->getName();
+                $queryName = $methodConfig->name ?? $reflectionMethod->getName();
+                $queryType = $methodConfig->type ?? $reflectionMethod->getReturnType()?->getName();
                 $objectType = new ObjectType(
-                    name: $queryName,
+                    name: ucfirst($queryName),
                     declaringClass: $reflectionMethod->getDeclaringClass()->getName(),
                     resolve: $reflectionMethod->getName(),
                     args: $arguments,
                     type: $queryType,
-                    isList: $methodConfig['isList'] ?? false,
-                    generator: $propertyConfig['generator'] ?? null,
-                    generatorArguments: $propertyConfig['generatorArguments'] ?? array(),
+                    isList: $methodConfig->isList ?? false,
+                    generator: $propertyConfig->generator ?? null,
+                    generatorArguments: $propertyConfig->generatorArguments ?? array(),
                 );
 
-                $typeRegistry->addQuery($objectType);
+                $this->queryRegistry->addType($objectType);
             }
         }
     }

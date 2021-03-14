@@ -22,11 +22,12 @@ interface AccessDecisionManagerInterface {
      * Decide whether access should be granted
      *
      * @param TokenInterface $token Token to vote against
-     * @param mixed $subject        Subject to vote on
-     * @param array $attributes     Decision attributes
+     * @param mixed $subject Subject to vote on
+     * @param array $attributes Decision attributes
+     * @param string|null $strategy Override default strategy
      *
      * @return bool
      */
-    public function decide( TokenInterface $token, mixed $subject, array $attributes ): bool;
+    public function decide( TokenInterface $token, mixed $subject, array $attributes, string $strategy = null ): bool;
 
 }

@@ -11,11 +11,13 @@
 namespace Swift\Events;
 
 use Symfony\Component\EventDispatcher\EventDispatcher as SymfonyEventDispatcher;
+use Symfony\Component\EventDispatcher\EventSubscriberInterface;
 
 /**
  * @internal
  */
 class EventDispatcher extends SymfonyEventDispatcher
 {
+
 
 }

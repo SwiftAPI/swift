@@ -11,12 +11,15 @@
 namespace Swift\Controller;
 
 
-use Psr\Http\Message\RequestInterface;
+use Swift\HttpFoundation\RequestInterface;
 use Swift\HttpFoundation\ServerRequest;
 use Swift\Kernel\Attributes\Autowire;
 use Swift\Kernel\DiTags;
 use Swift\Kernel\Attributes\DI;
 use Swift\Router\RouteInterface;
+use Swift\Security\Authentication\Token\TokenInterface;
+use Swift\Security\Authorization\AuthorizationCheckerInterface;
+use Swift\Security\Security;
 use Swift\Security\User\UserInterface;
 
 /**
@@ -28,7 +31,8 @@ abstract class AbstractController implements ControllerInterface {
 
     protected RouteInterface $route;
     protected RequestInterface $request;
-    protected UserInterface $user;
+    protected AuthorizationCheckerInterface $authorizationChecker;
+    protected Security $security;
 
     /**
      * @return RouteInterface
@@ -52,6 +56,19 @@ abstract class AbstractController implements ControllerInterface {
         $this->request = $serverRequest;
     }
 
+    #[Autowire]
+    public function setAuthorizationChecker( AuthorizationCheckerInterface $authorizationChecker ): void {
+        $this->authorizationChecker = $authorizationChecker;
+    }
+
+    /**
+     * @param Security $security
+     */
+    #[Autowire]
+    public function setSecurity( Security $security ): void {
+        $this->security = $security;
+    }
+
     /**
      * Get current request
      *
@@ -62,16 +79,22 @@ abstract class AbstractController implements ControllerInterface {
     }
 
     /**
-     * @param UserInterface $user
-     */
-    public function setCurrentUser( UserInterface $user ): void {
-        $this->user = $user;
-    }
-
-    /**
      * @return UserInterface|null
      */
     public function getCurrentUser(): ?UserInterface {
-        return $this->user;
+        return $this->security->getUser();
     }
+
+    public function getSecurityToken(): ?TokenInterface {
+        return $this->security->getToken();
+    }
+
+    /**
+     * @inheritDoc
+     */
+    public function denyAccessUnlessGranted(array $attributes, mixed $subject = null, string $strategy = null): void {
+        $this->authorizationChecker->denyUnlessGranted($attributes, $subject, $strategy);
+    }
+
+
 }

@@ -11,13 +11,14 @@
 namespace Swift\Security\Authorization;
 
 
+use Swift\Configuration\ConfigurationInterface;
 use Swift\Kernel\Attributes\Autowire;
-use Swift\Kernel\Container\Container;
 use Swift\Security\Authentication\Token\TokenInterface;
-use Swift\Security\Authorization\Strategy\DecisionStrategyAffirmative;
-use Swift\Security\Authorization\Strategy\DecisionStrategyConsensus;
-use Swift\Security\Authorization\Strategy\DecisionStrategyPriority;
-use Swift\Security\Authorization\Strategy\DecisionStrategyUnanimous;
+use Swift\Security\Authorization\Strategy\AffirmativeDecisionStrategy;
+use Swift\Security\Authorization\Strategy\ConsensusDecisionStrategy;
+use Swift\Security\Authorization\Strategy\DecisionStrategyInterface;
+use Swift\Security\Authorization\Strategy\PriorityDecisionStrategy;
+use Swift\Security\Authorization\Strategy\UnanimousDecisionStrategy;
 use Swift\Security\Authorization\Voter\VoterInterface;
 
 /**
@@ -27,33 +28,43 @@ use Swift\Security\Authorization\Voter\VoterInterface;
 #[Autowire]
 final class AccessDecisionManager implements AccessDecisionManagerInterface {
 
-    public const STRATEGY_AFFIRMATIVE = DecisionStrategyAffirmative::class;
-    public const STRATEGY_CONSENSUS = DecisionStrategyConsensus::class;
-    public const STRATEGY_UNANIMOUS = DecisionStrategyUnanimous::class;
-    public const STRATEGY_PRIORITY = DecisionStrategyPriority::class;
+    public const STRATEGY_AFFIRMATIVE = AffirmativeDecisionStrategy::class;
+    public const STRATEGY_CONSENSUS = ConsensusDecisionStrategy::class;
+    public const STRATEGY_UNANIMOUS = UnanimousDecisionStrategy::class;
+    public const STRATEGY_PRIORITY = PriorityDecisionStrategy::class;
 
     /** @var VoterInterface[] $voters */
     private array $voters = array();
 
-    /** @var array $decisionStrategies */
+    /** @var DecisionStrategyInterface[] $decisionStrategies */
     private array $decisionStrategies;
 
     /**
      * AccessDecisionManager constructor.
      *
-     * @param string $strategy
+     * @param ConfigurationInterface $configuration
      */
     public function __construct(
-        private string $strategy = self::STRATEGY_AFFIRMATIVE,
+        private ConfigurationInterface $configuration,
     ) {
     }
-
 
     /**
      * @inheritDoc
      */
-    public function decide( TokenInterface $token, mixed $subject, array $attributes, string $decisionStrategy = null ): bool {
-        // TODO: Implement decide() method.
+    public function decide( TokenInterface $token, mixed $subject, array $attributes, string $strategy = null ): bool {
+        $strategy ??= $this->configuration->get('access_decision_manager.strategy', 'security');
+        if (!array_key_exists(key: $strategy, array: $this->decisionStrategies)) {
+            throw new \InvalidArgumentException(sprintf('Decision strategy %s is not found. Please register this strategy or choose another', $strategy));
+        }
+
+        return $this->decisionStrategies[$strategy]->decide(
+            $this->voters,
+            $token,
+            $subject,
+            $attributes,
+            $this->configuration->get('access_decision_manager.allow_if_all_abstain', 'security')
+        );
     }
 
     #[Autowire]

@@ -1,0 +1,20 @@
+enable_firewalls: true
+
+firewalls:
+  main:
+    # limit login attempts, defaults to 5 per minute. Set to 0 to disable throttling
+    login_throttling:
+      max_attempts: 5
+
+role_hierarchy:
+  ROLE_GUEST:
+  ROLE_USER:
+  ROLE_CLIENT: ['ROLE_USERS_LIST']
+  ROLE_ADMIN: ['ROLE_USERS_LIST']
+  ROLE_SUPER_ADMIN: ['ROLE_ADMIN']
+
+access_decision_manager:
+  strategy: Swift\Security\Authorization\Strategy\AffirmativeDecisionStrategy
+  allow_if_all_abstain: false
+
+access_control:

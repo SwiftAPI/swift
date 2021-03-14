@@ -24,13 +24,13 @@ class Argument {
      * Argument constructor.
      *
      * @param string|null $name
-     * @param string|null $type
+     * @param string|array|null $type array of types will lead to a union
      * @param string|null $generator
      * @param array|null $generatorArguments
      */
     public function __construct(
         public string|null $name = null,
-        public string|null $type = null,
+        public string|array|null $type = null,
         public string|null $generator = null,
         #[ArrayShape(shape: ['entity' => 'string'])] public array|null $generatorArguments = null,
     ) {

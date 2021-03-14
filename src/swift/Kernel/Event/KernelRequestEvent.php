@@ -10,7 +10,7 @@
 
 namespace Swift\Kernel\Event;
 
-use Psr\Http\Message\RequestInterface;
+use Swift\HttpFoundation\RequestInterface;
 use Swift\Kernel\Attributes\DI;
 use Swift\Router\RouteInterface;
 use Symfony\Contracts\EventDispatcher\Event;

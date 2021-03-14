@@ -172,6 +172,7 @@ trait MessageTrait {
 
     public function getBody(): StreamInterface {
         if ( !isset($this->stream) || (null === $this->stream) ) {
+            var_dump('here');
             $this->stream = Stream::create( '' );
         }
 

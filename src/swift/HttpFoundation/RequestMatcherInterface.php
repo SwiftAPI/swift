@@ -10,8 +10,6 @@
 
 namespace Swift\HttpFoundation;
 
-use Psr\Http\Message\RequestInterface;
-
 /**
  * RequestMatcherInterface is an interface for strategies to match a Request.
  *

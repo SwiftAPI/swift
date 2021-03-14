@@ -10,7 +10,7 @@
 
 namespace Swift\Router\MatchTypes;
 
-use Psr\Http\Message\RequestInterface;
+use Swift\HttpFoundation\RequestInterface;
 use Swift\Kernel\Attributes\DI;
 use Swift\Router\DiTags;
 use Swift\Router\Exceptions\UnexpectedValueException;

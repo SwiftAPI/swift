@@ -11,7 +11,7 @@
 namespace Swift\Security\Authentication\Authenticator;
 
 
-use Psr\Http\Message\RequestInterface;
+use Swift\HttpFoundation\RequestInterface;
 use Swift\HttpFoundation\HeaderBag;
 use Swift\HttpFoundation\JsonResponse;
 use Swift\HttpFoundation\Response;
@@ -26,7 +26,9 @@ use Swift\Security\Authentication\Passport\PassportInterface;
 use Swift\Security\Authentication\Passport\Stamp\PreAuthenticatedStamp;
 use Swift\Security\Authentication\Token\PreAuthenticatedToken;
 use Swift\Security\Authentication\Token\TokenInterface;
+use Swift\Security\Authorization\AuthorizationRolesEnum;
 use Swift\Security\User\AnonymousUser;
+use Swift\Security\User\ClientUser;
 use Swift\Security\User\UserProviderInterface;
 
 /**
@@ -40,10 +42,12 @@ final class AccessTokenAuthenticator implements AuthenticatorInterface {
      * AccessTokenAuthenticator constructor.
      *
      * @param EntityInterface $accessTokenEntity
+     * @param EntityInterface $oauthClientsEntity
      * @param UserProviderInterface $userProvider
      */
     public function __construct(
         private EntityInterface $accessTokenEntity,
+        private EntityInterface $oauthClientsEntity,
         private UserProviderInterface $userProvider,
     ) {
     }
@@ -72,11 +76,25 @@ final class AccessTokenAuthenticator implements AuthenticatorInterface {
             throw new InvalidCredentialsException('No valid token found', Response::HTTP_UNAUTHORIZED);
         }
 
-        $user = $token->userId ?
-            $this->userProvider->getUserById($token->userId) :
-            new AnonymousUser();
+        if (!$token->userId && !$token->clientId) {
+            throw new AuthenticationException('No user or client related to token');
+        }
 
-        return new Passport($user, new AccessTokenCredentials($user, $token), array(new PreAuthenticatedStamp($token)));
+        if ($token->userId) {
+            $user = $this->userProvider->getUserById($token->userId);
+        } else {
+            $user = $this->oauthClientsEntity->findOne([
+                'id' => $token->clientId,
+            ]);
+
+            if (!$user) {
+                throw new AuthenticationException('Client not found');
+            }
+
+            $user = new ClientUser(...(array) $user);
+        }
+
+        return new Passport($user, new AccessTokenCredentials($token), array(new PreAuthenticatedStamp($token)));
     }
 
     /**

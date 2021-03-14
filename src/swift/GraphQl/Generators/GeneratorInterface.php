@@ -12,6 +12,7 @@ namespace Swift\GraphQl\Generators;
 
 use GraphQL\Type\Definition\Type;
 use Swift\GraphQl\TypeRegistry;
+use Swift\GraphQl\TypeRegistryInterface;
 use Swift\GraphQl\Types\ObjectType;
 use Swift\Kernel\Attributes\DI;
 
@@ -22,10 +23,10 @@ interface GeneratorInterface {
      * Adjust or generate type definition before assignment
      *
      * @param mixed $type
-     * @param TypeRegistry $typeRegistry
+     * @param TypeRegistryInterface $typeRegistry
      *
      * @return mixed
      */
-    public function generate( ObjectType $type, TypeRegistry $typeRegistry ): Type;
+    public function generate( ObjectType $type, TypeRegistryInterface $typeRegistry ): Type;
 
 }

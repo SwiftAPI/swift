@@ -10,9 +10,12 @@
 
 namespace Swift\Kernel\Container\CompilerPass;
 
+use Swift\Events\Attribute\ListenTo;
 use Swift\Events\EventDispatcher;
+use Swift\Kernel\DiTags;
 use Symfony\Component\DependencyInjection\ContainerBuilder;
 use Symfony\Component\DependencyInjection\Compiler\CompilerPassInterface;
+use Symfony\Component\EventDispatcher\EventSubscriberInterface;
 
 /**
  * Class EventRegistrationCompilerPass
@@ -24,9 +27,23 @@ class EventRegistrationCompilerPass implements CompilerPassInterface {
      * @inheritDoc
      */
     public function process( ContainerBuilder $container ) {
+        /** @var EventDispatcher $eventDispatcher */
+        $eventDispatcher = $container->get(EventDispatcher::class);
+
         // Get all event subscribers and register them by name
-        foreach ($container->getServicesByTag('kernel.event_subscriber') as $eventSubscriber) {
-            $container->get(EventDispatcher::class)->addSubscriber($container->get($eventSubscriber));
+        foreach ($container->getDefinitions() as $definition) {
+            if ($definition->hasTag(DiTags::EVENT_SUBSCRIBER)) {
+                $eventDispatcher->addSubscriber($container->get($definition->getClass()));
+            }
+
+            $reflection = $container->getReflectionClass($definition->getClass());
+            foreach ($reflection->getMethods() as $reflectionMethod) {
+                if (!empty($reflectionMethod->getAttributes(ListenTo::class))) {
+                    $attribute = $reflectionMethod->getAttributes(ListenTo::class)[0]->getArguments();
+                    $eventDispatcher->addListener($attribute['event'], [$container->get($definition->getClass()), $reflectionMethod->getName()]);
+                    //$eventDispatcher->addListener($attribute['event'], [$subscriber, $params])
+                }
+            }
         }
     }
 }

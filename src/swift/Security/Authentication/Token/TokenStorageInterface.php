@@ -21,6 +21,15 @@ use Swift\Security\Authentication\DiTags;
 interface TokenStorageInterface {
 
     /**
+     * Determine whether storage supports token
+     *
+     * @param TokenInterface $token
+     *
+     * @return bool
+     */
+    public function supports( TokenInterface $token ): bool;
+
+    /**
      * Returns the current security token
      *
      * @param string $accessToken

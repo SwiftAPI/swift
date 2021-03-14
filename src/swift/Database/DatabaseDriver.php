@@ -1,4 +1,4 @@
-<?php declare(strict_types=1);
+<?php declare( strict_types=1 );
 
 /*
  * This file is part of the Swift Framework
@@ -22,46 +22,46 @@ use Swift\Model\Exceptions\DatabaseException;
  */
 #[Autowire]
 class DatabaseDriver extends Connection {
-	/** @var Configuration $configuration */
-	protected Configuration $configuration;
 
-	/** @var string|null $prefix  table prefix */
-	protected string|null $prefix;
+    /** @var Configuration $configuration */
+    protected Configuration $configuration;
+
+    /** @var string|null $prefix table prefix */
+    protected string|null $prefix;
 
     /**
      * DatabaseDriver constructor.
      *
      * @param Configuration $configuration
-     *
      */
-	public function __construct(
-		Configuration $configuration
-	) {
-		$this->configuration = $configuration;
-		$this->prefix       = $configuration->get('database.prefix');
-		$config = array(
-				'driver'    => $configuration->get('database.driver'),
-				'host'      => $configuration->get('database.host'),
-				'username'  => $configuration->get('database.username'),
-				'password'  => $configuration->get('database.password'),
-				'database'  => $configuration->get('database.database'),
-				'port'      => intval($configuration->get('database.port')),
-		);
+    public function __construct(
+        Configuration $configuration
+    ) {
+        $this->configuration = $configuration;
+        $this->prefix        = $configuration->get( 'connection.prefix', 'database' );
+        $config              = array(
+            'driver'   => $configuration->get( 'connection.driver', 'database' ),
+            'host'     => $configuration->get( 'connection.host', 'database' ),
+            'username' => $configuration->get( 'connection.username', 'database' ),
+            'password' => $configuration->get( 'connection.password', 'database' ),
+            'database' => $configuration->get( 'connection.database', 'database' ),
+            'port'     => (int) $configuration->get( 'connection.port', 'database' ),
+        );
 
-		try {
-            parent::__construct($config);
-        } catch (Exception $exception) {
-		    throw new DatabaseException($exception->getMessage(), $exception->getCode(), $exception);
+        try {
+            parent::__construct( $config );
+        } catch ( Exception $exception ) {
+            throw new DatabaseException( $exception->getMessage(), $exception->getCode(), $exception );
         }
-	}
+    }
 
-	/**
-	 * Method to get table prefix
-	 *
-	 * @return string
-	 */
-	public function getPrefix() : string {
-		return $this->prefix;
-	}
+    /**
+     * Method to get table prefix
+     *
+     * @return string
+     */
+    public function getPrefix(): string {
+        return $this->prefix;
+    }
 
 }

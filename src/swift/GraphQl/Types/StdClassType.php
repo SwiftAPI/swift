@@ -1,5 +1,12 @@
-<?php declare(strict_types=1);
+<?php declare( strict_types=1 );
 
+/*
+ * This file is part of the Swift Framework
+ *
+ * (c) Henri van 't Sant <henri@henrivantsant.com>
+ *
+ * For the full copyright and license information, please view the LICENSE file that was distributed with this source code.
+ */
 
 namespace Swift\GraphQl\Types;
 
@@ -8,9 +15,14 @@ use GraphQL\Error\Error;
 use GraphQL\Language\AST\Node;
 use GraphQL\Type\Definition\ScalarType;
 use stdClass;
+use Swift\Kernel\Attributes\DI;
 
-class StdClassType extends ScalarType
-{
+/**
+ * Class StdClassType
+ * @package Swift\GraphQl\Types
+ */
+#[DI(autowire: false)]
+class StdClassType extends ScalarType {
     /** @var string */
     public $name = Type::STDCLASS;
 
@@ -25,8 +37,7 @@ represent dynamic data.';
      *
      * @return stdClass
      */
-    public function serialize(mixed $value): stdClass
-    {
+    public function serialize( mixed $value ): stdClass {
         return (object) $value;
     }
 
@@ -35,8 +46,7 @@ represent dynamic data.';
      *
      * @return stdClass
      */
-    public function parseValue(mixed $value): stdClass
-    {
+    public function parseValue( mixed $value ): stdClass {
         return (object) $value;
     }
 
@@ -47,16 +57,15 @@ represent dynamic data.';
      * @return string
      * @throws Error
      */
-    public function parseLiteral(Node $valueNode, ?array $variables = null)
-    {
+    public function parseLiteral( Node $valueNode, ?array $variables = null ) {
         $fields = $valueNode->fields;
 
-        if (empty($fields)) {
+        if ( empty( $fields ) ) {
             throw new Error();
         }
 
         $literal = new stdClass();
-        foreach ($fields as $field) {
+        foreach ( $fields as $field ) {
             $literal->{$field->name->value} = $field->value->value;
         }
 

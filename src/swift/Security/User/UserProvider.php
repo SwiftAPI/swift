@@ -13,6 +13,9 @@ namespace Swift\Security\User;
 
 use Swift\Kernel\Attributes\Autowire;
 use Swift\Model\EntityInterface;
+use Swift\Model\Exceptions\DuplicateEntryException;
+use Swift\Security\Authentication\Passport\Credentials\PasswordCredentialsEncoder;
+use Swift\Security\User\Exception\UserAlreadyExistsException;
 
 /**
  * Class UserProvider
@@ -60,6 +63,27 @@ final class UserProvider implements UserProviderInterface {
     }
 
     /**
+     * @inheritDoc
+     */
+    public function storeUser( string $username, string $password, string $email, string $firstname, string $lastname ): UserInterface {
+        try {
+            $data = $this->userDatabaseStorage->save([
+                'username' => $username,
+                'password' => (new PasswordCredentialsEncoder($password))->getEncoded(),
+                'email' => $email,
+                'firstname' => $firstname,
+                'lastname' => $lastname,
+                'created' => new \DateTime(),
+                'modified' => new \DateTime(),
+            ]);
+        } catch (DuplicateEntryException $exception) {
+            throw new UserAlreadyExistsException($exception->getMessage());
+        }
+
+        return $this->getUserInstance($data);
+    }
+
+    /**
      * @param \stdClass $userInfo
      *
      * @return UserInterface
@@ -69,7 +93,10 @@ final class UserProvider implements UserProviderInterface {
             return $this->user;
         }
 
-        return new User($this->userDatabaseStorage);
+        $this->user = new User(...(array)$userInfo);
+        $this->user->setUserStorage($this->userDatabaseStorage);
+
+        return $this->user;
     }
 
 

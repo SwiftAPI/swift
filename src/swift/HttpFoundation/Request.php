@@ -10,7 +10,9 @@
 
 namespace Swift\HttpFoundation;
 
-use Psr\Http\Message\{RequestInterface, StreamInterface, UriInterface};
+use GraphQL\Language\Parser;
+use GraphQL\Server\Helper;
+use GraphQL\Utils\Utils;
 use Swift\Configuration\Configuration;
 use Swift\HttpFoundation\Exception\ConflictingHeadersException;
 use Swift\HttpFoundation\Exception\JsonException;
@@ -19,14 +21,6 @@ use Swift\HttpFoundation\Session\SessionInterface;
 use Swift\Kernel\ServiceLocator;
 use function in_array;
 
-// Help opcache.preload discover always-needed symbols
-class_exists( AcceptHeader::class );
-class_exists( FileBag::class );
-class_exists( HeaderBag::class );
-class_exists( HeaderUtils::class );
-class_exists( InputBag::class );
-class_exists( ParameterBag::class );
-class_exists( ServerBag::class );
 
 /**
  * Request represents an HTTP request.
@@ -181,14 +175,17 @@ class Request implements RequestInterface {
      * @param array $server The SERVER parameters
      * @param string|resource|null $content The raw body data
      */
-    public function __construct( array $query = [], array $request = [], array $attributes = [], array $cookies = [], array $files = [], array $server = [], $content = null ) {
-        if ( empty( $query ) && empty( $request ) && empty( $attributes ) && empty( $cookies ) && empty( $files ) && empty( $server ) && empty( $content ) ) {
+    public function __construct( array $query = [], array $request = [], array $attributes = [], array $cookies = [], array $files = [], array $server = [] ) {
+        if ( empty( $query ) && empty( $request ) && empty( $attributes ) && empty( $cookies ) && empty( $files ) && empty( $server ) ) {
+            if (empty($_POST)) {
+                $_POST = $this->decodeInput();
+            }
             $this->initialize( $_GET, $_POST, [], $_COOKIE, $_FILES, $_SERVER );
 
             return;
         }
 
-        $this->initialize( $query, $request, $attributes, $cookies, $files, $server, $content );
+        $this->initialize( $query, $request, $attributes, $cookies, $files, $server );
     }
 
     /**
@@ -202,9 +199,8 @@ class Request implements RequestInterface {
      * @param array $cookies The COOKIE parameters
      * @param array $files The FILES parameters
      * @param array $server The SERVER parameters
-     * @param string|resource|null $content The raw body data
      */
-    public function initialize( array $query = [], array $request = [], array $attributes = [], array $cookies = [], array $files = [], array $server = [], $content = null ): void {
+    public function initialize( array $query = [], array $request = [], array $attributes = [], array $cookies = [], array $files = [], array $server = [] ): void {
         $this->request    = new ParameterBag( $request );
         $this->query      = new InputBag( $query );
         $this->attributes = new ParameterBag( $attributes );
@@ -213,7 +209,7 @@ class Request implements RequestInterface {
         $this->server     = new ServerBag( $server );
         $this->headers    = new HeaderBag( $this->server->getHeaders() );
 
-        $this->content                = $content;
+        $this->stream                 = Stream::create($this->jsonEncode($request));
         $this->languages              = null;
         $this->charsets               = null;
         $this->encodings              = null;
@@ -225,6 +221,10 @@ class Request implements RequestInterface {
         $this->method                 = (PHP_SAPI !== "cli") ? $this->getMethod() : 'GET';
         $this->format                 = null;
         $this->uri                    = (PHP_SAPI !== "cli") ? new Uri($this->getUriString()) : null;
+
+        if ((PHP_SAPI !== "cli") && ($this->getUri()->getPath() === '/graphql')) {
+            $this->stream = Stream::create($this->jsonEncode($this->getGraphQlStructure()));
+        }
     }
 
     /**
@@ -268,43 +268,22 @@ class Request implements RequestInterface {
      *
      * @param bool $asResource If true, a resource will be returned
      *
-     * @return bool|string|null The request body content or a resource to read the body stream
+     * @return ParameterBag The request body content or a resource to read the body stream
+     * @throws \JsonException
      */
-    public function getContent( bool $asResource = false ): bool|string|null {
-        $currentContentIsResource = \is_resource( $this->content );
+    public function getContent( bool $asResource = false ): ParameterBag {
+        $content = $this->getBody();
 
         if ( true === $asResource ) {
-            if ( $currentContentIsResource ) {
-                rewind( $this->content );
+            $content->rewind();
 
-                return $this->content;
-            }
-
-            // Content passed in parameter (test)
-            if ( \is_string( $this->content ) ) {
-                $resource = fopen( 'php://temp', 'r+' );
-                fwrite( $resource, $this->content );
-                rewind( $resource );
-
-                return $resource;
-            }
-
-            $this->content = false;
-
-            return fopen( 'php://input', 'rb' );
+            return $content->getResource();
         }
 
-        if ( $currentContentIsResource ) {
-            rewind( $this->content );
+        $content->rewind();
+        $body = $content->getContents();
 
-            return stream_get_contents( $this->content );
-        }
-
-        if ( null === $this->content || false === $this->content ) {
-            $this->content = file_get_contents( 'php://input' );
-        }
-
-        return $this->content;
+        return is_string($body) ? new ParameterBag(json_decode( $body, true, 512, JSON_THROW_ON_ERROR )) : new ParameterBag($body);
     }
 
     /**
@@ -2045,5 +2024,120 @@ class Request implements RequestInterface {
         $this->isSafeContentPreferred = AcceptHeader::fromString( $this->headers->get( 'Prefer' ) )->has( 'safe' );
 
         return $this->isSafeContentPreferred;
+    }
+
+    private function decodeInput(): array {
+        $input = file_get_contents('php://input');
+
+        if (is_string($input) && !empty($input)) {
+            $input = json_decode( $input, true, 512, JSON_THROW_ON_ERROR );
+        }
+
+        return is_array($input) ? $input : array();
+    }
+
+    /**
+     *
+     *
+     * @return array
+     * @throws \GraphQL\Error\SyntaxError
+     * @throws \JsonException
+     */
+    private function getGraphQlStructure(): array {
+        $parsed = array(
+            'query' => $this->getContent()->get( key: 'query' ),
+            'mutation' => $this->getContent()->get( key: 'mutation' ),
+            'variables' => $this->getContent()->get( key: 'variables' ),
+        );
+
+        $parser = new Parser($this->getContent()->get( key: 'query' ));
+
+        if (!empty($this->getContent()->get( key: 'query' ))) {
+            $parsedContent = $parser::parse($this->getContent()->get( key: 'query' ));
+            foreach ($parsedContent->definitions as /** @var \GraphQL\Language\AST\OperationDefinitionNode */ $definition) {
+                $selections = $definition->selectionSet->selections->getIterator();
+                foreach ($selections as $selection) {
+                    $arguments = $selection->arguments->getIterator();
+                    $parsed[$selection->name->value] = array();
+                    foreach ($arguments as $argument) {
+                        if (!isset($argument->value->fields) || empty($argument->value->fields)) {
+                            if (!isset($argument->value->name->value) && !isset($argument->value->value)) {
+                                continue;
+                            }
+                            $parsed[$selection->name->value][$argument->name->value] = $argument->value->kind === 'Variable' ?
+                                $parsed['variables'][$argument->value->name->value] : $argument->value->value;
+                            continue;
+                        }
+                        $fields = $argument->value->fields->getIterator();
+                        foreach ($fields as $field) {
+                            if (!isset($field->value->name->value) && !isset($field->value->value)) {
+                                continue;
+                            }
+                            $parsed[$selection->name->value][$field->name->value] = $field->value->kind === 'Variable' ?
+                                $parsed['variables'][$field->value->name->value] : $field->value->value;
+                        }
+                    }
+                }
+            }
+        }
+
+        if (!empty($this->getContent()->get( key: 'mutation' ))) {
+            $parsedContent = $parser::parse($this->getContent()->get( key: 'mutation' ));
+            foreach ($parsedContent->definitions as /** @var \GraphQL\Language\AST\OperationDefinitionNode */ $definition) {
+                $selections = $definition->selectionSet->selections->getIterator();
+                foreach ($selections as $selection) {
+                    $arguments = $selection->arguments->getIterator();
+                    $parsed[$selection->name->value] = array();
+                    foreach ($arguments as $argument) {
+                        if (!isset($argument->value->fields) || empty($argument->value->fields)) {
+                            continue;
+                        }
+                        $fields = $argument->value->fields->getIterator();
+                        foreach ($fields as $field) {
+                            if (!isset($field->value->name->value) && !isset($field->value->value)) {
+                                continue;
+                            }
+                            $parsed[$selection->name->value][$field->name->value] = $field->value->kind === 'Variable' ?
+                                $parsed['variables'][$field->value->name->value] : $field->value->value;
+                        }
+                    }
+                }
+            }
+        }
+
+        return $parsed;
+    }
+
+    /**
+     * Sets the data to be sent as JSON.
+     *
+     * @param mixed $data
+     *
+     * @return string
+     *
+     * @throws \InvalidArgumentException|\JsonException
+     */
+    private function jsonEncode( $data = array() ): string {
+        if (empty($data)) {
+            return '';
+        }
+        try {
+            $data = json_encode( $data, JSON_THROW_ON_ERROR | 15 );
+        } catch ( \Exception $e ) {
+            if ( 'Exception' === \get_class( $e ) && str_starts_with( $e->getMessage(), 'Failed calling ' ) ) {
+                throw $e->getPrevious() ?: $e;
+            }
+            throw $e;
+        }
+
+        if ( \JSON_THROW_ON_ERROR & 15 ) {
+            return $data;
+        }
+
+        if ( \JSON_ERROR_NONE !== json_last_error() ) {
+            throw new \InvalidArgumentException( json_last_error_msg() );
+        }
+
+        return $data;
     }
 }

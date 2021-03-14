@@ -44,7 +44,7 @@ class ConditionService {
      * @return array|null
      */
     public function getConditions( array $state, Arguments $arguments ): ?array {
-        return $this->condition->find($state, $arguments);
+        return $this->condition->findMany($state, $arguments);
     }
 
     /**

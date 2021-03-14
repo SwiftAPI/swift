@@ -15,23 +15,19 @@ use Swift\HttpFoundation\JsonResponse;
 use Swift\Kernel\Attributes\Autowire;
 use Swift\Kernel\Container\Provider\ControllersAwareTrait;
 use Swift\Router\Attributes\Route;
-use Swift\Router\Types\RouteTypesEnum;
+use Swift\Router\Types\RouteMethodEnum;
 use Swift\Security\Authorization\Attributes\IsGranted;
-use Swift\Security\Authorization\AuthorizationRolesEnum;
+use Swift\Security\Authorization\AuthorizationTypesEnum;
 
 /**
  * Class User
  * @package Swift\Users\Controller
  */
-#[Route(type: [RouteTypesEnum::POST, RouteTypesEnum::PUT], route: '/users/', name: 'users'), Autowire]
+#[Route(method: [RouteMethodEnum::POST, RouteMethodEnum::PUT], route: '/users/', name: 'users'), Autowire]
 class User extends AbstractController {
 
     use ControllersAwareTrait;
 
-    #[Route( type: RouteTypesEnum::POST, route: '/[i:device_id]/create/[create|edit:action]/', name: 'users.create' )]
-    #[IsGranted([AuthorizationRolesEnum::LOGGED_IN])]
-    public function create( array $params ): JsonResponse {
-        return new JsonResponse(['testing']);
-    }
+
 
 }

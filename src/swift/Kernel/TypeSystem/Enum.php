@@ -5,6 +5,7 @@ namespace Swift\Kernel\TypeSystem;
 
 
 use Swift\Kernel\Attributes\DI;
+use Swift\GraphQl\Attributes\Enum as GraphQlEnum;
 
 /**
  * Base Enum class
@@ -18,7 +19,7 @@ use Swift\Kernel\Attributes\DI;
  * @psalm-template T
  * @psalm-immutable
  */
-#[DI(autowire: false)]
+#[DI(autowire: false), GraphQlEnum]
 abstract class Enum implements \JsonSerializable
 {
     /**

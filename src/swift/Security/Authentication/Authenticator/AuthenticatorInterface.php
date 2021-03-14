@@ -10,7 +10,7 @@
 
 namespace Swift\Security\Authentication\Authenticator;
 
-use Psr\Http\Message\RequestInterface;
+use Swift\HttpFoundation\RequestInterface;
 use Swift\HttpFoundation\ResponseInterface;
 use Swift\Kernel\Attributes\DI;
 use Swift\Security\Authentication\DiTags;

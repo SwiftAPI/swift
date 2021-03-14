@@ -10,7 +10,7 @@
 
 namespace Swift\Router;
 
-use Psr\Http\Message\RequestInterface;
+use Swift\HttpFoundation\RequestInterface;
 use Swift\Router\MatchTypes\MatchTypeInterface;
 
 /**
@@ -29,11 +29,9 @@ interface RouteInterface {
     /**
      * Get full route regex including controller base
      *
-     * @param array $matchTypes
-     *
      * @return string|null
      */
-    public function getFullRegex(array $matchTypes = array()): ?string;
+    public function getFullRegex(): ?string;
 
     /**
      * Checks whether a given HTTPMethod applies for this route
@@ -48,11 +46,10 @@ interface RouteInterface {
      * Validate whether given route matches the passed request
      *
      * @param RequestInterface $request
-     * @param MatchTypeInterface[] $matchTypes
      *
      * @return bool
      */
-    public function matchesRequest( RequestInterface $request, array $matchTypes = array() ): bool;
+    public function matchesRequest( RequestInterface $request ): bool;
 
     /**
      * @return string|null
@@ -73,16 +70,6 @@ interface RouteInterface {
      * @param string $regex
      */
     public function setRegex( string $regex ): void;
-
-    /**
-     * @return string|null
-     */
-    public function getControllerBase(): ?string;
-
-    /**
-     * @param string|null $controllerBase
-     */
-    public function setControllerBase( ?string $controllerBase ): void;
 
     /**
      * @return array
@@ -130,18 +117,28 @@ interface RouteInterface {
     public function isAuthRequired(): bool;
 
     /**
-     * @param bool $authRequired
+     * @return array
      */
-    public function setAuthRequired( bool $authRequired ): void;
+    public function getAuthType(): array;
+
+    /**
+     * @param array $authType
+     */
+    public function setAuthType( array $authType ): void;
+
+    /**
+     * @param array $isGranted
+     */
+    public function setIsGranted( array $isGranted ): void;
 
     /**
      * @return array
      */
-    public function getAuthLevels(): array;
+    public function getIsGranted(): array;
 
     /**
-     * @param array $authLevels
+     * @return array
      */
-    public function setAuthLevels( array $authLevels ): void;
+    public function getTags(): array;
 
 }

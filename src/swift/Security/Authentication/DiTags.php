@@ -17,6 +17,7 @@ namespace Swift\Security\Authentication;
 class DiTags {
 
     public const SECURITY_AUTHENTICATOR = 'security.authentication.authenticator';
+    public const SECURITY_AUTHENTICATOR_ENTRYPOINT = 'security.authentication.authenticator.entrypoint';
     public const SECURITY_TOKEN_PROVIDER = 'security.authentication.token.provider';
     public const SECURITY_TOKEN_STORAGE = 'security.authentication.token.storage';
     public const SECURITY_USER_PROVIDER = 'security.user.provider';

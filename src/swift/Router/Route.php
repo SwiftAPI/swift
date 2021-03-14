@@ -11,10 +11,11 @@
 namespace Swift\Router;
 
 use JetBrains\PhpStorm\Pure;
-use Psr\Http\Message\RequestInterface;
+use Swift\HttpFoundation\RequestInterface;
 use Swift\HttpFoundation\RequestMatcher;
 use Swift\Kernel\Attributes\DI;
 use Swift\Router\MatchTypes\MatchTypeInterface;
+use Swift\Security\Authorization\AuthorizationTypesEnum;
 
 /**
  * Class Route
@@ -22,6 +23,8 @@ use Swift\Router\MatchTypes\MatchTypeInterface;
  */
 #[DI( exclude: true )]
 class Route implements RouteInterface {
+
+    public const TAG_LOGIN = 'login';
 
     /** @var RequestInterface $request */
     private RequestInterface $request;
@@ -37,24 +40,25 @@ class Route implements RouteInterface {
      *
      * @param string|null $name
      * @param string $regex The route regex, custom regex must start with an @. You can use multiple pre-set regex filters, like [i:id]
-     * @param string|null $controllerBase Controller base url/regex before the route
      * @param array $methods HTTP methods on which the route applies. Methods must be one or more of 5 HTTP Methods (GET|POST|PATCH|PUT|DELETE)
      * @param string $controller FQCN of the controller class
      * @param string|null $action
-     * @param bool $authRequired
-     * @param array $authLevels
+     * @param array $authType
+     * @param array $isGranted
+     * @param array $tags
+     * @param RouteInterface|null $controllerRoute Controller route params used as globals and/or prefix
      */
     #[Pure]
     public function __construct(
         private string|null $name,
         private string $regex,
-        private string|null $controllerBase,
         private array $methods,
         private string $controller,
         private string|null $action,
-        private bool $authRequired,
-        private array $authLevels,
-
+        private array $authType,
+        private array $isGranted,
+        private array $tags = array(),
+        private RouteInterface|null $controllerRoute = null,
     ) {
     }
 
@@ -62,12 +66,10 @@ class Route implements RouteInterface {
      * Validate whether given route matches the passed request
      *
      * @param RequestInterface $request
-     * @param array $matchTypes
      *
      * @return bool
      */
-    public function matchesRequest( RequestInterface $request, array $matchTypes = array() ): bool {
-        $matchTypes = ! empty( $matchTypes ) ? $matchTypes : $this->matchTypes;
+    public function matchesRequest( RequestInterface $request ): bool {
         // Method did not match, continue to next route.
         if ( ! $this->methodApplies( $request->getMethod() ) ) {
             return false;
@@ -101,7 +103,7 @@ class Route implements RouteInterface {
             return false;
         }
 
-        $matcher = new RequestMatcher( $this->getFullRegex( $matchTypes ), null, $this->getMethods() );
+        $matcher = new RequestMatcher( $this->getFullRegex(), null, $this->getMethods() );
         if ( $matcher->matches( $request ) ) {
             $this->params = $this->updateParams($matcher->getParams());
 
@@ -134,17 +136,15 @@ class Route implements RouteInterface {
             return null;
         }
 
-        return is_null( $this->controllerBase ) ? $this->regex : $this->controllerBase . '/' . $this->regex;
+        return is_null( $this->controllerRoute ) ? $this->regex : $this->controllerRoute->getRegex() . '/' . $this->regex;
     }
 
     /**
      * Get full route regex including controller base
      *
-     * @param array $matchTypes
-     *
      * @return string|null
      */
-    public function getFullRegex( array $matchTypes = array() ): ?string {
+    public function getFullRegex(): ?string {
         $route      = $this->getFullPath();
 
         foreach ( $this->getParamsFromPath( true ) as $parameter ) {
@@ -260,20 +260,6 @@ class Route implements RouteInterface {
     }
 
     /**
-     * @return string|null
-     */
-    public function getControllerBase(): ?string {
-        return $this->controllerBase;
-    }
-
-    /**
-     * @param string|null $controllerBase
-     */
-    public function setControllerBase( ?string $controllerBase ): void {
-        $this->controllerBase = $controllerBase;
-    }
-
-    /**
      * @param array $methods
      */
     public function setMethods( array $methods ): void {
@@ -312,28 +298,21 @@ class Route implements RouteInterface {
      * @return bool
      */
     public function isAuthRequired(): bool {
-        return $this->authRequired;
-    }
-
-    /**
-     * @param bool $authRequired
-     */
-    public function setAuthRequired( bool $authRequired ): void {
-        $this->authRequired = $authRequired;
+        return !in_array(AuthorizationTypesEnum::PUBLIC_ACCESS, $this->authType, true);
     }
 
     /**
      * @return array
      */
-    public function getAuthLevels(): array {
-        return $this->authLevels;
+    public function getAuthType(): array {
+        return $this->authType;
     }
 
     /**
-     * @param array $authLevels
+     * @param array $authType
      */
-    public function setAuthLevels( array $authLevels ): void {
-        $this->authLevels = $authLevels;
+    public function setAuthType( array $authType ): void {
+        $this->authType = $authType;
     }
 
     /**
@@ -349,5 +328,41 @@ class Route implements RouteInterface {
     public function setRequest( RequestInterface $request ): void {
         $this->request = $request;
     }
+
+    /**
+     * @inheritDoc
+     */
+    public function setIsGranted( array $isGranted ): void {
+        $this->isGranted = $isGranted;
+    }
+
+    /**
+     * @inheritDoc
+     */
+    public function getIsGranted(): array {
+        return $this->isGranted;
+    }
+
+    /**
+     * @param RouteInterface $route
+     */
+    public function setControllerRoute( RouteInterface $route ): void {
+        $this->controllerRoute = $route;
+    }
+
+    /**
+     * @return RouteInterface|null
+     */
+    public function getControllerRoute(): ?RouteInterface {
+        return $this->controllerRoute ?? null;
+    }
+
+    /**
+     * @return array
+     */
+    public function getTags(): array {
+        return $this->tags;
+    }
+
 
 }

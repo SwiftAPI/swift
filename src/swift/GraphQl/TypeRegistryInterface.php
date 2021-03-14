@@ -1,13 +1,23 @@
 <?php declare(strict_types=1);
 
+/*
+ * This file is part of the Swift Framework
+ *
+ * (c) Henri van 't Sant <henri@henrivantsant.com>
+ *
+ * For the full copyright and license information, please view the LICENSE file that was distributed with this source code.
+ */
 
 namespace Swift\GraphQl;
 
+use GraphQL\Type\Definition\Directive;
 use GraphQL\Type\Definition\Type;
 use Swift\GraphQl\Exceptions\InvalidTypeException;
 use Swift\GraphQl\Types\ObjectType;
 use GraphQL\Type\Definition\ObjectType as GraphQlObjectType;
+use Swift\Kernel\Attributes\DI;
 
+#[DI(tags: ['graphql.type_registry'])]
 interface TypeRegistryInterface {
 
     /**
@@ -44,42 +54,6 @@ interface TypeRegistryInterface {
      * @param ObjectType $type
      */
     public function addExtension( ObjectType $type ): void;
-
-    /**
-     * @param ObjectType $type
-     */
-    public function addQuery( ObjectType $type ): void;
-
-    /**
-     * @param string $name
-     *
-     * @return ObjectType|null
-     */
-    public function getQueryByName( string $name ): ObjectType|null;
-
-    /**
-     * @param ObjectType $type
-     *
-     * @return void
-     */
-    public function addMutation( ObjectType $type ): void;
-
-    /**
-     * @param string $name
-     *
-     * @return ObjectType|null
-     */
-    public function getMutationByName( string $name ): ObjectType|null;
-
-    /**
-     * @return GraphQlObjectType
-     */
-    public function getRootQuery(): GraphQlObjectType;
-
-    /**
-     * @return GraphQlObjectType
-     */
-    public function getRootMutation(): GraphQlObjectType;
 
     /**
      * Compile added types 

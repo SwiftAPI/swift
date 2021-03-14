@@ -27,9 +27,10 @@ interface DecisionStrategyInterface {
      * @param TokenInterface $token
      * @param mixed $subject
      * @param array $attributes
+     * @param bool $allowIfAllAbstain
      *
      * @return mixed
      */
-    public function decide( array $voters, TokenInterface $token, mixed $subject, array $attributes ): bool;
+    public function decide( array $voters, TokenInterface $token, mixed $subject, array $attributes, bool $allowIfAllAbstain = false ): bool;
 
 }

@@ -1,0 +1,17 @@
+app:
+  name: Swift
+  mode: develop
+  debug: true
+  allow_cors: true
+  timezone: Europe/Amsterdam
+
+routing:
+  baseurl: ''
+
+grapqhl:
+  enable_introspection: true
+
+logging:
+  enable_mail: false
+  logging_mail_from: log@example.com
+  logging_mail_to: log@example.com
