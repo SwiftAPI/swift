@@ -14,7 +14,7 @@ namespace Swift\HttpFoundation;
  * Class CorsResponse
  * @package Swift\HttpFoundation\Response
  */
-class CorsResponse extends Response {
+final class CorsResponse extends Response {
 
     protected function doOutput(): void {
         $origin = $_SERVER['HTTP_ORIGIN'] ?? '*';

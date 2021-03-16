@@ -42,7 +42,10 @@ class Foo extends AbstractController {
 
         $articleID = $params['articleid']->getValue();
 
-        return new JsonResponse(array('foo bar'));
+        return new JsonResponse(array(
+            'article_id' => $articleID,
+            'title' => 'Foo Bar',
+        ));
     }
 
     /**

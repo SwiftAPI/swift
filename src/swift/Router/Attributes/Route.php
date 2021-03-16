@@ -29,12 +29,12 @@ class Route {
      * Route constructor.
      *
      * @param string|array $method
-     * @param string $route
-     * @param string $name
+     * @param string $route The route for this method with a leading and closing slash
+     * @param string $name Make the route easy to find back in the router and allow for reversed routing
      * @param string|array|null $type
      * @param array|string|null $authType
-     * @param array|string|null $isGranted
-     * @param array $tags Route tags
+     * @param array|string|null $isGranted Validate user is granted certain rights or status. More on this in de Security documentation
+     * @param array $tags Provide a route with certain tags. E.g. the Security component uses this to define a route as authentication endpoint
      */
     #[Pure] public function __construct(
         public string|array $method,
