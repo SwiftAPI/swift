@@ -80,6 +80,7 @@ class AuthenticationManager {
                 // Store the token
                 $this->tokenStoragePool->setToken( $token );
 
+                // Finalize request with provided response
                 if ( $response = $authenticator->onAuthenticationSuccess( $request, $token ) ) {
                     $this->kernel->finalize( $response );
                 }

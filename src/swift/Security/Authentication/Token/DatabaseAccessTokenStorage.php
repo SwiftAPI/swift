@@ -47,6 +47,10 @@ final class DatabaseAccessTokenStorage implements TokenStorageInterface {
         return true;
     }
 
+    public function findOne( array $state ): \stdClass|null {
+        return $this->accessTokenEntity->findOne($state);
+    }
+
     /**
      * @inheritDoc
      */
@@ -68,6 +72,7 @@ final class DatabaseAccessTokenStorage implements TokenStorageInterface {
         }
 
         $data = $token->getData();
+
         $state = array(
             'accessToken' => $data->accessToken,
             'expires' => $data->expires,

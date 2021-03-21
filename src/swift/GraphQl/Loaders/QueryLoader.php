@@ -14,6 +14,7 @@ namespace Swift\GraphQl\Loaders;
 use Swift\GraphQl\Attributes\Argument;
 use Swift\GraphQl\Attributes\Query;
 use Swift\GraphQl\LoaderInterface;
+use Swift\GraphQl\ResolveHelper;
 use Swift\GraphQl\TypeRegistryInterface;
 use Swift\GraphQl\Types\ObjectType;
 use Swift\Kernel\Attributes\Autowire;
@@ -33,12 +34,14 @@ class QueryLoader implements LoaderInterface {
      * @param TypeRegistryInterface $inputTypeRegistry
      * @param TypeRegistryInterface $outputTypeRegistry
      * @param TypeRegistryInterface $queryRegistry
+     * @param ResolveHelper $helper
      * @param ServiceLocatorInterface $serviceLocator
      */
     public function __construct(
         private TypeRegistryInterface $inputTypeRegistry,
         private TypeRegistryInterface $outputTypeRegistry,
         private TypeRegistryInterface $queryRegistry,
+        private ResolveHelper $helper,
         private ServiceLocatorInterface $serviceLocator,
     ) {
     }
@@ -67,7 +70,7 @@ class QueryLoader implements LoaderInterface {
                 foreach ($methodParameters as $reflectionParameter) {
                     /** @var Argument $parameterConfig */
                     $parameterConfig = !empty($reflectionParameter->getAttributes(name: Argument::class)) ? $reflectionParameter->getAttributes(name: Argument::class)[0]->newInstance() : null;
-                    $argumentType = $parameterConfig->type ?? $reflectionParameter->getType()?->getName();
+                    $argumentType = $this->helper->getArgumentType($parameterConfig?->type, $reflectionParameter?->getType());
                     $argumentName = $parameterConfig->name ?? $reflectionParameter->getName();
 
                     $arguments[$argumentName] = new ObjectType(
@@ -78,11 +81,12 @@ class QueryLoader implements LoaderInterface {
                         nullable: $reflectionParameter->isOptional(),
                         generator: $parameterConfig->generator ?? null,
                         generatorArguments: $parameterConfig->generatorArguments ?? array(),
+                        description: $parameterConfig->description ?? null,
                     );
                 }
 
                 $queryName = $methodConfig->name ?? $reflectionMethod->getName();
-                $queryType = $methodConfig->type ?? $reflectionMethod->getReturnType()?->getName();
+                $queryType = $this->helper->getReturnType($methodConfig?->type, $reflectionMethod?->getReturnType());
                 $objectType = new ObjectType(
                     name: ucfirst($queryName),
                     declaringClass: $reflectionMethod->getDeclaringClass()->getName(),
@@ -90,8 +94,9 @@ class QueryLoader implements LoaderInterface {
                     args: $arguments,
                     type: $queryType,
                     isList: $methodConfig->isList ?? false,
-                    generator: $propertyConfig->generator ?? null,
-                    generatorArguments: $propertyConfig->generatorArguments ?? array(),
+                    generator: $methodConfig->generator ?? null,
+                    generatorArguments: $methodConfig->generatorArguments ?? array(),
+                    description: $methodConfig->description ?? null,
                 );
 
                 $this->queryRegistry->addType($objectType);

@@ -8,27 +8,25 @@
  * For the full copyright and license information, please view the LICENSE file that was distributed with this source code.
  */
 
-namespace Swift\Security\Authentication\Types;
+namespace Foo\Type;
 
 use Swift\GraphQl\Attributes\Field;
 use Swift\GraphQl\Attributes\InputType;
 
 /**
- * Class RefreshTokenInput
- * @package Swift\Security\Authentication\Types
+ * Class BarInput
+ * @package Foo\Type
  */
 #[InputType]
-class RefreshTokenInput {
+class BarInput {
 
     /**
-     * RefreshTokenInput constructor.
+     * FooType constructor.
      *
-     * @param string $refreshToken
-     * @param string $grantType
+     * @param string $title
      */
     public function __construct(
-        #[Field] public string $refreshToken,
-        #[Field] public string $grantType,
+        #[Field] public string $title,
     ) {
     }
 

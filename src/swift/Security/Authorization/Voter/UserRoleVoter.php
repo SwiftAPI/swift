@@ -11,11 +11,13 @@
 namespace Swift\Security\Authorization\Voter;
 
 
+use Swift\Configuration\ConfigurationInterface;
 use Swift\Kernel\Attributes\Autowire;
 use Swift\Security\Authentication\AuthenticationTypeResolverInterface;
 use Swift\Security\Authentication\Token\TokenInterface;
 use Swift\Security\Authorization\AuthorizationRolesEnum;
 use Swift\Security\Authorization\AuthorizationTypesEnum;
+use Swift\Security\User\UserRolesBag;
 
 /**
  * Class UserRoleVoter
@@ -23,6 +25,16 @@ use Swift\Security\Authorization\AuthorizationTypesEnum;
  */
 #[Autowire]
 class UserRoleVoter implements VoterInterface {
+
+    /**
+     * UserRoleVoter constructor.
+     *
+     * @param ConfigurationInterface $configuration
+     */
+    public function __construct(
+        private ConfigurationInterface $configuration,
+    ) {
+    }
 
     /**
      * @inheritDoc
@@ -34,6 +46,8 @@ class UserRoleVoter implements VoterInterface {
             return VoterInterface::ACCESS_GRANTED;
         }
 
+        $rolesBag = new UserRolesBag($this->getAllRoles($token->getUser()->getRoles()->getIterator()->getArrayCopy()) ?? array());
+
         foreach ($attributes as $attribute) {
             // Abstain on non supported attributes
             if (!AuthorizationRolesEnum::isValid($attribute)) {
@@ -42,11 +56,39 @@ class UserRoleVoter implements VoterInterface {
 
             $vote = VoterInterface::ACCESS_DENIED;
 
-            if ($token->getUser()->getRoles()->has($attribute)) {
+            if ($rolesBag->has($attribute)) {
                 return VoterInterface::ACCESS_GRANTED;
             }
         }
 
         return $vote;
     }
+
+    /**
+     * Resolve role hierarchy and fetch all roles the user has based on hierarchy or relations
+     *
+     * @param array $roles
+     *
+     * @return array|null
+     */
+    private function getAllRoles( array $roles ): array|null {
+        $config = $this->configuration->get('role_hierarchy', 'security');
+
+        if (!is_array($config) || empty($roles)) {
+            return null;
+        }
+
+        $related = array();
+
+        foreach ($roles as $role) {
+            $related[$role] = $role;
+            if (array_key_exists($role, $config)) {
+                $result = $this->getAllRoles($config[$role]);
+                $related = $result ? array_merge($related, $result) : $related;
+            }
+        }
+
+        return $related;
+    }
+
 }

@@ -10,6 +10,7 @@
 
 namespace Swift\Security\User\EventSubscriber;
 
+use Swift\Configuration\ConfigurationInterface;
 use Swift\Events\Attribute\ListenTo;
 use Swift\Kernel\Attributes\Autowire;
 use Swift\Security\Authentication\Events\AuthenticationTokenCreatedEvent;
@@ -29,7 +30,6 @@ class OnAfterAuthentication {
     #[ListenTo(event: AuthenticationTokenCreatedEvent::class)]
     public function assignUserRoles( AuthenticationTokenCreatedEvent $event ): void {
         $user = $event->getToken()->getUser();
-        //var_dump($user);
     }
 
 }

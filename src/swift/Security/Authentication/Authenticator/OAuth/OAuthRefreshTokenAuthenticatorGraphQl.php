@@ -11,8 +11,8 @@
 namespace Swift\Security\Authentication\Authenticator\OAuth;
 
 
-use Swift\HttpFoundation\RequestInterface;
 use Swift\HttpFoundation\JsonResponse;
+use Swift\HttpFoundation\RequestInterface;
 use Swift\HttpFoundation\ResponseInterface;
 use Swift\Kernel\Attributes\Autowire;
 use Swift\Model\EntityInterface;
@@ -20,31 +20,36 @@ use Swift\Security\Authentication\Authenticator\AuthenticatorEntrypointInterface
 use Swift\Security\Authentication\Authenticator\AuthenticatorInterface;
 use Swift\Security\Authentication\Exception\AuthenticationException;
 use Swift\Security\Authentication\Passport\Credentials\ClientCredentials;
+use Swift\Security\Authentication\Passport\Credentials\RefreshTokenCredentials;
 use Swift\Security\Authentication\Passport\Passport;
 use Swift\Security\Authentication\Passport\PassportInterface;
-use Swift\Security\Authentication\Token\OathClientCredentialsToken;
+use Swift\Security\Authentication\Token\OauthAccessToken;
+use Swift\Security\Authentication\Token\OauthRefreshToken;
 use Swift\Security\Authentication\Token\TokenInterface;
+use Swift\Security\Authentication\Token\TokenStorageInterface;
 use Swift\Security\Authentication\Token\TokenStoragePoolInterface;
 use Swift\Security\User\ClientUser;
 use Swift\Security\User\UserProviderInterface;
 
 /**
- * Class OAuthClientCredentialsAuthenticator
+ * Class OAuthRefreshTokenAuthenticator
  * @package Swift\Security\Authentication\Authenticator\OAuth
  */
 #[Autowire]
-final class OAuthClientCredentialsAuthenticator implements AuthenticatorInterface, AuthenticatorEntrypointInterface {
+class OAuthRefreshTokenAuthenticatorGraphQl implements AuthenticatorInterface, AuthenticatorEntrypointInterface {
 
     /**
-     * OAuthClientCredentialsAuthenticator constructor.
+     * OAuthRefreshTokenAuthenticator constructor.
      *
      * @param EntityInterface $oauthClientsEntity
      * @param UserProviderInterface $userProvider
+     * @param TokenStorageInterface $databaseTokenStorage
      * @param TokenStoragePoolInterface $tokenStoragePool
      */
     public function __construct(
         private EntityInterface $oauthClientsEntity,
         private UserProviderInterface $userProvider,
+        private TokenStorageInterface $databaseTokenStorage,
         private TokenStoragePoolInterface $tokenStoragePool,
     ) {
     }
@@ -56,9 +61,8 @@ final class OAuthClientCredentialsAuthenticator implements AuthenticatorInterfac
         $requestContent = $request->getContent();
 
         return !empty($requestContent->get('grant_type')) &&
-               ($requestContent->get('grant_type') === 'client_credentials') &&
-               !empty($requestContent->get('client_id')) &&
-               !empty($requestContent->get('client_secret'));
+               ($requestContent->get('grant_type') === 'refresh_token') &&
+               !empty($requestContent->get('refresh_token'));
     }
 
     /**
@@ -66,33 +70,40 @@ final class OAuthClientCredentialsAuthenticator implements AuthenticatorInterfac
      */
     public function authenticate( RequestInterface $request ): PassportInterface {
         $requestContent = $request->getContent();
+
+        $token = $this->databaseTokenStorage->findOne([
+            'accessToken' => $requestContent->get('refresh_token'),
+            'scope' => 'SCOPE_REFRESH_TOKEN',
+        ]);
+
+        if (!$token) {
+            throw new AuthenticationException('Invalid token');
+        }
+
         $client = $this->oauthClientsEntity->findOne([
-            'clientId' => $requestContent->get('client_id'),
+            'id' => $token->clientId,
         ]);
 
         if (!$client) {
-            throw new AuthenticationException('Client not found');
+            throw new AuthenticationException('Invalid token');
         }
 
         $client = new ClientUser(...(array) $client);
 
-        return new Passport($client, new ClientCredentials($client->getCredential()));
+        return new Passport($client, new RefreshTokenCredentials($token));
     }
 
     /**
      * @inheritDoc
      */
     public function createAuthenticatedToken( PassportInterface $passport ): TokenInterface {
-        return new OathClientCredentialsToken($passport->getUser());
+        return new OauthAccessToken($passport->getUser());
     }
 
     /**
      * @inheritDoc
      */
-    public function onAuthenticationSuccess( RequestInterface $request, /** @var OathClientCredentialsToken */ TokenInterface $token ): ?ResponseInterface {
-        // Store refresh token
-        $this->tokenStoragePool->setToken($token->getRefreshToken());
-
+    public function onAuthenticationSuccess( RequestInterface $request, /** @var OauthAccessToken */ TokenInterface $token ): ?ResponseInterface {
         return null;
     }
 
@@ -102,4 +113,5 @@ final class OAuthClientCredentialsAuthenticator implements AuthenticatorInterfac
     public function onAuthenticationFailure( RequestInterface $request, AuthenticationException $authenticationException ): ?ResponseInterface {
         return new JsonResponse(JsonResponse::$reasonPhrases[JsonResponse::HTTP_UNAUTHORIZED], JsonResponse::HTTP_UNAUTHORIZED);
     }
+
 }

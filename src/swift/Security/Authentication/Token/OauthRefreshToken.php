@@ -36,6 +36,8 @@ class OauthRefreshToken extends AbstractToken {
         parent::__construct($user, $scope, $token, $isAuthenticated);
 
         $this->expires = (new DateTime())->modify('+ 1 month');
+        $this->userId = null;
+        $this->clientId = $this->getUser()->getId();
     }
 
 }

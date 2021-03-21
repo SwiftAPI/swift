@@ -125,7 +125,7 @@ class RequestMatcher implements RequestMatcherInterface {
      *
      * @param string|string[]|null $scheme An HTTP scheme or an array of HTTP schemes
      */
-    public function matchScheme( $scheme ): void {
+    public function matchScheme( array|string|null $scheme ): void {
         $this->schemes = null !== $scheme ? array_map( 'strtolower', (array) $scheme ) : [];
     }
 

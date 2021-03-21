@@ -8,19 +8,21 @@
  * For the full copyright and license information, please view the LICENSE file that was distributed with this source code.
  */
 
-namespace Swift\Security\User;
+namespace Swift\Router;
 
 use Swift\HttpFoundation\ParameterBag;
 
 /**
- * Class UserRolesBag
- * @package Swift\Security\User
+ * Class RouteParameterBag
+ * @package Swift\Router
  */
-class UserRolesBag extends ParameterBag {
+final class RouteParameterBag extends ParameterBag {
 
-    public function set( string $key, $value = null ): void {
-        $value ??= $key;
-        parent::set( $key, $value );
+    /** @var RouteParameter[] */
+    protected array $parameters;
+
+    public function get( string $key, $default = null ): RouteParameter|null {
+        return parent::get( $key, $default );
     }
 
 }

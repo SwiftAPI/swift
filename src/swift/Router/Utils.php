@@ -10,6 +10,7 @@
 
 namespace Swift\Router;
 
+use Swift\HttpFoundation\ParameterBag;
 use Swift\Router\MatchTypes\MatchType;
 use Swift\Router\MatchTypes\MatchTypeInterface;
 
@@ -22,33 +23,33 @@ class Utils {
     /**
      * @param array $params
      *
-     * @return array
+     * @return RouteParameterBag
      */
-    public static function formatRouteParams( array $params ): array {
+    public static function formatRouteParams( array $params ): RouteParameterBag {
         foreach ($params as $key => $value) {
             if (is_numeric($key)) {
                 unset($params[$key]);
             }
         }
 
-        return $params;
+        return new RouteParameterBag($params);
     }
 
     /**
      * @param string $path
      * @param MatchTypeInterface[] $matchTypes
      *
-     * @return array
+     * @return RouteParameterBag
      */
-    public static function getRouteParametersFromPath( string $path, array &$matchTypes = array() ): array {
-        $parameters = array();
+    public static function getRouteParametersFromPath( string $path, array &$matchTypes = array() ): RouteParameterBag {
+        $parameters = new RouteParameterBag();
         if (preg_match_all('`(/|\.|)\[([^:\]]*+)(?::([^:\]]*+))?\](\?|)`', $path, $matches, PREG_SET_ORDER)) {
             foreach ($matches as [$block, $pre, $type, $param, $optional] ) {
                 if (!array_key_exists($type, $matchTypes)) {
                     $matchTypes[$type] = new MatchType($type, $type);
                 }
                 $matchType = $matchTypes[$type];
-                $parameters[$param] = new RouteParameter($block, $pre, $matchType, $param, $optional);
+                $parameters->set($param, new RouteParameter($block, $pre, $matchType, $param, $optional));
             }
         }
 

@@ -23,7 +23,7 @@ use Swift\Security\Authorization\Voter\VoterInterface;
 class UnanimousDecisionStrategy implements DecisionStrategyInterface {
 
     /**
-     * Grants access if only grant (or abstain) votes were received.
+     * Grants access if only grant (ignoring abstain) votes were received.
      *
      * @inheritDoc
      */

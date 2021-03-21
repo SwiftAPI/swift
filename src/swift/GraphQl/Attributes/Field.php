@@ -30,6 +30,7 @@ class Field {
      * @param bool $isList
      * @param string|null $generator
      * @param array $generatorArguments
+     * @param string|null $description
      */
     public function __construct(
         public string|null $name = null,
@@ -38,6 +39,7 @@ class Field {
         public bool $isList = false,
         public string|null $generator = null,
         public array $generatorArguments = array(),
+        public string|null $description = null,
     ) {
     }
 }

@@ -14,12 +14,18 @@ use Swift\Controller\AbstractController;
 use Swift\HttpFoundation\Exception\BadRequestException;
 use Swift\HttpFoundation\JsonResponse;
 use Swift\Kernel\Attributes\Autowire;
+use Swift\Model\Entity\Arguments;
 use Swift\Router\Attributes\Route;
 use Swift\Router\RouteParameter;
+use Swift\Router\RouteParameterBag;
 use Swift\Router\Types\RouteMethodEnum;
+use Swift\Security\Authorization\AuthorizationRolesEnum;
 use Swift\Security\Authorization\AuthorizationTypesEnum;
 use Swift\Security\User\Exception\UserAlreadyExistsException;
+use Swift\Security\User\Exception\UserNotFoundException;
+use Swift\Security\User\Type\UserType;
 use Swift\Security\User\UserProviderInterface;
+use Swift\Security\User\UserStorageInterface;
 
 /**
  * Class UserControllerRest
@@ -32,21 +38,23 @@ class UserControllerRest extends AbstractController {
      * UserController constructor.
      *
      * @param UserProviderInterface $userProvider
+     * @param UserStorageInterface $userDatabaseStorage
      */
     public function __construct(
         private UserProviderInterface $userProvider,
+        private UserStorageInterface $userDatabaseStorage,
     ) {
     }
 
     /**
      * Create user account endpoint
      *
-     * @param RouteParameter[] $params
+     * @param RouteParameterBag $params
      *
      * @return JsonResponse
      */
     #[Route( method: RouteMethodEnum::POST, route: '/create/', name: 'security.user.create' )]
-    public function create( array $params ): JsonResponse {
+    public function create( RouteParameterBag $params ): JsonResponse {
         $request = $this->getRequest()->getContent();
 
         $username = $request->get('username');
@@ -72,16 +80,69 @@ class UserControllerRest extends AbstractController {
     /**
      * Return currently authenticated user. For this it is required that a user is authenticated
      *
-     * @param RouteParameter[] $params
+     * @param RouteParameterBag $params
      *
      * @return JsonResponse
      */
     #[Route( method: RouteMethodEnum::GET, route: '/me/', name: 'security.users.me', isGranted: [AuthorizationTypesEnum::IS_AUTHENTICATED] )]
-    public function me( array $params ): JsonResponse {
+    public function me( RouteParameterBag $params ): JsonResponse {
         $data = $this->getCurrentUser()->serialize();
         unset($data->password);
 
         return new JsonResponse($data);
+    }
+
+    /**
+     * Fetch user by id
+     *
+     * User must have permission to list users (ROLE_USERS_LIST)
+     * To fetch current user data, use the /me/ endpoint. This does not require ROLE_USERS_LIST permission
+     *
+     * @param RouteParameterBag $params
+     *
+     * @return JsonResponse
+     */
+    #[Route( method: [RouteMethodEnum::GET], route: '/[i:user_id]/', name: 'security.users.single', isGranted: [AuthorizationRolesEnum::ROLE_USERS_LIST] )]
+    public function user( RouteParameterBag $params ): JsonResponse {
+        // Get user data
+        if (!$data = $this->userProvider->getUserById($params->get('user_id')->getValue())?->serialize()) {
+            throw new UserNotFoundException(sprintf('User with id %s not found', $params->get('user_id')->getValue()));
+        }
+        unset($data->password);
+        $data->created = $data->created->format('Y-m-d H:i:s');
+        $data->modified = $data->modified->format('Y-m-d H:i:s');
+
+        return new JsonResponse($data);
+    }
+
+    /**
+     * REST users list endpoint
+     * Endpoint accepts the same parameters as GraphQl endpoint for filtering and pagination
+     *
+     * User must have permission to list users (ROLE_USERS_LIST)
+     *
+     * @param RouteParameterBag $params
+     *
+     * @return JsonResponse
+     */
+    #[Route( method: [RouteMethodEnum::GET, RouteMethodEnum::POST], route: '/list/', name: 'security.users.list', isGranted: [AuthorizationRolesEnum::ROLE_USERS_LIST] )]
+    public function users( RouteParameterBag $params ): JsonResponse {
+        $filter = $this->getRequest()->getContent()->getIterator()->getArrayCopy();
+        $state = $filter['where'] ?? array();
+        unset($filter['where']);
+        $filter = array_filter($filter, static fn( $item) => !empty($item));
+
+        $result = $this->userDatabaseStorage->findMany($state, new Arguments(...$filter));
+
+        $users = array();
+        foreach ($result as $value) {
+            unset($value->password);
+            $value->created = $value->created->format('Y-m-d H:i:s');
+            $value->modified = $value->modified->format('Y-m-d H:i:s');
+            $users[] = $value;
+        }
+
+        return new JsonResponse($users);
     }
 
     /**
@@ -91,13 +152,15 @@ class UserControllerRest extends AbstractController {
      *
      * Only a direct login is valid here. Re-authentication or no authentication is not valid. This is already cover through isGranted in the route (validated by the firewall)
      *
-     * @param RouteParameter[] $params
+     * @param RouteParameterBag $params
      *
      * @return JsonResponse
      */
     #[Route( method: [RouteMethodEnum::POST], route: '/login/', name: 'security.user.login', isGranted: [AuthorizationTypesEnum::IS_AUTHENTICATED_DIRECTLY], tags: [Route::TAG_ENTRYPOINT] )]
-    public function login( array $params ): JsonResponse {
+    public function login( RouteParameterBag $params ): JsonResponse {
         $data = $this->getCurrentUser()?->serialize();
+        $data->created = $data->created->format('Y-m-d H:i:s');
+        $data->modified = $data->modified->format('Y-m-d H:i:s');
         $data->token = new \stdClass();
         $data->token->token = $this->getSecurityToken()->getTokenString();
         $data->token->expires = $this->getSecurityToken()->expiresAt()->format('Y-m-d H:i:s');

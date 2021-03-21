@@ -105,6 +105,10 @@ abstract class AbstractToken implements TokenInterface {
         return $data;
     }
 
+    public function getScope(): string {
+        return $this->scope;
+    }
+
     /**
      * Generate a security token
      *

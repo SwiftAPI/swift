@@ -27,12 +27,14 @@ class Mutation {
      * @param string|null $type
      * @param string|null $generator
      * @param array $generatorArguments
+     * @param string|null $description
      */
     public function __construct(
         public string|null $name = null,
         public string|null $type = null,
         public string|null $generator = null,
         public array $generatorArguments = array(),
+        public string|null $description = null,
     ) {
     }
 }

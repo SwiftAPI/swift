@@ -12,6 +12,7 @@ namespace Swift\GraphQl\TypeRegistry;
 
 
 use GraphQL\Type\Definition\EnumType;
+use GraphQL\Type\Definition\ListOfType;
 use GraphQL\Type\Definition\ObjectType as GraphQlObjectType;
 use GraphQL\Type\Definition\Type;
 use GraphQL\Type\Definition\UnionType;
@@ -126,22 +127,8 @@ class OutputTypeRegistry implements TypeRegistryInterface {
             return $this->definitions[$identifier];
         }
 
-        $fields = array();
-        foreach ($type->fields as $field) {
-            if (!$field->type) {
-                continue;
-            }
-            if (is_array($field->type)) {
-                return $this->buildUnion($field);
-            }
-            $field->type = $field->name === 'id' ? 'id' : $field->type;
-            if (array_key_exists($field->type, \Swift\GraphQl\Types\Type::getStandardTypes())) {
-                $fields[$field->name] = \Swift\GraphQl\Types\Type::getStandardTypes()[$field->type];
-                continue;
-            }
-            $fields[$field->name] = array_key_exists(key: $identifier, array: $this->definitions) ?
-                $this->definitions[$field->type] : $this->createObject($field);
-        }
+        $fields = $this->resolveFields($type->fields);
+        $args = $this->resolveFields($type->args ?? array());
 
         if ($type->generator) {
             if (!array_key_exists(key: $type->generator, array: $this->generators)) {
@@ -164,9 +151,13 @@ class OutputTypeRegistry implements TypeRegistryInterface {
                 'fields' => $fields,
                 'declaration' => $type,
                 'interfaces' => $this->interfaceRegistry->fromType($type),
+                'args' => $args,
             ));
             $this->definitions[$identifier] = $object;
         }
+
+
+        $object = $type->isList ? \Swift\GraphQl\Types\Type::listOf($object) : $object;
 
         return $object;
     }
@@ -186,6 +177,36 @@ class OutputTypeRegistry implements TypeRegistryInterface {
         ]);
         $this->definitions[$name] = $object;
         return $object;
+    }
+
+    private function resolveFields( array $items ): array {
+        $fields = array();
+        foreach ($items as $field) {
+            if (!$field->type) {
+                continue;
+            }
+            if (is_array($field->type)) {
+                return $this->buildUnion($field);
+            }
+            $field->type = $field->name === 'id' ? 'id' : $field->type;
+            $config = array(
+                'description' => $field->description,
+                'args' => $this->resolveFields($field->args ?? array())
+            );
+            if (array_key_exists($field->type, \Swift\GraphQl\Types\Type::getStandardTypes())) {
+                $config['type'] = $field->nullable ?
+                    \Swift\GraphQl\Types\Type::getStandardTypes()[ $field->type ] :
+                    \Swift\GraphQl\Types\Type::nonNull(\Swift\GraphQl\Types\Type::getStandardTypes()[ $field->type ]);
+                $fields[ $field->name ] = $config;
+                continue;
+            }
+            $fieldItem = array_key_exists(key: $field->type, array: $this->definitions) ?
+                $this->definitions[$field->type] : $this->createObject($field);
+            $config['type'] = $field->isList && (!$fieldItem instanceof ListOfType) ? \Swift\GraphQl\Types\Type::listOf($fieldItem) : $fieldItem;
+            $fields[$field->name] = $config;
+        }
+
+        return $fields;
     }
 
 }

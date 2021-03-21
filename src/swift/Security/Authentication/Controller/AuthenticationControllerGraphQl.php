@@ -1,4 +1,4 @@
-<?php declare(strict_types=1);
+<?php declare( strict_types=1 );
 
 /*
  * This file is part of the Swift Framework
@@ -13,8 +13,12 @@ namespace Swift\Security\Authentication\Controller;
 
 use Swift\Controller\AbstractController;
 use Swift\GraphQl\Attributes\Mutation;
+use Swift\GraphQl\Attributes\Query;
+use Swift\Security\Authentication\Types\AccessTokenRequestResponse;
 use Swift\Security\Authentication\Types\ClientCredentialsInput;
+use Swift\Security\Authentication\Types\RefreshTokenInput;
 use Swift\Security\Authentication\Types\TokenRequestResponse;
+use Swift\Security\Authorization\AuthorizationTypesEnum;
 
 /**
  * Class AuthenticationControllerGraphQl
@@ -25,15 +29,29 @@ class AuthenticationControllerGraphQl extends AbstractController {
     /**
      * @param ClientCredentialsInput $credentials
      *
-     * @return TokenRequestResponse
+     * @return AccessTokenRequestResponse
      */
-    #[Mutation(name: 'authTokenGet')]
-    public function token(ClientCredentialsInput $credentials): TokenRequestResponse {
-        return new TokenRequestResponse(
+    #[Mutation( name: 'AuthAccessTokenGet', description: 'Oauth client credentials endpoint' )]
+    public function token( ClientCredentialsInput $credentials ): AccessTokenRequestResponse {
+        return new AccessTokenRequestResponse(
             $this->getSecurityToken()->getTokenString(),
             $this->getSecurityToken()->expiresAt(),
             'bearer',
             $this->getSecurityToken()->getRefreshToken()->getTokenString(),
+        );
+    }
+
+    /**
+     * @param RefreshTokenInput $refreshToken
+     *
+     * @return TokenRequestResponse
+     */
+    #[Mutation( name: 'AuthRefreshToken', description: 'Fetch new accessToken with refreshToken' )]
+    public function refresh( RefreshTokenInput $refreshToken ): TokenRequestResponse {
+        return new TokenRequestResponse(
+            $this->getSecurityToken()->getTokenString(),
+            $this->getSecurityToken()->expiresAt(),
+            'bearer',
         );
     }
 

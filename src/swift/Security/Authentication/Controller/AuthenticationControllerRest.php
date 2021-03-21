@@ -14,6 +14,7 @@ use Swift\Controller\AbstractController;
 use Swift\HttpFoundation\JsonResponse;
 use Swift\Router\Attributes\Route;
 use Swift\Router\Types\RouteMethodEnum;
+use Swift\Security\Authentication\Token\TokenInterface;
 
 /**
  * Class AuthenticationControllerRest
@@ -29,17 +30,17 @@ class AuthenticationControllerRest extends AbstractController {
      */
     #[Route(method: [RouteMethodEnum::POST], route: '/token/', name: 'authorize.token', tags: [Route::TAG_ENTRYPOINT])]
     public function token(): JsonResponse {
-        return new JsonResponse([
+        $response = array(
             'access_token' => $this->getSecurityToken()->getTokenString(),
             'expires' => $this->getSecurityToken()->expiresAt()->format('Y-m-d H:i:s'),
             'token_type' => 'bearer',
-            'refresh_token' => $this->getSecurityToken()->getRefreshToken()->getTokenString(),
-        ]);
-    }
+        );
 
-    #[Route(method: [RouteMethodEnum::POST], route: '/token/refresh', name: 'authorize.refresh_token', tags: [Route::TAG_ENTRYPOINT])]
-    public function refreshToken(): JsonResponse {
+        if ($this->getRequest()->getContent()->get('grant_type') === 'client_credentials') {
+            $response['refresh_token'] = $this->getSecurityToken()->getRefreshToken()->getTokenString();
+        }
 
+        return new JsonResponse($response);
     }
 
 }

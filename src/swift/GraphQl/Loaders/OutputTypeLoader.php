@@ -82,6 +82,7 @@ class OutputTypeLoader implements LoaderInterface {
                 nullable: $nullable,
                 generator: $propertyConfig->generator ?? null,
                 generatorArguments: $propertyConfig->generatorArguments ?? array(),
+                description: $propertyConfig->description ?? null,
             );
         }
 
@@ -111,20 +112,23 @@ class OutputTypeLoader implements LoaderInterface {
                     declaringMethod: $methodConfig->name ?? $reflectionMethod->getName(),
                     type: $parameterFieldType,
                     nullable: $reflectionParameter->isOptional(),
-                    generator: $propertyConfig->generator ?? null,
-                    generatorArguments: $propertyConfig->generatorArguments ?? array(),
+                    generator: $parameterConfig->generator ?? null,
+                    generatorArguments: $parameterConfig->generatorArguments ?? array(),
+                    description: $parameterConfig->description ?? null,
                 );
             }
 
             $fields[ $fieldName ] = new ObjectType(
                 name: $fieldName,
                 declaringClass: $reflectionMethod->getDeclaringClass()->getName(),
+                declaringMethod: $reflectionMethod->getName(),
                 resolve: $reflectionMethod->getName(),
                 args: $args,
                 type: $fieldType,
                 isList: $methodConfig->isList ?? false,
-                generator: $propertyConfig->generator ?? null,
-                generatorArguments: $propertyConfig->generatorArguments ?? array(),
+                generator: $methodConfig->generator ?? null,
+                generatorArguments: $methodConfig->generatorArguments ?? array(),
+                description: $methodConfig->description,
             );
         }
 
@@ -132,6 +136,7 @@ class OutputTypeLoader implements LoaderInterface {
             name: $typeConfig->extends ?? $typeName,
             declaringClass: $classReflection?->getName(),
             fields: $fields,
+            description: $typeConfig->description,
         );
 
         if ( ! empty( $typeConfig->extends ) ) {

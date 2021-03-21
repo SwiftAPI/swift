@@ -34,7 +34,7 @@ class LoginResponseType extends UserType {
      * @param string $lastname
      * @param DateTime $created
      * @param DateTime $modified
-     * @param stdClass $token
+     * @param TokenType $token
      */
     public function __construct(
         #[Field(nullable: true)] public ?int $id,

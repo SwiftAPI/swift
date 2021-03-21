@@ -64,4 +64,6 @@ interface TokenInterface {
      */
     public function getData(): stdClass;
 
+    public function getScope(): string;
+
 }

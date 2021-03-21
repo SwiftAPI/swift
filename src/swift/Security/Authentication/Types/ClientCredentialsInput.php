@@ -25,10 +25,12 @@ class ClientCredentialsInput {
      *
      * @param string $clientId
      * @param string $clientSecret
+     * @param string $grantType
      */
     public function __construct(
         #[Field] public string $clientId,
         #[Field] public string $clientSecret,
+        #[Field] public string $grantType,
     ) {
     }
 

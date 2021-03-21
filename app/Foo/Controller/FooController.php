@@ -7,7 +7,7 @@ use Swift\Configuration\ConfigurationInterface;
 use Swift\Controller\AbstractController;
 use Swift\HttpFoundation\JsonResponse;
 use Swift\Router\Attributes\Route;
-use Swift\Router\RouteParameter;
+use Swift\Router\RouteParameterBag;
 use Swift\Router\Types\RouteMethodEnum;
 
 /**
@@ -15,7 +15,7 @@ use Swift\Router\Types\RouteMethodEnum;
  * @package Foo\Controller
  */
 #[Route(method: [RouteMethodEnum::GET, RouteMethodEnum::PATCH], route: '/foo/', name: 'foo')]
-class Foo extends AbstractController {
+class FooController extends AbstractController {
 
     /**
      * Foo constructor.
@@ -32,15 +32,15 @@ class Foo extends AbstractController {
     }
 
     /**
-     * @param RouteParameter[] $params
+     * @param RouteParameterBag $params
      *
      * @return JSONResponse
      */
-    #[Route(method: [RouteMethodEnum::GET], route: '/bar/[i:articleid]/', name: 'foo.get_bar')]
-    public function getBar( array $params): JsonResponse {
+    #[Route(method: [RouteMethodEnum::GET], route: '/bar/[i:article_id]/', name: 'foo.get_bar')]
+    public function getBar( RouteParameterBag $params): JsonResponse {
         // Let's return the article here
 
-        $articleID = $params['articleid']->getValue();
+        $articleID = $params->get('article_id')->getValue();
 
         return new JsonResponse(array(
             'article_id' => $articleID,
@@ -49,12 +49,12 @@ class Foo extends AbstractController {
     }
 
     /**
-     * @param RouteParameter[] $params
+     * @param RouteParameterBag $params
      *
      * @return JsonResponse
      */
-    #[Route(method: [RouteMethodEnum::PATCH], route: '/bar/[i:articleid]/', name: 'foo.patch_bar')]
-    public function patchBar( array $params): JsonResponse {
+    #[Route(method: [RouteMethodEnum::PATCH], route: '/bar/[i:article_id]/', name: 'foo.patch_bar')]
+    public function patchBar( RouteParameterBag $params): JsonResponse {
         // Let's update the article here
         return new JsonResponse(array('foo bar'));
     }

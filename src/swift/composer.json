@@ -3,7 +3,7 @@
     "type": "library",
     "description": "Simple PHP framework based on Symfony",
     "keywords": ["api","framework","symfony", "simple"],
-    "homepage": "https://github.com/HenrivantSant/henri",
+    "homepage": "https://github.com/HenrivantSant/swift",
     "license": "MIT",
     "authors": [
         {
@@ -14,14 +14,12 @@
         }
     ],
     "require": {
-        "php": ">= 7.3",
+        "php": ">= 8",
         "symfony/dependency-injection": "^4.4",
         "symfony/config": "^4.4",
         "symfony/yaml": "^4.4",
-        "symfony/orm-pack": "^1.0",
         "symfony/console": "^4.4",
         "dibi/dibi": "^4.1",
-        "doctrine/annotations": "^1.8",
         "mashape/unirest-php": "^3.0",
         "firebase/php-jwt": "^5.2",
         "ext-json": "*",

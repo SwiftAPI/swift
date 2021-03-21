@@ -27,6 +27,7 @@ class ObjectType {
      * @param string|null $generator
      * @param array $generatorArguments
      * @param array $interfaces
+     * @param string|null $description
      */
     public function __construct(
         public string $name,
@@ -41,6 +42,7 @@ class ObjectType {
         public string|null $generator = null,
         public array $generatorArguments = array(),
         public array $interfaces = array(),
+        public string|null $description = null,
     ) {
     }
 }

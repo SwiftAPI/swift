@@ -27,8 +27,8 @@ class ControllerRoute implements RouteInterface {
     /** @var RequestInterface $request */
     private RequestInterface $request;
 
-    /** @var RouteParameter[] $params */
-    private array $params = array();
+    /** @var RouteParameterBag $params */
+    private RouteParameterBag $params ;
 
     /** @var MatchTypeInterface[] */
     private array $matchTypes = array();
@@ -56,6 +56,7 @@ class ControllerRoute implements RouteInterface {
         private array $isGranted,
         private array $tags = array(),
     ) {
+        $this->params = new RouteParameterBag();
     }
 
     /**
@@ -82,8 +83,8 @@ class ControllerRoute implements RouteInterface {
         if ( isset( $this->getFullPath()[0] ) && $this->getFullPath()[0] === '@' ) {
             // @ regex delimiter
             $pattern      = '`' . substr( $this->getFullPath(), 1 ) . '`u';
-            $match        = preg_match( $pattern, $requestUrl, $this->params ) === 1;
-            $this->params = Utils::formatRouteParams( $this->params );
+            $match        = preg_match( $pattern, $requestUrl, $params ) === 1;
+            $this->params = Utils::formatRouteParams( $params );
 
             return $match;
         }
@@ -175,9 +176,9 @@ class ControllerRoute implements RouteInterface {
     /**
      * @param bool $fresh
      *
-     * @return RouteParameter[]
+     * @return RouteParameterBag
      */
-    public function getParamsFromPath( bool $fresh = false ): array {
+    public function getParamsFromPath( bool $fresh = false ): RouteParameterBag {
         if ( $fresh || !isset($this->params) ) {
             $this->params = Utils::getRouteParametersFromPath( $this->getFullPath(), $this->matchTypes );
         }
@@ -190,12 +191,12 @@ class ControllerRoute implements RouteInterface {
      *
      * @param array $params
      *
-     * @return RouteParameter[]
+     * @return RouteParameterBag
      */
-    private function updateParams( array $params ): array {
+    private function updateParams( array $params ): RouteParameterBag {
         foreach (Utils::formatRouteParams( $params ) as $name => $value) {
-            if (array_key_exists($name, $this->params)) {
-                $this->params[$name]->value = $this->params[$name]->type->parseValue($value, $this->request);
+            if ($this->params->has($name)) {
+                $this->params->get($name)->setValue($this->params->get($name)->getType()->parseValue($value, $this->request));
             }
         }
 
@@ -203,17 +204,17 @@ class ControllerRoute implements RouteInterface {
     }
 
     /**
-     * @return RouteParameter[]
+     * @return RouteParameterBag
      */
-    public function getParams(): array {
+    public function getParams(): RouteParameterBag {
         return $this->params;
     }
 
     /**
-     * @param RouteParameter[] $params
+     * @param RouteParameter[]|RouteParameterBag $params
      */
-    public function setParams( array $params ): void {
-        $this->params = $params;
+    public function setParams( array|RouteParameterBag $params ): void {
+        $this->params = is_array($params) ? new RouteParameterBag($params) : $params;
     }
 
     /**

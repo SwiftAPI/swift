@@ -56,7 +56,7 @@ class OauthClientCredentialsAuthenticatorGraphQl implements AuthenticatorInterfa
             return false;
         }
 
-        $requestContent = $request->getContent()->get('authTokenGet');
+        $requestContent = $request->getContent()->get('AuthAccessTokenGet');
 
         return !empty($requestContent['grantType']) && !empty($requestContent['clientId']) && !empty($requestContent['clientSecret']);
     }
@@ -65,7 +65,7 @@ class OauthClientCredentialsAuthenticatorGraphQl implements AuthenticatorInterfa
      * @inheritDoc
      */
     public function authenticate( RequestInterface $request ): PassportInterface {
-        $requestContent = $request->getContent()->get('authTokenGet');
+        $requestContent = $request->getContent()->get('AuthAccessTokenGet');
         $client = $this->oauthClientsEntity->findOne([
             'clientId' => $requestContent['clientId'],
         ]);

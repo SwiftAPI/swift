@@ -16,10 +16,10 @@ use Swift\Security\User\UserInterface;
  * Class OathClientCredentialsToken
  * @package Swift\Security\Authentication\Token
  */
-class OathClientCredentialsToken extends AbstractToken {
+class OauthAccessToken extends AbstractToken {
 
     /**
-     * Token constructor.
+     * OauthAccessToken constructor.
      *
      * @param UserInterface $user
      * @param string|null $token
@@ -32,16 +32,10 @@ class OathClientCredentialsToken extends AbstractToken {
         protected ?TokenInterface $refreshToken = null,
         protected bool $isAuthenticated = false,
     ) {
-        $this->refreshToken = new OauthRefreshToken($this->user, TokenInterface::SCOPE_REFRESH_TOKEN);
-
         parent::__construct($user, TokenInterface::SCOPE_ACCESS_TOKEN, $token, $isAuthenticated);
 
         $this->userId = null;
         $this->clientId = $this->getUser()->getId();
-    }
-
-    public function getRefreshToken(): TokenInterface {
-        return $this->refreshToken;
     }
 
 

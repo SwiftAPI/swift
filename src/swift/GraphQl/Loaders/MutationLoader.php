@@ -86,6 +86,7 @@ class MutationLoader implements LoaderInterface {
                         nullable: $reflectionParameter->isOptional(),
                         generator: $parameterConfig->generator ?? null,
                         generatorArguments: $parameterConfig->generatorArguments ?? array(),
+                        description: $parameterConfig->description ?? null,
                     );
                 }
 
@@ -99,6 +100,7 @@ class MutationLoader implements LoaderInterface {
                     args: $arguments,
                     type: $queryType,
                     isList: $methodConfig->isList ?? false,
+                    description: $methodConfig->description ?? null,
                 );
 
                 $this->mutationRegistry->addType($objectType);

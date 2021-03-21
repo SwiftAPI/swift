@@ -117,6 +117,7 @@ class MutationRegistry implements TypeRegistryInterface {
                 'type' => $query->isList ? \Swift\GraphQl\Types\Type::listOf($queryType) : $queryType,
                 'args' => $this->resolveArguments($query->args),
                 'declaration' => $query,
+                'description' => $query->description ?? null,
             );
 
         }

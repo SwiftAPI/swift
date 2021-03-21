@@ -14,6 +14,7 @@ namespace Swift\GraphQl\TypeRegistry;
 use GraphQL\Type\Definition\EnumType;
 use GraphQL\Type\Definition\InputObjectType;
 use GraphQL\Type\Definition\Type;
+use GraphQL\Type\Definition\UnionType;
 use Swift\GraphQl\Exceptions\DuplicateTypeException;
 use Swift\GraphQl\TypeRegistryInterface;
 use Swift\GraphQl\Types\ObjectType;
@@ -104,12 +105,12 @@ class InputTypeRegistry implements TypeRegistryInterface {
     }
 
     public function createObject( ObjectType|\GraphQL\Type\Definition\Type $type, string $identifier = null ) {
-        if ( is_a( object_or_class: $type, class: \GraphQL\Type\Definition\Type::class, allow_string: false ) ) {
-            return $type;
-        }
-
         if (!$type->generator && array_key_exists($type->type, $this->types)) {
             $type = $this->getTypeByClass($type->type);
+        }
+
+        if ( is_a( object_or_class: $type, class: \GraphQL\Type\Definition\Type::class, allow_string: false ) ) {
+            return $type;
         }
 
         $type->type ??= $type->declaringClass;
@@ -119,21 +120,8 @@ class InputTypeRegistry implements TypeRegistryInterface {
             return $this->definitions[ $identifier ];
         }
 
-        $fields = array();
-        foreach ( $type->fields as $field ) {
-            if ( ! $field->type ) {
-                continue;
-            }
-
-            $field->type = $field->name === 'id' ? 'id' : $field->type;
-            if ( array_key_exists( $field->type, \Swift\GraphQl\Types\Type::getStandardTypes() ) ) {
-                $fieldType = \Swift\GraphQl\Types\Type::getStandardTypes()[ $field->type ];
-                $fields[ $field->name ] = $field->nullable ? $fieldType : \Swift\GraphQl\Types\Type::nonNull($fieldType);
-                continue;
-            }
-            $fields[ $field->name ] = array_key_exists( key: $field->type, array: $this->definitions ) ?
-                $this->definitions[ $field->type ] : $this->createObject( $field );
-        }
+        $fields = $this->resolveFields($type->fields ?? array());
+        $args = $this->resolveFields($type->args ?? array());
 
         if ( $type->generator ) {
             if ( ! array_key_exists( key: $type->generator, array: $this->generators ) ) {
@@ -162,6 +150,33 @@ class InputTypeRegistry implements TypeRegistryInterface {
         }
 
         return $object;
+    }
+
+    private function resolveFields( array $items ): array {
+        $fields = array();
+        foreach ( $items as $field ) {
+            if ( ! $field->type ) {
+                continue;
+            }
+
+            $field->type = $field->name === 'id' ? 'id' : $field->type;
+            $config = array(
+                'description' => $field->description,
+                'args' => $this->resolveFields($field->args ?? array())
+            );
+            if ( array_key_exists( $field->type, \Swift\GraphQl\Types\Type::getStandardTypes() ) ) {
+                $config['type'] = $field->nullable ?
+                    \Swift\GraphQl\Types\Type::getStandardTypes()[ $field->type ] :
+                    \Swift\GraphQl\Types\Type::nonNull(\Swift\GraphQl\Types\Type::getStandardTypes()[ $field->type ]);
+                $fields[ $field->name ] = $config;
+                continue;
+            }
+            $config['type'] = array_key_exists( key: $field->type, array: $this->definitions ) ?
+                $this->definitions[ $field->type ] : $this->createObject( $field );
+            $fields[ $field->name ] = $config;
+        }
+
+        return $fields;
     }
 
 }

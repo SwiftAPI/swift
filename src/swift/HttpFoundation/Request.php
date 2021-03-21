@@ -283,7 +283,13 @@ class Request implements RequestInterface {
         $content->rewind();
         $body = $content->getContents();
 
-        return is_string($body) ? new ParameterBag(json_decode( $body, true, 512, JSON_THROW_ON_ERROR )) : new ParameterBag($body);
+        try {
+            $body = is_string($body) ? json_decode( $body, true, 512, JSON_THROW_ON_ERROR ) : $body;
+        } catch (\JsonException) {
+            $body = is_string($body) ? array($body) : $body;
+        }
+
+        return new ParameterBag($body);
     }
 
     /**

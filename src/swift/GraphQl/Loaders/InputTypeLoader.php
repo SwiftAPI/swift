@@ -84,6 +84,7 @@ class InputTypeLoader implements LoaderInterface {
                 nullable: $nullable,
                 generator: $propertyConfig->generator ?? null,
                 generatorArguments: $propertyConfig->generatorArguments ?? array(),
+                description: $propertyConfig->description ?? null,
             );
         }
 
@@ -111,8 +112,9 @@ class InputTypeLoader implements LoaderInterface {
                     name: $parameterFieldName,
                     declaringClass: $reflectionParameter->getDeclaringClass()?->getName(),
                     type: $parameterFieldType,
-                    generator: $propertyConfig->generator ?? null,
-                    generatorArguments: $propertyConfig->generatorArguments ?? array(),
+                    generator: $methodConfig->generator ?? null,
+                    generatorArguments: $methodConfig->generatorArguments ?? array(),
+                    description: $parameterConfig->description ?? null,
                 );
             }
 
@@ -121,8 +123,9 @@ class InputTypeLoader implements LoaderInterface {
                 declaringClass: $reflectionMethod->getDeclaringClass()->getName(),
                 args: $args,
                 type: $fieldType,
-                generator: $propertyConfig->generator ?? null,
-                generatorArguments: $propertyConfig->generatorArguments ?? array(),
+                generator: $methodConfig->generator ?? null,
+                generatorArguments: $methodConfig->generatorArguments ?? array(),
+                description: $methodConfig->description ?? null,
             );
         }
 
@@ -130,6 +133,7 @@ class InputTypeLoader implements LoaderInterface {
             name: ucfirst($typeConfig->extends ?? $typeName),
             declaringClass: $classReflection?->getName(),
             fields: $fields,
+            description: $typeConfig->description,
         );
 
         if ( ! empty( $typeConfig->extends ) ) {

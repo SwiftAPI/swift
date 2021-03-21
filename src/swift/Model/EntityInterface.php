@@ -42,7 +42,7 @@ interface EntityInterface {
      *
      * @return array
      */
-    public function findMany( array|stdClass $state, Arguments|null $arguments, bool $exceptionOnNotFound = false ): array;
+    public function findMany( array|stdClass $state, Arguments|null $arguments = null, bool $exceptionOnNotFound = false ): array;
 
     /**
      * Save/update based on the given state

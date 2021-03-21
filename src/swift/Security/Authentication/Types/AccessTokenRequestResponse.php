@@ -14,24 +14,27 @@ use Swift\GraphQl\Attributes\Field;
 use Swift\GraphQl\Attributes\Type;
 
 /**
- * Class TokenRequestResponse
+ * Class AccessTokenRequestResponse
  * @package Swift\Security\Authentication\Type
  */
 #[Type]
-class TokenRequestResponse {
+class AccessTokenRequestResponse extends TokenRequestResponse {
 
     /**
-     * TokenRequestResponse constructor.
+     * AuthTokenRequestResponse constructor.
      *
      * @param string $accessToken
      * @param \DateTimeInterface $expires
      * @param string $tokenType
+     * @param string $refreshToken
      */
     public function __construct(
         #[Field] public string $accessToken,
         #[Field(type: \DateTime::class)] public \DateTimeInterface $expires,
         #[Field] public string $tokenType,
+        #[Field] public string $refreshToken,
     ) {
+        parent::__construct($this->accessToken, $this->expires, $this->tokenType);
     }
 
 }

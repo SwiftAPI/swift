@@ -102,9 +102,9 @@ interface RouteInterface {
     public function setAction( ?string $action ): void;
 
     /**
-     * @return RouteParameter[]
+     * @return RouteParameterBag
      */
-    public function getParams(): array;
+    public function getParams(): RouteParameterBag;
 
     /**
      * @param RouteParameter[] $params

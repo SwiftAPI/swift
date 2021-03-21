@@ -12,6 +12,7 @@ namespace Swift\GraphQl\Resolvers;
 
 
 use Closure;
+use GraphQL\Type\Definition\ListOfType;
 use GraphQL\Type\Definition\NonNull;
 use GraphQL\Type\Definition\QueryPlan;
 use GraphQL\Type\Definition\ResolveInfo;
@@ -41,6 +42,8 @@ class FieldResolver {
 
     public function resolve( $value, $args, $context, ResolveInfo $info ) {
         $fieldName = $info->fieldName;
+        $type      = $info->fieldDefinition->getType() instanceof ListOfType || $info->fieldDefinition->getType() instanceof NonNull ?
+            $info->fieldDefinition->getType()->getOfType() : $info->fieldDefinition->getType();
         $property  = null;
 
         $this->context->setInfo($info);
@@ -57,8 +60,9 @@ class FieldResolver {
         }
 
         // If field is marked as a method on the value, execute it is as such
-        if (is_object($value) && method_exists($value, $fieldName)) {
-            return $value->{$fieldName}();
+        if (is_object($value) && (method_exists($value, $fieldName) || method_exists($value, 'get' . ucfirst($fieldName)))) {
+            $methodName = method_exists($value, $fieldName) ? $fieldName : 'get' . ucfirst($fieldName);
+            return $value->{$methodName}();
         }
 
         // Arguments will always be in array form no matter the declaration. If marked as such, instance the desired classes

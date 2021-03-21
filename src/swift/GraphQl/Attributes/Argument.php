@@ -23,10 +23,10 @@ class Argument {
     /**
      * Argument constructor.
      *
-     * @param string|null $name
+     * @param string|null $name argument name in the schema
      * @param string|array|null $type array of types will lead to a union
-     * @param string|null $generator
-     * @param array|null $generatorArguments
+     * @param string|null $generator FQN of the generator class
+     * @param array|null $generatorArguments Arguments to be passed to the generator
      */
     public function __construct(
         public string|null $name = null,

@@ -63,7 +63,7 @@ class UserControllerGraphQl extends AbstractController {
      *
      * @return UserType
      */
-    #[Mutation(name: 'userCreate', type: UserType::class )]
+    #[Mutation(name: 'userCreate', type: UserType::class, description: 'Create new user' )]
     public function create( UserInput $userInput ): UserType {
         try {
             $data = $this->userProvider->storeUser(...(array) $userInput)->serialize();
@@ -80,7 +80,7 @@ class UserControllerGraphQl extends AbstractController {
      *
      * @return UserType
      */
-    #[Query(name: 'userMe', isList: false )]
+    #[Query(name: 'userMe', isList: false, description: 'Fetch currently authenticated user' )]
     public function me(): UserType {
         // Make sure a user is authenticated
         $this->denyAccessUnlessGranted(
@@ -103,7 +103,7 @@ class UserControllerGraphQl extends AbstractController {
      *
      * @return UserType
      */
-    #[Query(name: 'user', type: UserType::class, isList: false )]
+    #[Query(name: 'user', type: UserType::class, isList: false, description: 'Fetch user by id' )]
     public function user( int $id ): UserType {
         // Make sure a user is authenticated
         $this->denyAccessUnlessGranted([AuthorizationTypesEnum::IS_AUTHENTICATED, AuthorizationRolesEnum::ROLE_USERS_LIST]);
@@ -124,10 +124,10 @@ class UserControllerGraphQl extends AbstractController {
      *
      * @return UserType[]
      */
-    #[Query(name: 'users', type: UserType::class, isList: true )]
+    #[Query(name: 'users', type: UserType::class, isList: true, description: 'List all users' )]
     public function users( #[Argument(type: Arguments::class, generator: EntityArgumentGenerator::class, generatorArguments: ['entity' => UserEntity::class])] array $filter ): array {
         // Make sure a user is authenticated
-        $this->denyAccessUnlessGranted([AuthorizationRolesEnum::ROLE_CLIENT]);
+        $this->denyAccessUnlessGranted([AuthorizationRolesEnum::ROLE_USERS_LIST]);
 
         $state = $filter['where'] ?? array();
         unset($filter['where']);
@@ -154,7 +154,7 @@ class UserControllerGraphQl extends AbstractController {
      *
      * @return LoginResponseType    User data and session token
      */
-    #[Mutation(name: 'userLogin', type: LoginResponseType::class )]
+    #[Mutation(name: 'userLogin', type: LoginResponseType::class, description: 'User login endpoint (username + password)' )]
     public function login( LoginInput $credentials ): LoginResponseType {
         // Make sure a direct login occurred instead of a re-authentication or no authentication at all
         $this->authorizationChecker->denyUnlessGranted([AuthorizationTypesEnum::IS_AUTHENTICATED_DIRECTLY]);

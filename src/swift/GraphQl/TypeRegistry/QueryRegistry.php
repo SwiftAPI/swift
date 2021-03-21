@@ -111,6 +111,7 @@ class QueryRegistry implements TypeRegistryInterface {
                 'type' => $query->isList ? \Swift\GraphQl\Types\Type::listOf($queryType) : $queryType,
                 'args' => $this->resolveArguments($query->args),
                 'declaration' => $query,
+                'description' => $query->description ?? null,
             );
         }
     }
@@ -143,6 +144,8 @@ class QueryRegistry implements TypeRegistryInterface {
             }
             $generator = $this->generators[$type->generator];
             $object = $generator->generate($type, $this);
+        } elseif (is_array($type->type)) {
+            return $this->inputTypeRegistry->createObject($type);
         } elseif (array_key_exists($identifier, \Swift\GraphQl\Types\Type::getStandardTypes())) {
             $fieldType = \Swift\GraphQl\Types\Type::getStandardTypes()[$identifier];
             return $type->nullable ? $fieldType : \Swift\GraphQl\Types\Type::nonNull($fieldType);
@@ -156,7 +159,7 @@ class QueryRegistry implements TypeRegistryInterface {
             $object = $this->inputTypeRegistry->getCompiled()->get($identifier);
         }
 
-        return $object;
+        return $type->isList ? \Swift\GraphQl\Types\Type::listOf($object) : $object;
     }
 
 }
