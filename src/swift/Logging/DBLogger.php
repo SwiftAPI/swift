@@ -28,6 +28,7 @@ class DBLogger extends Logger {
      * AppLogger constructor.
      *
      * @param EventDispatcher $dispatcher
+     * @param DBHandler $dbHandler
      */
     public function __construct( EventDispatcher $dispatcher, DBHandler $dbHandler ) {
         $dbHandler->setFormatter(new LineFormatter());

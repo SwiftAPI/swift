@@ -10,10 +10,7 @@
 
 namespace Swift\HttpFoundation;
 
-// Help opcache.preload discover always-needed symbols
 use Swift\Kernel\Attributes\DI;
-
-class_exists( AcceptHeaderItem::class );
 
 /**
  * Represents an Accept-* header.
@@ -25,6 +22,7 @@ class_exists( AcceptHeaderItem::class );
  */
 #[DI( exclude: true, autowire: false )]
 class AcceptHeader {
+
     /**
      * @var AcceptHeaderItem[]
      */

@@ -12,6 +12,7 @@ namespace Swift\GraphQl\EventSubscriber;
 
 
 use Swift\AuthenticationDeprecated\Types\AuthenticationLevelsEnum;
+use Swift\Configuration\ConfigurationInterface;
 use Swift\Events\EventDispatcher;
 use Swift\GraphQl\Kernel;
 use Swift\Kernel\Attributes\Autowire;
@@ -26,6 +27,16 @@ use Symfony\Component\EventDispatcher\EventSubscriberInterface;
  */
 #[Autowire]
 class OnBeforeRouteSubscriber implements EventSubscriberInterface {
+
+    /**
+     * OnBeforeRouteSubscriber constructor.
+     *
+     * @param ConfigurationInterface $configuration
+     */
+    public function __construct(
+        private ConfigurationInterface $configuration,
+    ) {
+    }
 
     /**
      * Returns an array of event names this subscriber wants to listen to.
@@ -57,15 +68,17 @@ class OnBeforeRouteSubscriber implements EventSubscriberInterface {
      * @param EventDispatcher $eventDispatcher
      */
     public function onBeforeRoutesCompile( OnBeforeRoutesCompileEvent $event, string $eventClassName, EventDispatcher $eventDispatcher ): void {
-        $event->addRoute(new Route(...array(
-            'name' => 'graphql',
-            'regex' => 'graphql',
-            'methods' => array('POST'),
-            'controller' => Kernel::class,
-            'action' => 'run',
-            'authType' => array(AuthorizationTypesEnum::PUBLIC_ACCESS),
-            'isGranted' => array(),
-        )));
+        if ($this->configuration->get('graphql.enabled', 'app')) {
+            $event->addRoute(new Route(...array(
+                'name' => 'graphql',
+                'regex' => 'graphql',
+                'methods' => array('POST'),
+                'controller' => Kernel::class,
+                'action' => 'run',
+                'authType' => array(AuthorizationTypesEnum::PUBLIC_ACCESS),
+                'isGranted' => array(),
+            )));
+        }
     }
 
 

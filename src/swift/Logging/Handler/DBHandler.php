@@ -32,7 +32,8 @@ class DBHandler extends AbstractProcessingHandler {
      */
     public function __construct(
         private LogEntity $entityLog,
-        private SystemLogger $systemLogger ) {
+        private SystemLogger $systemLogger
+    ) {
 
         parent::__construct();
     }

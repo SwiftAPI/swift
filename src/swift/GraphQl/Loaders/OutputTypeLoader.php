@@ -13,6 +13,7 @@ namespace Swift\GraphQl\Loaders;
 use Swift\GraphQl\Attributes\Field;
 use Swift\GraphQl\Attributes\Type;
 use Swift\GraphQl\LoaderInterface;
+use Swift\GraphQl\ResolveHelper;
 use Swift\GraphQl\TypeRegistryInterface;
 use Swift\GraphQl\Types\ObjectType;
 use Swift\Kernel\Attributes\Autowire;
@@ -32,11 +33,13 @@ class OutputTypeLoader implements LoaderInterface {
      * @param TypeRegistryInterface $outputTypeRegistry
      * @param TypeRegistryInterface $interfaceRegistry
      * @param ServiceLocatorInterface $serviceLocator
+     * @param ResolveHelper $helper
      */
     public function __construct(
         private TypeRegistryInterface $outputTypeRegistry,
         private TypeRegistryInterface $interfaceRegistry,
         private ServiceLocatorInterface $serviceLocator,
+        private ResolveHelper $helper,
     ) {
     }
 
@@ -79,6 +82,7 @@ class OutputTypeLoader implements LoaderInterface {
                 name: $fieldName,
                 declaringClass: $reflectionProperty->getDeclaringClass()->getName(),
                 type: $fieldType,
+                defaultValue: $propertyConfig->defaultValue ?? $this->helper->getDefaultValue($reflectionProperty),
                 nullable: $nullable,
                 generator: $propertyConfig->generator ?? null,
                 generatorArguments: $propertyConfig->generatorArguments ?? array(),
@@ -102,15 +106,17 @@ class OutputTypeLoader implements LoaderInterface {
             $args      = array();
 
             foreach ( $methodParameters as $reflectionParameter ) {
-                $parameterConfig    = $reflectionParameter->getAttributes( name: Field::class );
-                $parameterFieldName = $parameterConfig['name'] ?? $reflectionParameter->getName();
-                $parameterFieldType = $parameterConfig['type'] ?? $reflectionParameter->getType()->getName();
+                $parameterConfig    = !empty($reflectionParameter->getAttributes( name: Field::class )) ?
+                    $reflectionParameter->getAttributes( name: Field::class )[0]->newInstance() : new Field();
+                $parameterFieldName = $parameterConfig->name ?? $reflectionParameter->getName();
+                $parameterFieldType = $parameterConfig->type ?? $reflectionParameter->getType()->getName();
 
                 $args[ $parameterFieldName ] = new ObjectType(
                     name: $parameterFieldName,
                     declaringClass: $reflectionParameter->getDeclaringClass()?->getName(),
                     declaringMethod: $methodConfig->name ?? $reflectionMethod->getName(),
                     type: $parameterFieldType,
+                    defaultValue: $parameterConfig->defaultValue ?? $this->helper->getDefaultValue($reflectionParameter),
                     nullable: $reflectionParameter->isOptional(),
                     generator: $parameterConfig->generator ?? null,
                     generatorArguments: $parameterConfig->generatorArguments ?? array(),
@@ -125,6 +131,7 @@ class OutputTypeLoader implements LoaderInterface {
                 resolve: $reflectionMethod->getName(),
                 args: $args,
                 type: $fieldType,
+                defaultValue: $methodConfig->defaultValue,
                 isList: $methodConfig->isList ?? false,
                 generator: $methodConfig->generator ?? null,
                 generatorArguments: $methodConfig->generatorArguments ?? array(),
@@ -168,6 +175,7 @@ class OutputTypeLoader implements LoaderInterface {
                 name: $fieldName,
                 declaringClass: $reflectionProperty->getDeclaringClass()->getName(),
                 type: $fieldType,
+                defaultValue: $propertyConfig->defaultValue ?? $this->helper->getDefaultValue($reflectionProperty),
                 nullable: $nullable,
                 generator: $propertyConfig->generator ?? null,
                 generatorArguments: $propertyConfig->generatorArguments ?? array(),

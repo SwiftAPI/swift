@@ -38,7 +38,6 @@ class OauthService {
         $prefix = $this->configuration->get('connection.prefix', 'database');
         $this->storage = new Pdo(array(
             'dsn' => sprintf('mysql:dbname=%s;host=%s',
-                //$this->configuration->get('database.driver', 'root'),
                 $this->configuration->get('connection.database', 'database'),
                 $this->configuration->get('connection.host', 'database')
             ),

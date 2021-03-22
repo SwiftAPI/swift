@@ -22,6 +22,7 @@ class ObjectType {
      * @param string|null $resolve
      * @param array|null $args
      * @param string|array|null $type
+     * @param mixed|null $defaultValue
      * @param bool $nullable
      * @param bool $isList
      * @param string|null $generator
@@ -37,6 +38,7 @@ class ObjectType {
         public string|null $resolve = null,
         public array|null $args = null,
         public string|array|null $type = null,
+        public mixed $defaultValue = null,
         public bool $nullable = true,
         public bool $isList = false,
         public string|null $generator = null,

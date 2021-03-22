@@ -10,6 +10,7 @@
 
 namespace Swift\GraphQl;
 
+use GraphQL\Utils\BuildSchema;
 use Swift\Configuration\Configuration;
 use Swift\GraphQl\Loaders\BatchLoader;
 use Swift\GraphQl\Loaders\DirectivesLoader;

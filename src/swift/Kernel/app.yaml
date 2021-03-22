@@ -9,6 +9,7 @@ routing:
   baseurl: ''
 
 grapqhl:
+  enabled: true
   enable_introspection: true
 
 logging:

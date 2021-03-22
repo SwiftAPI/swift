@@ -46,10 +46,6 @@ class Kernel {
     }
 
     public function run(): JsonResponse {
-        // @TODO: Compile type registry
-        // @TODO: Generate root query
-        // @TODO: Apply resolver logic
-
         return new JsonResponse( $this->execute() );
     }
 
@@ -72,7 +68,6 @@ class Kernel {
 
             return $result->toArray($debug);
         } catch(\Exception $exception) {
-            throw $exception;
             return array('errors' => [FormattedError::createFromException($exception)]);
         }
     }

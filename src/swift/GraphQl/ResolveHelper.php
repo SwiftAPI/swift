@@ -62,4 +62,16 @@ class ResolveHelper {
         return $types;
     }
 
+    public function getDefaultValue( object $object ): mixed {
+        if (!method_exists($object, 'getDefaultValue')) {
+            return null;
+        }
+
+        try {
+            return $object->getDefaultValue();
+        } catch (\ReflectionException) {
+            return null;
+        }
+    }
+
 }

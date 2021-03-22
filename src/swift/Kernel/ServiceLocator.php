@@ -10,6 +10,9 @@
 
 namespace Swift\Kernel;
 
+use ReflectionClass;
+use Swift\Kernel\Container\Container;
+
 /**
  * Class ServiceLocator
  * @package Swift\Kernel
@@ -80,7 +83,7 @@ class ServiceLocator implements ServiceLocatorInterface {
      *
      * @return ReflectionClass
      */
-    public function getReflectionClass( string $serviceId ): \ReflectionClass {
+    public function getReflectionClass( string $serviceId ): ReflectionClass {
         return $this->container->getReflectionClass($serviceId);
     }
 

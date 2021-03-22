@@ -13,6 +13,7 @@ namespace Swift\Kernel\Container;
 use Swift\Kernel\Container\CompilerPass\DependencyInjectionCompilerPass;
 use Swift\Kernel\Container\CompilerPass\EventRegistrationCompilerPass;
 use Swift\Kernel\Container\CompilerPass\ExtensionsCompilerPass;
+use Swift\Kernel\ServiceLocatorInterface;
 use Symfony\Component\DependencyInjection\Compiler\CompilerPassInterface;
 use Symfony\Component\DependencyInjection\ContainerBuilder;
 use Swift\Events\EventDispatcher;
@@ -103,7 +104,6 @@ class Container extends ContainerBuilder {
             return $definitions;
         }
 
-        $tag = strtolower($tag);
         foreach ($this->getDefinitions() as $key => $definition) {
             if ($definition->hasTag($tag)) {
                 $definitions[] = $this->get($key);

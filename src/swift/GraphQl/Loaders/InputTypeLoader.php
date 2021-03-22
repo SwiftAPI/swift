@@ -81,6 +81,7 @@ class InputTypeLoader implements LoaderInterface {
                 name: $fieldName,
                 declaringClass: $reflectionProperty->getDeclaringClass()->getName(),
                 type: $fieldType,
+                defaultValue: $propertyConfig->defaultValue ?? $this->helper->getDefaultValue($reflectionProperty),
                 nullable: $nullable,
                 generator: $propertyConfig->generator ?? null,
                 generatorArguments: $propertyConfig->generatorArguments ?? array(),
@@ -104,14 +105,16 @@ class InputTypeLoader implements LoaderInterface {
             $args      = array();
 
             foreach ( $methodParameters as $reflectionParameter ) {
-                $parameterConfig    = $reflectionParameter->getAttributes( name: Field::class );
-                $parameterFieldName = $parameterConfig['name'] ?? $reflectionParameter->getName();
-                $parameterFieldType = $parameterConfig['type'] ?? $reflectionParameter->getType()->getName();
+                $parameterConfig    = !empty($reflectionParameter->getAttributes( name: Field::class )) ?
+                    $reflectionParameter->getAttributes( name: Field::class )[0]->newInstance() : new Field();
+                $parameterFieldName = $parameterConfig->name ?? $reflectionParameter->getName();
+                $parameterFieldType = $parameterConfig->type ?? $reflectionParameter->getType()->getName();
 
                 $args[ $parameterFieldName ] = new ObjectType(
                     name: $parameterFieldName,
                     declaringClass: $reflectionParameter->getDeclaringClass()?->getName(),
                     type: $parameterFieldType,
+                    defaultValue: $parameterConfig->defaultValue ?? $this->helper->getDefaultValue($reflectionParameter),
                     generator: $methodConfig->generator ?? null,
                     generatorArguments: $methodConfig->generatorArguments ?? array(),
                     description: $parameterConfig->description ?? null,
@@ -123,6 +126,7 @@ class InputTypeLoader implements LoaderInterface {
                 declaringClass: $reflectionMethod->getDeclaringClass()->getName(),
                 args: $args,
                 type: $fieldType,
+                defaultValue: $methodConfig->defaultValue,
                 generator: $methodConfig->generator ?? null,
                 generatorArguments: $methodConfig->generatorArguments ?? array(),
                 description: $methodConfig->description ?? null,

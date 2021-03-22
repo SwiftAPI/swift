@@ -33,10 +33,12 @@ class FieldResolver {
      *
      * @param ServiceLocatorInterface $serviceLocator
      * @param ContextInterface $context
+     * @param array $instances
      */
     public function __construct(
         private ServiceLocatorInterface $serviceLocator,
         private ContextInterface $context,
+        private array $instances = array(),
     ) {
     }
 
@@ -59,12 +61,6 @@ class FieldResolver {
             }
         }
 
-        // If field is marked as a method on the value, execute it is as such
-        if (is_object($value) && (method_exists($value, $fieldName) || method_exists($value, 'get' . ucfirst($fieldName)))) {
-            $methodName = method_exists($value, $fieldName) ? $fieldName : 'get' . ucfirst($fieldName);
-            return $value->{$methodName}();
-        }
-
         // Arguments will always be in array form no matter the declaration. If marked as such, instance the desired classes
         $arguments = array();
         if (!empty($info->fieldDefinition->args)) {
@@ -74,11 +70,18 @@ class FieldResolver {
                     $className = $argType->config['declaration']->declaringClass;
                     $argValue = new $className(...$args[$arg->name]);
                 } else {
-                    $argValue = $args[$arg->name];
+                    $argValue = $args[$arg->name] ?? $arg->defaultValue;
                 }
                 $arguments[$arg->name] = $argValue;
             }
             $args = $arguments;
+        }
+
+        // If field is marked as a method on the value, execute it is as such
+        if (is_object($value) && (method_exists($value, $fieldName) || method_exists($value, 'get' . ucfirst($fieldName)))) {
+            $methodName = method_exists($value, $fieldName) ? $fieldName : 'get' . ucfirst($fieldName);
+            $value = $this->getClassWithAutowire($value, $arguments);
+            return $value->{$methodName}(...$args);
         }
 
         // Find the field resolver (defining class and method of Query or Mutation) and executing
@@ -110,6 +113,49 @@ class FieldResolver {
         }
 
         return $value;
+    }
+
+    public function getClassWithAutowire( object $class ): object {
+        $instance = is_object($class) ? $class : new $class();
+        if (array_key_exists($instance::class, $this->instances) && is_object($class)) {
+            return $class;
+        }
+
+        $reflection = $this->serviceLocator->getReflectionClass($instance::class);
+        foreach ($reflection->getMethods() as $reflectionMethod) {
+            $attributes = $reflectionMethod->getAttributes(Autowire::class);
+            if (empty($attributes)) {
+                continue;
+            }
+
+            foreach ($reflectionMethod->getParameters() as $reflectionParameter) {
+                $autowireSetting      = !empty($reflectionParameter->getAttributes(Autowire::class)) ? $reflectionParameter->getAttributes(Autowire::class)[0]->newInstance() : new Autowire();
+                $paramType            = $autowireSetting->serviceId ?? $reflectionParameter->getType()?->getName();
+
+                // Check if the type can be resolved as a service
+                if ( $this->serviceLocator->has( $paramType ) ) {
+                    $instance->{$reflectionMethod->getName()}($this->serviceLocator->get($paramType));
+                    continue;
+                }
+
+                // Check if the type can be resolved as a service
+                if ( $this->serviceLocator->getServiceInstancesByTag( 'alias:' . $paramType . ' $' . $reflectionParameter->getName() ) ) {
+                    $instance->{$reflectionMethod->getName()}($this->serviceLocator->getServiceInstancesByTag( 'alias:' . $paramType . ' $' . $reflectionParameter->getName() )[0]);
+                    continue;
+                }
+
+                // Check if it has an attribute which can be resolved
+                if ( $autowireSetting->tag ) {
+                    $instance->{$reflectionMethod->getName()}($this->serviceLocator->getServiceInstancesByTag($autowireSetting->tag));
+                    continue;
+                }
+            }
+
+        }
+
+        $this->instances[$instance::class] = true;
+
+        return $class;
     }
 
 }

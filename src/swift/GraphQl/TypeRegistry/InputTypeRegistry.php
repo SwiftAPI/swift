@@ -144,6 +144,7 @@ class InputTypeRegistry implements TypeRegistryInterface {
                 'name'        => ucfirst($type->name),
                 'fields'      => $fields,
                 'declaration' => $type,
+                'defaultValue' => $type->defaultValue,
             ) );
             $object = $type->nullable ? $object : \Swift\GraphQl\Types\Type::nonNull($object);
             $this->definitions[ $identifier ] = $object;
@@ -162,7 +163,8 @@ class InputTypeRegistry implements TypeRegistryInterface {
             $field->type = $field->name === 'id' ? 'id' : $field->type;
             $config = array(
                 'description' => $field->description,
-                'args' => $this->resolveFields($field->args ?? array())
+                'args' => $this->resolveFields($field->args ?? array()),
+                'defaultValue' => $field->defaultValue,
             );
             if ( array_key_exists( $field->type, \Swift\GraphQl\Types\Type::getStandardTypes() ) ) {
                 $config['type'] = $field->nullable ?

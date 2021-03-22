@@ -55,6 +55,7 @@ class DependencyInjectionCompilerPass implements CompilerPassInterface {
                 }
                 if ( ! empty( $attributes['name'] ) ) {
                     $container->setAlias( $attributes['name'], $definition->getClass() );
+                    $definition->addTag('alias:' . $attributes['name']);
                 }
                 if ( ! empty( $attributes['shared'] ) && is_bool( $attributes['shared'] ) ) {
                     $definition->setShared( $attributes['shared'] );
@@ -63,7 +64,10 @@ class DependencyInjectionCompilerPass implements CompilerPassInterface {
                     array_map( callback: fn( $tag ) => $definition->addTag( $tag ), array: $attributes['tags'] );
                 }
                 if ( ! empty( $attributes['aliases'] ) && is_array( $attributes['aliases'] ) ) {
-                    array_map( callback: fn( $alias ) => $container->setAlias( $alias, $definition->getClass() ), array: $attributes['aliases'] );
+                    array_map( function( $alias ) use ($container, $definition) {
+                        $definition->addTag('alias:' . $alias);
+                        $container->setAlias( $alias, $definition->getClass() );
+                    }, $attributes['aliases'] );
                 }
                 if ( isset( $attributes['autowire'] ) && is_bool( $attributes['autowire'] ) ) {
                     $definition->setAutowired( $attributes['autowire'] );
@@ -75,6 +79,8 @@ class DependencyInjectionCompilerPass implements CompilerPassInterface {
             if ( ! empty( $reflection?->getInterfaces() ) ) {
                 foreach ( $reflection?->getInterfaces() as $interface ) {
                     $container->setAlias( $interface->getName() . ' $' . Utils::classFqnToAliasVariable( $definition->getClass() ), $definition->getClass() );
+                    $definition->addTag('alias:' . $interface->getName() . ' $' . Utils::classFqnToAliasVariable( $definition->getClass() ));
+                    $definition->addTag('alias:' . $interface->getName() . ' $' . Utils::classFqnToAliasVariable( $reflection->getShortName() ));
                 }
             }
 

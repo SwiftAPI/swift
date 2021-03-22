@@ -11,6 +11,7 @@
 namespace Swift\Logging;
 
 
+use DateTimeZone;
 use Swift\Events\EventDispatcher;
 use Swift\Kernel\Attributes\Autowire;
 use Swift\Logging\Event\OnBeforeLoggerHandlersEvent;
@@ -27,7 +28,7 @@ class Logger extends \Monolog\Logger {
     /**
      * @var EventDispatcher $dispatcher
      */
-    private $dispatcher;
+    private EventDispatcher $dispatcher;
 
     /**
      * Logger constructor.

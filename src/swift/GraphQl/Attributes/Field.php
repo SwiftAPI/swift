@@ -26,6 +26,7 @@ class Field {
      *
      * @param string|null $name
      * @param string|Type|null $type
+     * @param mixed|null $defaultValue
      * @param bool $nullable
      * @param bool $isList
      * @param string|null $generator
@@ -35,6 +36,7 @@ class Field {
     public function __construct(
         public string|null $name = null,
         public string|Type|null $type = null,
+        public mixed $defaultValue = null,
         public bool $nullable = false,
         public bool $isList = false,
         public string|null $generator = null,

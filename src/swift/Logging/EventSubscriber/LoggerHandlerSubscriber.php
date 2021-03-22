@@ -79,7 +79,7 @@ class LoggerHandlerSubscriber implements EventSubscriberInterface {
             $event->addHandler(
                 new NativeMailerHandler(
                     $this->configuration->get('logging.logging_mail_to', 'root'),
-                    sprintf('Logging: %s', $this->configuration->get('app.name')),
+                    sprintf('Logging: %s', $this->configuration->get('app.name', 'app')),
                     $this->configuration->get('logging.logging_mail_from', 'root'),
                     \Monolog\Logger::ERROR
                 )

@@ -11,6 +11,7 @@
 namespace Swift\Application\Bootstrap\DependencyInjection;
 
 use Exception;
+use Swift\Kernel\ServiceLocatorInterface;
 use Symfony\Component\Config\FileLocator;
 use Symfony\Component\DependencyInjection\Loader\YamlFileLoader;
 use Swift\Kernel\Container\Container;

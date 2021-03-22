@@ -146,12 +146,16 @@ class OutputTypeRegistry implements TypeRegistryInterface {
             ));
             $this->definitions[$identifier] = $object;
         } else {
+            if ($type->defaultValue) {
+                var_dump($type);
+            }
             $object = new GraphQlObjectType(array(
                 'name' => $type->name,
                 'fields' => $fields,
                 'declaration' => $type,
                 'interfaces' => $this->interfaceRegistry->fromType($type),
                 'args' => $args,
+                'defaultValue' => $type->defaultValue,
             ));
             $this->definitions[$identifier] = $object;
         }
@@ -191,7 +195,8 @@ class OutputTypeRegistry implements TypeRegistryInterface {
             $field->type = $field->name === 'id' ? 'id' : $field->type;
             $config = array(
                 'description' => $field->description,
-                'args' => $this->resolveFields($field->args ?? array())
+                'args' => $this->resolveFields($field->args ?? array()),
+                'defaultValue' => $field->defaultValue,
             );
             if (array_key_exists($field->type, \Swift\GraphQl\Types\Type::getStandardTypes())) {
                 $config['type'] = $field->nullable ?

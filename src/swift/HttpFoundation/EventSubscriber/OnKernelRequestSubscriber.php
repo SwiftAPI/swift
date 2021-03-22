@@ -53,10 +53,10 @@ final class OnKernelRequestSubscriber implements EventSubscriberInterface {
      */
     public function onKernelRequest( KernelRequestEvent $event ): void {
         $method = $event->getRequest()->getMethod();
-        if ((($method === 'OPTIONS') || ($method === 'HEAD')) && $this->configuration->get(settingName: 'app.allow_cors', scope: 'root')) {
+        if ((($method === 'OPTIONS') || ($method === 'HEAD')) && $this->configuration->get('app.allow_cors', 'root')) {
             $response = new CorsResponse();
             $response->sendOutput();
-            $this->application->shutdown(response: $response);
+            $this->application->finalize($response);
         }
 
     }

@@ -92,6 +92,7 @@ class AppConfiguration extends ConfigurationScope implements ConfigurationScopeI
 
                 ->arrayNode('graphql')
                 ->children()
+                    ->booleanNode('enabled')->defaultTrue()->end()
                     ->booleanNode('enable_introspection')->defaultTrue()->end()
                 ->end()
                 ->end()
