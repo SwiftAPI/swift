@@ -21,7 +21,7 @@ use Swift\Model\Types\FieldTypes;
  * Class OauthClientsEntity
  * @package Swift\Security\Authentication\Entity
  */
-#[DI( aliases: [ EntityInterface::class . ' $oauthClientsEntity' ] ), DB( table: 'oauth_clients' )]
+#[DI( aliases: [ EntityInterface::class . ' $oauthClientsEntity', EntityInterface::class . ' $securityClientsEntity' ] ), DB( table: 'security_clients' )]
 final class OauthClientsEntity extends Entity {
 
     #[DBField( name: 'id', primary: true, type: FieldTypes::INT, length: 11 )]

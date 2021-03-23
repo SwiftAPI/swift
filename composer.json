@@ -16,7 +16,8 @@
         "monolog/monolog": "^2.1",
         "mashape/unirest-php": "^3.0",
         "symfony/event-dispatcher": "^5.2",
-        "symfony/event-dispatcher-contracts": "^2.2"
+        "symfony/event-dispatcher-contracts": "^2.2",
+        "ramsey/uuid": "^4.1"
     },
     "require-dev": {
         "symfony/maker-bundle": "^1.14",

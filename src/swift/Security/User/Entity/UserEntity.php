@@ -23,7 +23,7 @@ use Swift\Security\User\UserStorageInterface;
  * Class UserEntity
  * @package Swift\Security\User\Entity
  */
-#[DI(aliases: [EntityInterface::class . ' $userEntity', UserStorageInterface::class . ' $userDatabaseStorage']), DB(table: 'users'), Type]
+#[DI(aliases: [EntityInterface::class . ' $userEntity', UserStorageInterface::class . ' $userDatabaseStorage']), DB(table: 'security_users'), Type]
 class UserEntity extends Entity implements UserStorageInterface {
 
 	#[DBField( name: 'id', primary: true, type: FieldTypes::INT, length: 11 )]

@@ -80,7 +80,7 @@ class FieldResolver {
         // If field is marked as a method on the value, execute it is as such
         if (is_object($value) && (method_exists($value, $fieldName) || method_exists($value, 'get' . ucfirst($fieldName)))) {
             $methodName = method_exists($value, $fieldName) ? $fieldName : 'get' . ucfirst($fieldName);
-            $value = $this->getClassWithAutowire($value, $arguments);
+            $value = $this->getClassWithAutowire($value);
             return $value->{$methodName}(...$args);
         }
 

@@ -10,6 +10,7 @@
 
 namespace Swift\Console;
 
+use Swift\Console\Command\AbstractCommand;
 use Swift\Console\Command\HelloWorld;
 use Swift\Database\Command\UpdateEntitiesCommand;
 use Swift\Kernel\Attributes\Autowire;

@@ -11,6 +11,7 @@
 namespace Swift\GraphQl\Command;
 
 use GraphQL\Utils\SchemaPrinter;
+use Swift\Console\Command\AbstractCommand;
 use Swift\Console\Command\Command;
 use Swift\GraphQl\Schema;
 use Symfony\Component\Console\Input\InputArgument;
@@ -22,14 +23,7 @@ use Symfony\Component\Console\Style\SymfonyStyle;
  * Class SchemaDump
  * @package Swift\GraphQl\Command
  */
-final class SchemaDump extends Command {
-
-    /**
-     * the name of the command (the part after "bin/console")
-     * @var string $defaultName
-     */
-    protected static $defaultName = 'graphql:schema:dump';
-
+final class SchemaDump extends AbstractCommand {
 
     /**
      * GetClientCommand constructor.
@@ -43,9 +37,16 @@ final class SchemaDump extends Command {
     }
 
     /**
+     * @inheritDoc
+     */
+    public function getCommandName(): string {
+        return 'graphql:schema:dump';
+    }
+
+    /**
      * Method to set command configuration
      */
-    protected function configure() {
+    protected function configure(): void {
         $this
             // the short description shown while running "php bin/console list"
             ->setDescription('Dump graphql schema in type language')
@@ -56,11 +57,10 @@ final class SchemaDump extends Command {
         ;
     }
 
-    protected function execute(InputInterface $input, OutputInterface $output) {
-        $io = new SymfonyStyle($input, $output);
-        $io->writeln('Writing schema...');
+    protected function execute(InputInterface $input, OutputInterface $output): int {
+        $this->io->writeln('Writing schema...');
         file_put_contents(INCLUDE_DIR . '/etc/schema.graphql', SchemaPrinter::doPrint($this->schema->getSchema()));
-        $io->success(sprintf('Wrote schema to %s', INCLUDE_DIR . '/etc/schema.graphql'));
+        $this->io->success(sprintf('Wrote schema to %s', INCLUDE_DIR . '/etc/schema.graphql'));
 
         return 0;
     }
