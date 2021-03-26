@@ -10,8 +10,6 @@
 
 namespace Swift\Logging;
 
-
-use Swift\Events\EventDispatcher;
 use Swift\Kernel\Attributes\Autowire;
 use Swift\Logging\Formatter\LineFormatter;
 use Monolog\Handler\StreamHandler;
@@ -21,18 +19,16 @@ use Monolog\Handler\StreamHandler;
  * @package Swift\Logging
  */
 #[Autowire]
-class AppLogger extends Logger {
+class AppLogger extends AbstractLogger {
 
     /**
      * AppLogger constructor.
-     *
-     * @param EventDispatcher $dispatcher
      */
-    public function __construct( EventDispatcher $dispatcher ) {
-        $stream = new StreamHandler(INCLUDE_DIR . '/var/app.log', Logger::DEBUG);
+    public function __construct() {
+        $stream = new StreamHandler(INCLUDE_DIR . '/var/app.log', AbstractLogger::DEBUG);
         $stream->setFormatter(new LineFormatter());
 
-        parent::__construct($dispatcher, 'app', array($stream));
+        parent::__construct('app', array($stream));
     }
 
 

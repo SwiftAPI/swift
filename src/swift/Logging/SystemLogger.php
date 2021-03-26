@@ -21,18 +21,16 @@ use Monolog\Handler\StreamHandler;
  * @package Swift\Logging
  */
 #[Autowire]
-class SystemLogger extends Logger {
+class SystemLogger extends AbstractLogger {
 
     /**
      * SystemLogger constructor.
-     *
-     * @param EventDispatcher $dispatcher
      */
-    public function __construct( EventDispatcher $dispatcher ) {
-        $stream = new StreamHandler(INCLUDE_DIR . '/var/system.log', Logger::DEBUG);
+    public function __construct() {
+        $stream = new StreamHandler(INCLUDE_DIR . '/var/system.log', AbstractLogger::DEBUG);
         $stream->setFormatter(new LineFormatter());
 
-        parent::__construct($dispatcher, 'system', array($stream));
+        parent::__construct('system', array($stream));
     }
 
 }

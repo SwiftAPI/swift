@@ -10,19 +10,18 @@
 
 namespace Swift\Logging\Handler;
 
-use Exception;
 use Swift\Kernel\Attributes\Autowire;
 use Swift\Logging\Entity\LogEntity;
 use Swift\Logging\SystemLogger;
-use Monolog\DateTimeImmutable;
 use Monolog\Handler\AbstractProcessingHandler;
+use Swift\Model\Exceptions\DatabaseException;
 
 /**
  * Class DBHandler
  * @package Swift\Logging\Handler
  */
 #[Autowire]
-class DBHandler extends AbstractProcessingHandler {
+class DbHandler extends AbstractProcessingHandler {
 
     /**
      * DBHandler constructor.
@@ -43,18 +42,16 @@ class DBHandler extends AbstractProcessingHandler {
      */
     protected function write( array $record ): void {
         try {
-            $dataFormat            = $this->entityLog->getPropertiesAsObject();
-            $dataFormat->channel   = $record['channel'];
-            $dataFormat->message   = $record['message'];
-            $dataFormat->context   = $record['context'];
-            $dataFormat->level     = $record['level'];
-            $dataFormat->levelName = $record['level_name'];
-            /** @var DateTimeImmutable $date */
-            $date                 = $record['datetime'];
-            $dataFormat->datetime = $date->format( 'Y-m-d H:i:s' );
-            $this->entityLog->save($dataFormat);
-        } catch ( Exception $exception ) {
-            $this->systemLogger->error('Could not save log record to database in DBHandler', array(
+            $this->entityLog->save(array(
+                'channel' => $record['channel'],
+                'message' => $record['message'],
+                'context' => $record['context'],
+                'level' => $record['level'],
+                'level_name' => $record['level_name'],
+                'datetime' => $record['datetime']->format('Y-m-d H:i:s'),
+            ));
+        } catch ( DatabaseException $exception ) {
+            $this->systemLogger->error('Could not save log record to database in DbHandler', array(
                 'record' => $record,
                 'exception' => $exception->getMessage(),
             ));

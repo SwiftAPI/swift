@@ -23,30 +23,31 @@ use Monolog\Handler\HandlerInterface;
  * @package Swift\Logging
  */
 #[Autowire]
-class Logger extends \Monolog\Logger {
+abstract class AbstractLogger extends \Monolog\Logger {
 
     /**
      * @var EventDispatcher $dispatcher
      */
-    private EventDispatcher $dispatcher;
+    protected EventDispatcher $dispatcher;
 
     /**
      * Logger constructor.
      *
-     * @param EventDispatcher    $dispatcher
      * @param string             $name       The logging channel, a simple descriptive name that is attached to all log records
      * @param HandlerInterface[] $handlers   Optional stack of handlers, the first one in the array is called first, etc.
      * @param callable[]         $processors Optional array of processors
      * @param DateTimeZone|null  $timezone   Optional timezone, if not provided date_default_timezone_get() will be used
      */
-    public function __construct( EventDispatcher $dispatcher, string $name = '', array $handlers = array(), array $processors =  array(), ?DateTimeZone $timezone = null ) {
-        $this->dispatcher = $dispatcher;
-
+    public function __construct( string $name = '', array $handlers = array(), array $processors =  array(), ?DateTimeZone $timezone = null ) {
         /** @var OnBeforeLoggerHandlersEvent $event */
-        $event = $this->dispatcher->dispatch(new OnBeforeLoggerHandlersEvent(UserLogger::class, $handlers));
+        $event = $this->dispatcher->dispatch(new OnBeforeLoggerHandlersEvent(AppLogger::class, $handlers));
 
         parent::__construct($name, $event->getHandlers(), $processors, $timezone);
     }
 
+    #[Autowire]
+    public function setEventDispatcher( EventDispatcher $dispatcher ): void {
+        $this->dispatcher = $dispatcher;
+    }
 
 }

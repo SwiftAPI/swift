@@ -11,29 +11,26 @@
 namespace Swift\Logging;
 
 
-use Swift\Events\EventDispatcher;
 use Swift\Kernel\Attributes\Autowire;
 use Swift\Logging\Formatter\LineFormatter;
-use Swift\Logging\Handler\DBHandler;
-use Monolog\Handler\StreamHandler;
+use Swift\Logging\Handler\DbHandler;
 
 /**
  * Class DBLogger
  * @package Swift\Logging
  */
 #[Autowire]
-class DBLogger extends Logger {
+class DbLogger extends AbstractLogger {
 
     /**
      * AppLogger constructor.
      *
-     * @param EventDispatcher $dispatcher
-     * @param DBHandler $dbHandler
+     * @param DbHandler $dbHandler
      */
-    public function __construct( EventDispatcher $dispatcher, DBHandler $dbHandler ) {
+    public function __construct( DbHandler $dbHandler ) {
         $dbHandler->setFormatter(new LineFormatter());
 
-        parent::__construct($dispatcher, 'app', array($dbHandler));
+        parent::__construct( 'app', array($dbHandler));
     }
 
 

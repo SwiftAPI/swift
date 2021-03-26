@@ -11,11 +11,10 @@
 namespace Swift\Logging\EventSubscriber;
 
 
-use Swift\Configuration\Configuration;
+use Swift\Configuration\ConfigurationInterface;
 use Swift\Events\EventDispatcher;
 use Swift\Kernel\Attributes\Autowire;
 use Swift\Logging\Event\OnBeforeLoggerHandlersEvent;
-use Swift\Logging\Formatter\LineFormatter;
 use Monolog\Handler\NativeMailerHandler;
 use Symfony\Component\EventDispatcher\EventSubscriberInterface;
 
@@ -27,16 +26,16 @@ use Symfony\Component\EventDispatcher\EventSubscriberInterface;
 class LoggerHandlerSubscriber implements EventSubscriberInterface {
 
     /**
-     * @var Configuration $configuration
+     * @var ConfigurationInterface $configuration
      */
-    private $configuration;
+    private ConfigurationInterface $configuration;
 
     /**
      * LoggerHandlerSubscriber constructor.
      *
-     * @param Configuration $configuration
+     * @param ConfigurationInterface $configuration
      */
-    public function __construct( Configuration $configuration ) {
+    public function __construct( ConfigurationInterface $configuration ) {
         $this->configuration = $configuration;
     }
 
