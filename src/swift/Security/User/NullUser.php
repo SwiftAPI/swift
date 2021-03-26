@@ -88,4 +88,9 @@ class NullUser implements UserInterface {
         return $this->roles;
     }
 
+    public function set( array $state ): void {
+        // TODO: Implement set() method.
+    }
+
+
 }

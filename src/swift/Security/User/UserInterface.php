@@ -59,4 +59,6 @@ interface UserInterface {
 
     public function getRoles(): UserRolesBag;
 
+    public function set( array $state ): void;
+
 }

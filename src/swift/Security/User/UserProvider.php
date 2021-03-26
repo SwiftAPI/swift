@@ -40,9 +40,7 @@ final class UserProvider implements UserProviderInterface {
      * @inheritDoc
      */
     public function getUserByUsername( string $username ): ?UserInterface {
-        $userInfo = $this->userDatabaseStorage->findOne(array('username' => $username));
-
-        if (!$userInfo) {
+        if (!$userInfo = $this->userDatabaseStorage->findOne(array('username' => $username))) {
             return null;
         }
 
@@ -52,10 +50,20 @@ final class UserProvider implements UserProviderInterface {
     /**
      * @inheritDoc
      */
-    public function getUserById( int $id ): ?UserInterface {
-        $userInfo = $this->userDatabaseStorage->findOne(array('id' => $id));
+    public function getUserByEmail( string $email ): ?UserInterface {
+        if (!$userInfo = $this->userDatabaseStorage->findOne(array('email' => $email))) {
+            return null;
+        }
 
-        if (!$userInfo) {
+        return $this->getUserInstance($userInfo);
+    }
+
+
+    /**
+     * @inheritDoc
+     */
+    public function getUserById( int $id ): ?UserInterface {
+        if (!$userInfo = $this->userDatabaseStorage->findOne(array('id' => $id))) {
             return null;
         }
 

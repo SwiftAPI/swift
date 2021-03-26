@@ -22,7 +22,7 @@ class Utils {
      * @return string
      * @throws \Exception
      */
-    public static function generateToken(): string {
+    public static function randomToken(): string {
         if (function_exists('random_bytes')) {
             $randomData = random_bytes(20);
             if ($randomData !== false && strlen($randomData) === 20) {

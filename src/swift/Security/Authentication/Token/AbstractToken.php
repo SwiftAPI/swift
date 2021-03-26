@@ -116,6 +116,6 @@ abstract class AbstractToken implements TokenInterface {
      * @return string
      */
     protected function generateToken(): string {
-        return Utils::generateToken();
+        return Utils::randomToken();
     }
 }

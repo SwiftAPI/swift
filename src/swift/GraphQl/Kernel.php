@@ -52,6 +52,9 @@ class Kernel {
     private function execute(): array {
         $fieldResolver = $this->fieldResolver;
 
+        $debug = ($this->configuration->get(identifier: 'app.debug', scope: 'root') || ($this->configuration->get(identifier: 'app.mode', scope: 'root') === 'develop')) ?
+            DebugFlag::INCLUDE_DEBUG_MESSAGE | DebugFlag::INCLUDE_TRACE : DebugFlag::NONE;
+
         try {
             $result = GraphQL::executeQuery(
                 schema: $this->schema->getSchema(),
@@ -63,12 +66,9 @@ class Kernel {
                 validationRules: $this->getValidationRules()
             );
 
-            $debug = ($this->configuration->get(identifier: 'app.debug', scope: 'root') || ($this->configuration->get(identifier: 'app.mode', scope: 'root') === 'develop')) ?
-                DebugFlag::INCLUDE_DEBUG_MESSAGE | DebugFlag::INCLUDE_TRACE : DebugFlag::NONE;
-
             return $result->toArray($debug);
         } catch(\Exception $exception) {
-            return array('errors' => [FormattedError::createFromException($exception)]);
+            return array('errors' => [FormattedError::createFromException($exception, $debug)]);
         }
     }
 

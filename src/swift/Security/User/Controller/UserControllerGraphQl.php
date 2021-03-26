@@ -28,8 +28,11 @@ use Swift\Security\Authorization\AuthorizationTypesEnum;
 use Swift\Security\User\Entity\UserEntity;
 use Swift\Security\User\Exception\UserAlreadyExistsException;
 use Swift\Security\User\Exception\UserNotFoundException;
+use Swift\Security\User\Type\ForgotPasswordResponse;
 use Swift\Security\User\Type\LoginInput;
 use Swift\Security\User\Type\LoginResponseType;
+use Swift\Security\User\Type\ResetPasswordInput;
+use Swift\Security\User\Type\ResetPasswordResponse;
 use Swift\Security\User\Type\UserInput;
 use Swift\Security\User\Type\UserType;
 use Swift\Security\User\UserProviderInterface;
@@ -63,7 +66,7 @@ class UserControllerGraphQl extends AbstractController {
      *
      * @return UserType
      */
-    #[Mutation(name: 'userCreate', type: UserType::class, description: 'Create new user' )]
+    #[Mutation(name: 'UserCreate', type: UserType::class, description: 'Create new user' )]
     public function create( UserInput $userInput ): UserType {
         try {
             $data = $this->userProvider->storeUser(...(array) $userInput)->serialize();
@@ -80,7 +83,7 @@ class UserControllerGraphQl extends AbstractController {
      *
      * @return UserType
      */
-    #[Query(name: 'userMe', isList: false, description: 'Fetch currently authenticated user' )]
+    #[Query(name: 'UserMe', isList: false, description: 'Fetch currently authenticated user' )]
     public function me(): UserType {
         // Make sure a user is authenticated
         $this->denyAccessUnlessGranted(
@@ -103,7 +106,7 @@ class UserControllerGraphQl extends AbstractController {
      *
      * @return UserType
      */
-    #[Query(name: 'user', type: UserType::class, isList: false, description: 'Fetch user by id' )]
+    #[Query(name: 'User', type: UserType::class, isList: false, description: 'Fetch user by id' )]
     public function user( int $id ): UserType {
         // Make sure a user is authenticated
         $this->denyAccessUnlessGranted([AuthorizationTypesEnum::IS_AUTHENTICATED, AuthorizationRolesEnum::ROLE_USERS_LIST]);
@@ -124,7 +127,7 @@ class UserControllerGraphQl extends AbstractController {
      *
      * @return UserType[]
      */
-    #[Query(name: 'users', type: UserType::class, isList: true, description: 'List all users' )]
+    #[Query(name: 'Users', type: UserType::class, isList: true, description: 'List all users' )]
     public function users( #[Argument(type: Arguments::class, generator: EntityArgumentGenerator::class, generatorArguments: ['entity' => UserEntity::class])] array $filter ): array {
         // Make sure a user is authenticated
         $this->denyAccessUnlessGranted([AuthorizationRolesEnum::ROLE_USERS_LIST]);
@@ -154,7 +157,7 @@ class UserControllerGraphQl extends AbstractController {
      *
      * @return LoginResponseType    User data and session token
      */
-    #[Mutation(name: 'userLogin', type: LoginResponseType::class, description: 'User login endpoint (username + password)' )]
+    #[Mutation(name: 'UserLogin', type: LoginResponseType::class, description: 'User login endpoint (username + password)' )]
     public function login( LoginInput $credentials ): LoginResponseType {
         // Make sure a direct login occurred instead of a re-authentication or no authentication at all
         $this->authorizationChecker->denyUnlessGranted([AuthorizationTypesEnum::IS_AUTHENTICATED_DIRECTLY]);
@@ -169,6 +172,28 @@ class UserControllerGraphQl extends AbstractController {
         );
 
         return new LoginResponseType(...(array)$data);
+    }
+
+    /**
+     * Forgot password authentication endpoint
+     *
+     * Make sure no user authenticated (hence AuthorizationRolesEnum::ROLE_GUEST)
+     *
+     * @param string $email
+     *
+     * @return ForgotPasswordResponse
+     */
+    #[Mutation(name: 'ForgotPassword', description: 'Request new password')]
+    public function forgotPassword( string $email ): ForgotPasswordResponse {
+        $this->denyAccessUnlessGranted([AuthorizationRolesEnum::ROLE_GUEST]);
+
+        return new ForgotPasswordResponse();
+    }
+
+    #[Mutation(name: 'ResetPassword', description: 'Set new user password')]
+    public function resetPassword( ResetPasswordInput $resetPasswordInput ): ResetPasswordResponse {
+
+        return new ResetPasswordResponse();
     }
 
 }

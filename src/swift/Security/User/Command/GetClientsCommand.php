@@ -37,7 +37,7 @@ class GetClientsCommand extends AbstractCommand {
         parent::__construct();
     }
 
-    protected function configure() {
+    protected function configure(): void {
         $this
             ->setDescription('Get client by name')
 

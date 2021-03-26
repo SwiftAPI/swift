@@ -69,7 +69,7 @@ class JsonResponse extends Response {
     private function toJson( $data = [] ): string {
         try {
             $data = json_encode( $data, JSON_THROW_ON_ERROR | $this->encodingOptions );
-        } catch ( \Exception $e ) {
+        } catch ( \JsonException $e ) {
             if ( 'Exception' === \get_class( $e ) && str_starts_with( $e->getMessage(), 'Failed calling ' ) ) {
                 throw $e->getPrevious() ?: $e;
             }
@@ -78,10 +78,6 @@ class JsonResponse extends Response {
 
         if ( \PHP_VERSION_ID >= 70300 && ( \JSON_THROW_ON_ERROR & $this->encodingOptions ) ) {
             return $data;
-        }
-
-        if ( \JSON_ERROR_NONE !== json_last_error() ) {
-            throw new \InvalidArgumentException( json_last_error_msg() );
         }
 
         return $data;

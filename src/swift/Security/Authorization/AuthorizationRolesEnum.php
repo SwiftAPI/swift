@@ -28,5 +28,6 @@ class AuthorizationRolesEnum extends Enum {
 
     // Sub roles
     public const ROLE_USERS_LIST = 'ROLE_USERS_LIST';
+    public const ROLE_CHANGE_PASSWORD = 'ROLE_CHANGE_PASSWORD';
 
 }

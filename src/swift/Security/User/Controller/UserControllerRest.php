@@ -12,13 +12,18 @@ namespace Swift\Security\User\Controller;
 
 use Swift\Controller\AbstractController;
 use Swift\HttpFoundation\Exception\BadRequestException;
+use Swift\HttpFoundation\Exception\InternalErrorException;
 use Swift\HttpFoundation\JsonResponse;
+use Swift\HttpFoundation\Response;
 use Swift\Kernel\Attributes\Autowire;
 use Swift\Model\Entity\Arguments;
+use Swift\Model\Exceptions\DatabaseException;
 use Swift\Router\Attributes\Route;
 use Swift\Router\RouteParameter;
 use Swift\Router\RouteParameterBag;
 use Swift\Router\Types\RouteMethodEnum;
+use Swift\Security\Authentication\Authenticator\User\ForgotPasswordAuthenticator;
+use Swift\Security\Authentication\Authenticator\User\ResetPasswordAuthenticator;
 use Swift\Security\Authorization\AuthorizationRolesEnum;
 use Swift\Security\Authorization\AuthorizationTypesEnum;
 use Swift\Security\User\Exception\UserAlreadyExistsException;
@@ -166,6 +171,46 @@ class UserControllerRest extends AbstractController {
         $data->token->expires = $this->getSecurityToken()->expiresAt()->format('Y-m-d H:i:s');
 
         return new JsonResponse($data);
+    }
+
+    /**
+     * Forgot password authentication endpoint
+     *
+     * Make sure no user authenticated (hence AuthorizationRolesEnum::ROLE_GUEST)
+     *
+     * @param RouteParameterBag $params
+     *
+     * @return JsonResponse
+     */
+    #[Route( method: [RouteMethodEnum::POST], route: '/password/forgot/', name: 'security.user.password.forgot', isGranted: [AuthorizationRolesEnum::ROLE_GUEST], tags: [Route::TAG_ENTRYPOINT, ForgotPasswordAuthenticator::TAG_FORGOT_PASSWORD] )]
+    public function forgotPassword( RouteParameterBag $params ): JsonResponse {
+        return new JsonResponse(array(
+            'message' => 'Successfully requested reset password token. The user has been notified.',
+            'code' => Response::HTTP_OK,
+        ));
+    }
+
+    /**
+     * Reset password endpoint
+     *
+     * @param RouteParameterBag $params
+     *
+     * @return JsonResponse
+     */
+    #[Route( method: [RouteMethodEnum::POST], route: '/password/reset/', name: 'security.user.password.reset', isGranted: [AuthorizationRolesEnum::ROLE_CHANGE_PASSWORD], tags: [Route::TAG_ENTRYPOINT, ResetPasswordAuthenticator::TAG_RESET_PASSWORD] )]
+    public function resetPassword( RouteParameterBag $params ): JsonResponse {
+        try {
+            $this->getCurrentUser()->set(array(
+                'password' => $this->getRequest()->getContent()->get('newPassword'),
+            ));
+        } catch (DatabaseException) {
+            throw new InternalErrorException();
+        }
+
+        return new JsonResponse(array(
+            'message' => 'Successfully reset password',
+            'code' => Response::HTTP_OK,
+        ));
     }
 
 }

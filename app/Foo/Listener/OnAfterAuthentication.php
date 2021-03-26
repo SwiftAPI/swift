@@ -1,26 +1,16 @@
 <?php declare(strict_types=1);
 
-/*
- * This file is part of the Swift Framework
- *
- * (c) Henri van 't Sant <henri@henrivantsant.com>
- *
- * For the full copyright and license information, please view the LICENSE file that was distributed with this source code.
- */
 
-namespace Swift\Security\User\EventSubscriber;
+namespace Foo\Listener;
 
-use Swift\Configuration\ConfigurationInterface;
 use Swift\Events\Attribute\ListenTo;
-use Swift\Kernel\Attributes\Autowire;
 use Swift\Security\Authentication\Events\AuthenticationTokenCreatedEvent;
 use Swift\Security\Authentication\Token\ResetPasswordToken;
 
 /**
  * Class OnAfterAuthentication
- * @package Swift\Security\User\EventSubscriber
+ * @package Foo\Listener
  */
-#[Autowire]
 class OnAfterAuthentication {
 
     /**
@@ -30,7 +20,13 @@ class OnAfterAuthentication {
      */
     #[ListenTo(event: AuthenticationTokenCreatedEvent::class)]
     public function assignUserRoles( AuthenticationTokenCreatedEvent $event ): void {
-
+        if ($event->getToken() instanceof ResetPasswordToken) {
+            mail(
+                to: $event->getToken()->getUser()->getEmail(),
+                subject: 'Password reset',
+                message: sprintf('Hi %s, Hereby your password reset token: %s.', $event->getToken()->getUser()->getFullName(), $event->getToken()->getTokenString())
+            );
+        }
     }
 
 }

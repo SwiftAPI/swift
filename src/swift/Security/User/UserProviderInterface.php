@@ -29,6 +29,15 @@ interface UserProviderInterface {
     public function getUserByUsername(string $username): ?UserInterface;
 
     /**
+     * Fetch user by email
+     *
+     * @param string $email
+     *
+     * @return UserInterface|null
+     */
+    public function getUserByEmail( string $email ): ?UserInterface;
+
+    /**
      * Fetch user by id
      *
      * @param int $id

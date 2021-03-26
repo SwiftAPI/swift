@@ -11,6 +11,7 @@
 namespace Swift\Security\User;
 
 use stdClass;
+use Swift\Security\Authentication\Passport\Credentials\PasswordCredentialsEncoder;
 use Swift\Security\Authorization\AuthorizationRolesEnum;
 
 /**
@@ -119,6 +120,21 @@ class User implements UserInterface {
         return $this->roles;
     }
 
+    public function set( array $state ): void {
+        if (array_key_exists('password', $state)) {
+            $state['password'] = (new PasswordCredentialsEncoder($state['password']))->getEncoded();
+        }
+        if (array_key_exists('modified', $state) && is_string($state['modified'])) {
+            $state['modified'] = new \DateTime($state['modified']);
+        }
+        if (array_key_exists('created', $state)) {
+            throw new \UnexpectedValueException('Cannot change created date of user');
+        }
+
+        $state['id'] = $this->getId();
+
+        $this->userStorage->save($state);
+    }
 
     public function serialize(): stdClass {
         $array = array();
@@ -132,7 +148,6 @@ class User implements UserInterface {
 
         return (object) $array;
     }
-
 
     public function setUserStorage( UserStorageInterface $userStorage ): void {
         $this->userStorage = $userStorage;

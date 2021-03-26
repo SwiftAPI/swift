@@ -1,26 +1,46 @@
-<?php
+<?php declare(strict_types=1);
 
 namespace Foo\Command;
 
-use Symfony\Component\Console\Command\Command;
+use Swift\Console\Command\AbstractCommand;
 use Symfony\Component\Console\Input\InputInterface;
 use Symfony\Component\Console\Output\OutputInterface;
 
-final class FooCommand extends Command {
+/**
+ * Class FooCommand
+ * @package Foo\Command
+ */
+class FooCommand extends AbstractCommand {
 
-    // the name of the command (the part after "bin/console")
-    protected static $defaultName = 'foo:bar';
-
-    protected function configure()
-    {
-        // ...
+    /**
+     * @inheritDoc
+     */
+    public function getCommandName(): string {
+        // the name of the command (the part after "bin/console")
+        return 'foo:bar';
     }
 
-    protected function execute(InputInterface $input, OutputInterface $output)
-    {
-        // ...
+    /**
+     * Configure command
+     */
+    protected function configure(): void {
+        $this
+            ->setDescription('Command description')
 
-        return 0;
+            ->setHelp('Explanatory information about command')
+        ;
+    }
+
+    /**
+     * @param InputInterface $input     Input for command
+     * @param OutputInterface $output   Output helper for command
+     *
+     * @return int
+     */
+    protected function execute(InputInterface $input, OutputInterface $output): int {
+        $this->io->writeln('Foo bar');
+
+        return AbstractCommand::SUCCESS; // OR AbstractCommand::FAILURE
     }
 
 }

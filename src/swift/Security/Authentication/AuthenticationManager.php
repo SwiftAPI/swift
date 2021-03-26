@@ -116,7 +116,7 @@ class AuthenticationManager {
      * @return AuthenticatorInterface|null
      */
     private function getAuthenticator( RequestInterface $request ): ?AuthenticatorInterface {
-        $entryPoint = in_array( Route::TAG_ENTRYPOINT, $this->router->getCurrentRoute()->getTags(), true );
+        $entryPoint = $this->router->getCurrentRoute()->getTags()->has(Route::TAG_ENTRYPOINT);
 
         foreach ( $this->authenticators as $authenticator ) {
             if (($entryPoint && !$authenticator instanceof AuthenticatorEntrypointInterface) ||

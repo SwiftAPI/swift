@@ -52,7 +52,7 @@ class CreateClientCommand extends AbstractCommand {
 
             return $value;
         });
-        $clientSecret = $this->io->ask('Client secret (skip to generate random =>)', Utils::generateToken());
+        $clientSecret = $this->io->ask('Client secret (skip to generate random =>)', Utils::randomToken());
 
         try {
             $client = $this->securityClientsEntity->save([
