@@ -29,6 +29,9 @@ class Route implements RouteInterface {
     /** @var RequestInterface $request */
     private RequestInterface $request;
 
+    /** @var RouteTagBag $tags */
+    private RouteTagBag $tags;
+
     /** @var RouteParameterBag $params */
     private RouteParameterBag $params;
 
@@ -48,7 +51,6 @@ class Route implements RouteInterface {
      * @param array $tags
      * @param RouteInterface|null $controllerRoute Controller route params used as globals and/or prefix
      */
-    #[Pure]
     public function __construct(
         private string|null $name,
         private string $regex,
@@ -57,10 +59,11 @@ class Route implements RouteInterface {
         private string|null $action,
         private array $authType,
         private array $isGranted,
-        private array $tags = array(),
+        array $tags = array(),
         private RouteInterface|null $controllerRoute = null,
     ) {
-        $this->params = new RouteParameterBag();
+        $this->tags = new RouteTagBag($tags);
+        $this->params = new RouteParameterBag($tags);
     }
 
     /**
@@ -131,7 +134,6 @@ class Route implements RouteInterface {
      *
      * @return string|null
      */
-    #[Pure]
     public function getFullPath(): ?string {
         if ( is_null( $this->regex ) ) {
             return null;
@@ -359,9 +361,9 @@ class Route implements RouteInterface {
     }
 
     /**
-     * @return array
+     * @return RouteTagBag
      */
-    public function getTags(): array {
+    public function getTags(): RouteTagBag {
         return $this->tags;
     }
 

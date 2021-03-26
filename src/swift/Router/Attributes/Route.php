@@ -23,7 +23,7 @@ use Swift\Security\Authorization\AuthorizationTypesEnum;
 #[Attribute( Attribute::TARGET_CLASS|Attribute::TARGET_METHOD )]
 class Route {
 
-    public const TAG_ENTRYPOINT = 'entrypoint';
+    public const TAG_ENTRYPOINT = 'ENTRYPOINT';
 
     /**
      * Route constructor.

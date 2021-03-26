@@ -27,6 +27,9 @@ class ControllerRoute implements RouteInterface {
     /** @var RequestInterface $request */
     private RequestInterface $request;
 
+    /** @var RouteTagBag $tags */
+    private RouteTagBag $tags;
+
     /** @var RouteParameterBag $params */
     private RouteParameterBag $params ;
 
@@ -54,8 +57,9 @@ class ControllerRoute implements RouteInterface {
         private string|null $action,
         private array $authType,
         private array $isGranted,
-        private array $tags = array(),
+        array $tags = array(),
     ) {
+        $this->tags = new RouteTagBag($tags);
         $this->params = new RouteParameterBag();
     }
 
@@ -351,9 +355,9 @@ class ControllerRoute implements RouteInterface {
     }
 
     /**
-     * @return array
+     * @return RouteTagBag
      */
-    public function getTags(): array {
+    public function getTags(): RouteTagBag {
         return $this->tags;
     }
 

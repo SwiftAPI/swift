@@ -137,8 +137,8 @@ interface RouteInterface {
     public function getIsGranted(): array;
 
     /**
-     * @return array
+     * @return RouteTagBag
      */
-    public function getTags(): array;
+    public function getTags(): RouteTagBag;
 
 }
