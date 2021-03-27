@@ -14,9 +14,8 @@ use Swift\Events\Attribute\ListenTo;
 use Swift\HttpFoundation\Exception\NotAuthorizedException;
 use Swift\HttpFoundation\Response;
 use Swift\Kernel\Attributes\Autowire;
-use Swift\Router\Attributes\Route;
 use Swift\Router\RouterInterface;
-use Swift\Security\Authentication\Events\AuthenticationSuccessEvent;
+use Swift\Security\Authentication\Events\AuthenticationFinishedEvent;
 use Swift\Security\Authorization\AccessDecisionManagerInterface;
 use Swift\Security\Security;
 
@@ -43,8 +42,8 @@ class AccessListener {
     ) {
     }
 
-    #[ListenTo(event: AuthenticationSuccessEvent::class)]
-    public function onAuthenticationFinished( AuthenticationSuccessEvent $event ): void {
+    #[ListenTo(event: AuthenticationFinishedEvent::class)]
+    public function onAuthenticationFinished( AuthenticationFinishedEvent $event ): void {
         if (!empty($this->router->getCurrentRoute()?->getIsGranted()) &&
             !$this->accessDecisionManager->decide($this->security->getToken(), null, $this->router->getCurrentRoute()?->getIsGranted())
         ) {

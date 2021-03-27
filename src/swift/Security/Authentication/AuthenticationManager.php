@@ -18,6 +18,8 @@ use Swift\Router\Attributes\Route;
 use Swift\Router\RouterInterface;
 use Swift\Security\Authentication\Authenticator\AuthenticatorEntrypointInterface;
 use Swift\Security\Authentication\Authenticator\AuthenticatorInterface;
+use Swift\Security\Authentication\Events\AuthenticationFailedEvent;
+use Swift\Security\Authentication\Events\AuthenticationFinishedEvent;
 use Swift\Security\Authentication\Events\AuthenticationSuccessEvent;
 use Swift\Security\Authentication\Events\AuthenticationTokenCreatedEvent;
 use Swift\Security\Authentication\Events\CheckPassportEvent;
@@ -94,8 +96,10 @@ class AuthenticationManager {
                 return $passport;
             } catch ( AuthenticationException $authenticationException ) {
                 if ( $response = $authenticator->onAuthenticationFailure( $request, $authenticationException ) ) {
+                    $this->eventDispatcher->dispatch( new AuthenticationFailedEvent( $request, $authenticator, $authenticationException ) );
                     $this->kernel->finalize( $response );
                 }
+                $this->eventDispatcher->dispatch( new AuthenticationFailedEvent( $request, $authenticator, $authenticationException ) );
             }
         }
 
@@ -104,6 +108,8 @@ class AuthenticationManager {
         $this->security->setPassport( $passport );
         $this->security->setUser( $token->getUser() );
         $this->security->setToken( $token );
+
+        $this->eventDispatcher->dispatch( new AuthenticationFinishedEvent( $token, $passport, $request ) );
 
         return $passport;
     }
