@@ -76,10 +76,13 @@ abstract class Entity implements EntityInterface {
         protected array $indexes = array(),
     ) {
         $this->reflectionClass = new ReflectionClass( static::class );
+        $this->cache = new QueryCacheBag();
 
         $this->setTable();
         $this->mapProperties();
     }
+
+    private QueryCacheBag $cache;
 
     /**
      * Fetch a single row by the given state
@@ -89,7 +92,7 @@ abstract class Entity implements EntityInterface {
      *
      * @return stdClass|null
      */
-    public function findOne( array|stdClass $state, bool $exceptionOnNotFound = false ): ?stdClass {
+    public function findOne( array|stdClass $state, bool $exceptionOnNotFound = false ): ?Result {
         $result = $this->findMany( $state, new Arguments( limit: 1 ), $exceptionOnNotFound );
 
         return $result[0] ?? null;
@@ -104,9 +107,9 @@ abstract class Entity implements EntityInterface {
      *
      * @return array
      */
-    public function findMany( array|stdClass $state, Arguments|null $arguments = null, bool $exceptionOnNotFound = false ): array {
+    public function findMany( array|stdClass $state, Arguments|null $arguments = null, bool $exceptionOnNotFound = false ): ResultSet {
         $state = (array) $state;
-        $query = $this->database->select( '[*]' )->from( '[' . $this->tableNamePrefixed . ']' );
+        $query = $this->database->select( implode(',', array_values($this->propertyMap)) )->from( '[' . $this->tableNamePrefixed . ']' );
 
         foreach ( $state as $propertyName => $value ) {
             if (is_array($value)) {
@@ -133,9 +136,14 @@ abstract class Entity implements EntityInterface {
             throw new NoResultException( sprintf( 'No result found for search in %s', __CLASS__ ) );
         }
 
-        $items = array();
+        $items = new ResultSet(
+            $this->getReferenceCallback($this),
+            $this->getReferenceCallback($query),
+            $this->getReferenceCallback($state),
+            $this->getReferenceCallback($arguments),
+        );
         foreach ( $results as $result ) {
-            $item = new stdClass();
+            $item = new Result($this->getReferenceCallback($this));
             foreach ( $result->toArray() as $key => $value ) {
                 $property = array_search( $key, $this->propertyMap, true );
                 if ( $property && property_exists( $this, $property ) ) {
@@ -144,6 +152,12 @@ abstract class Entity implements EntityInterface {
             }
             $items[] = $item;
         }
+
+        $this->cache->set((string) time(), array(
+            'state' => $state,
+            'arguments' => $arguments,
+            'result' => $items,
+        ));
 
         return $items;
     }
@@ -155,10 +169,10 @@ abstract class Entity implements EntityInterface {
      * @param Arguments|null $arguments
      * @param bool $exceptionOnNotFound
      *
-     * @return array
+     * @return ResultSet
      */
     #[Deprecated( reason: 'Improve naming consistency by renaming method to findMany', replacement: 'Replaced by findMany()' )]
-    public function find( array|stdClass $state, Arguments|null $arguments = null, bool $exceptionOnNotFound = false ): array {
+    public function find( array|stdClass $state, Arguments|null $arguments = null, bool $exceptionOnNotFound = false ): ResultSet {
         return $this->findMany($state, $arguments, $exceptionOnNotFound);
     }
 
@@ -167,9 +181,9 @@ abstract class Entity implements EntityInterface {
      *
      * @param array|stdClass $state
      *
-     * @return stdClass
+     * @return Result
      */
-    public function save( array|stdClass $state ): stdClass {
+    public function save( array|stdClass $state ): Result {
         $state = (array) $state;
 
         // Check if record is new
@@ -215,6 +229,31 @@ abstract class Entity implements EntityInterface {
         } catch ( \Dibi\Exception $exception ) {
             throw new DatabaseException( $exception->getMessage(), $exception->getCode(), $exception );
         }
+    }
+
+    /**
+     * @return string|null
+     */
+    public function getPrimaryKey(): ?string {
+        return $this->primaryKey;
+    }
+
+    /**
+     * Get reference callback
+     *
+     * @param mixed $subject
+     *
+     * @return \Closure
+     */
+    public function getReferenceCallback(mixed $subject): \Closure {
+        $reference = $subject;
+        return static function () use($reference) {
+            return $reference;
+        };
+    }
+
+    public function getPropertyMap(): array {
+        return $this->propertyMap;
     }
 
     /**

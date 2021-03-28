@@ -29,9 +29,9 @@ interface EntityInterface {
      * @param array|stdClass $state
      * @param bool $exceptionOnNotFound
      *
-     * @return stdClass|null
+     * @return Result|null
      */
-    public function findOne( array|stdClass $state, bool $exceptionOnNotFound = false ): ?stdClass;
+    public function findOne( array|stdClass $state, bool $exceptionOnNotFound = false ): ?Result;
 
     /**
      * Fetch all rows matching given state and arguments
@@ -40,20 +40,20 @@ interface EntityInterface {
      * @param Arguments|null $arguments
      * @param bool $exceptionOnNotFound
      *
-     * @return array
+     * @return ResultSet
      */
-    public function findMany( array|stdClass $state, Arguments|null $arguments = null, bool $exceptionOnNotFound = false ): array;
+    public function findMany( array|stdClass $state, Arguments|null $arguments = null, bool $exceptionOnNotFound = false ): ResultSet;
 
     /**
      * Save/update based on the given state
      *
      * @param array|stdClass $state
      *
-     * @return stdClass Return updated/created result from action
+     * @return Result Return updated/created result from action
      *
      * @throws DatabaseException
      */
-    public function save( array|stdClass $state ): stdClass;
+    public function save( array|stdClass $state ): Result;
 
     /**
      * Delete row where primary key value equals given key
@@ -65,6 +65,13 @@ interface EntityInterface {
      * @throws DatabaseException
      */
     public function delete( mixed $key ): int;
+
+    /**
+     * Get primary key name
+     *
+     * @return string|null
+     */
+    public function getPrimaryKey(): string|null;
 
 
 
