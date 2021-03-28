@@ -91,7 +91,7 @@ final class AccessTokenAuthenticator implements AuthenticatorInterface {
                 throw new AuthenticationException('Client not found');
             }
 
-            $user = new ClientUser(...(array) $user);
+            $user = new ClientUser(...$user->toArray());
         }
 
         return new Passport($user, new AccessTokenCredentials($token), array(new PreAuthenticatedStamp($token)));

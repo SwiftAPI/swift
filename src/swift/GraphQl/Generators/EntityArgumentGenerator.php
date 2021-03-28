@@ -67,7 +67,11 @@ class EntityArgumentGenerator implements GeneratorInterface {
             }
 
             if ( array_key_exists( $field->type, \Swift\GraphQl\Types\Type::getStandardTypes() ) ) {
-                $fields[ $name ] = \Swift\GraphQl\Types\Type::getStandardTypes()[ $field->type ];
+                $fields[ $name ] = array(
+                    'description' => $field->description,
+                    'defaultValue' => $field->defaultValue,
+                    'type' => \Swift\GraphQl\Types\Type::getStandardTypes()[ $field->type ],
+                );
                 continue;
             }
 

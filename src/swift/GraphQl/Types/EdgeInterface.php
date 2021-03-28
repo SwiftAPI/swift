@@ -14,13 +14,16 @@ use Swift\GraphQl\Attributes\Field;
 use Swift\GraphQl\Attributes\InterfaceType;
 
 /**
- * Class NodeTypeInterface
+ * Interface EdgeInterface
  * @package Swift\GraphQl\Types
  */
-#[InterfaceType(name: 'Node')]
-interface NodeTypeInterface {
+#[InterfaceType(name: 'EdgeInterface')]
+interface EdgeInterface {
 
-    #[Field(name: 'id')]
-    public function getId(): string;
+    #[Field(name: 'node', type: NodeTypeInterface::class, isList: false)]
+    public function getNode(): NodeTypeInterface;
+
+    #[Field(name: 'cursor')]
+    public function getCursor(): string;
 
 }

@@ -40,13 +40,13 @@ class UserType implements NodeTypeInterface {
         #[Field(nullable: true)] public ?string $email,
         #[Field] public string $firstname,
         #[Field] public string $lastname,
-        #[Field(type: \Swift\GraphQl\Types\Type::DATETIME)] public DateTime $created,
-        #[Field(type: \Swift\GraphQl\Types\Type::DATETIME)] public DateTime $modified,
+        #[Field] public DateTime $created,
+        #[Field] public DateTime $modified,
     ) {
     }
 
     #[Field( name: 'id' )]
-    public function getId(): int {
-        return $this->id;
+    public function getId(): string {
+        return base64_encode('UserType:' . $this->id);
     }
 }

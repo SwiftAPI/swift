@@ -74,7 +74,7 @@ final class OAuthClientCredentialsAuthenticator implements AuthenticatorInterfac
             throw new AuthenticationException('Client not found');
         }
 
-        $client = new ClientUser(...(array) $client);
+        $client = new ClientUser(...$client->toArray());
 
         return new Passport($client, new ClientCredentials($client->getCredential()));
     }

@@ -18,6 +18,7 @@ use Swift\Model\Entity;
 use Swift\Model\EntityInterface;
 use Swift\Model\Exceptions\DatabaseException;
 use Swift\Model\Exceptions\InvalidStateException;
+use Swift\Model\Result;
 use Swift\Model\Types\FieldTypes;
 use stdClass;
 
@@ -51,9 +52,9 @@ final class AccessTokenEntity extends Entity {
      *
      * @param array|stdClass $state
      *
-     * @return stdClass
+     * @return Result
      */
-    public function save( array|stdClass $state ): stdClass {
+    public function save( array|stdClass $state ): Result {
         $state = (array) $state;
 
         if (empty($state['clientId']) && empty($state['userId']) && empty($state['id'])) {

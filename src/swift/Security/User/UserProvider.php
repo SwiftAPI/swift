@@ -55,7 +55,7 @@ final class UserProvider implements UserProviderInterface {
             return null;
         }
 
-        return $this->getUserInstance($userInfo);
+        return $this->getUserInstance($userInfo->toArray());
     }
 
 
@@ -67,7 +67,7 @@ final class UserProvider implements UserProviderInterface {
             return null;
         }
 
-        return $this->getUserInstance($userInfo);
+        return $this->getUserInstance($userInfo->toArray());
     }
 
     /**
@@ -88,20 +88,20 @@ final class UserProvider implements UserProviderInterface {
             throw new UserAlreadyExistsException($exception->getMessage());
         }
 
-        return $this->getUserInstance($data);
+        return $this->getUserInstance($data->toArray());
     }
 
     /**
-     * @param \stdClass $userInfo
+     * @param array $userInfo
      *
      * @return UserInterface
      */
-    private function getUserInstance(\stdClass $userInfo): UserInterface {
+    private function getUserInstance(array $userInfo): UserInterface {
         if (isset($this->user)) {
             return $this->user;
         }
 
-        $this->user = new User(...(array)$userInfo);
+        $this->user = new User(...$userInfo);
         $this->user->setUserStorage($this->userDatabaseStorage);
 
         return $this->user;

@@ -61,21 +61,7 @@ class FieldResolver {
             }
         }
 
-        // Arguments will always be in array form no matter the declaration. If marked as such, instance the desired classes
-        $arguments = array();
-        if (!empty($info->fieldDefinition->args)) {
-            foreach ($info->fieldDefinition->args as $arg) {
-                $argType = $arg->getType() instanceof NonNull ? $arg->getType()->getOfType() : $arg->getType();
-                if (array_key_exists('declaration', $argType->config)) {
-                    $className = $argType->config['declaration']->declaringClass;
-                    $argValue = new $className(...$args[$arg->name]);
-                } else {
-                    $argValue = $args[$arg->name] ?? $arg->defaultValue;
-                }
-                $arguments[$arg->name] = $argValue;
-            }
-            $args = $arguments;
-        }
+        $args = $this->resolveArgs($args, $info->fieldDefinition->args);
 
         // If field is marked as a method on the value, execute it is as such
         if (is_object($value) && (method_exists($value, $fieldName) || method_exists($value, 'get' . ucfirst($fieldName)))) {
@@ -113,6 +99,35 @@ class FieldResolver {
         }
 
         return $value;
+    }
+
+    /**
+     * @param array $args
+     * @param \GraphQL\Type\Definition\FieldArgument[] $fieldArgs
+     *
+     * @return array
+     */
+    private function resolveArgs( array $args, array $fieldArgs ): array {
+        // Arguments will always be in array form no matter the declaration. If marked as such, instance the desired classes
+        $arguments = array();
+        foreach ($fieldArgs as $arg) {
+            $argType = $arg->getType() instanceof NonNull ? $arg->getType()->getOfType() : $arg->getType();
+            if (array_key_exists('declaration', $argType->config)) {
+                $className = $argType->config['declaration']->declaringClass;
+                $argValue = new $className(...$args[$arg->name]);
+            } else {
+                $argValue = $args[$arg->name] ?? $arg->defaultValue;
+            }
+            $arguments[$arg->name] = $argValue;
+
+            if (method_exists($arg->config['type'], 'getFields') && !empty($arg->config['type']->getFields())) {
+                foreach ($arg->config['type']->getFields() as $fieldName => /** @var \GraphQL\Type\Definition\InputObjectField */ $field) {
+                    $arguments[$arg->name][$fieldName] = $args[$arg->name][$field->name] ?? $field->defaultValue;
+                }
+            }
+        }
+
+        return $arguments;
     }
 
     public function getClassWithAutowire( object $class ): object {

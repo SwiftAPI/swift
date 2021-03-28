@@ -16,6 +16,7 @@ use Swift\GraphQl\Attributes\Mutation;
 use Swift\GraphQl\Attributes\Query;
 use Swift\GraphQl\ContextInterface;
 use Swift\GraphQl\Generators\EntityArgumentGenerator;
+use Swift\GraphQl\Types\PageInfoType;
 use Swift\HttpFoundation\Exception\BadRequestException;
 use Swift\Kernel\Attributes\Autowire;
 use Swift\Model\Entity\Arguments;
@@ -33,8 +34,11 @@ use Swift\Security\User\Type\LoginInput;
 use Swift\Security\User\Type\LoginResponseType;
 use Swift\Security\User\Type\ResetPasswordInput;
 use Swift\Security\User\Type\ResetPasswordResponse;
+use Swift\Security\User\Type\UserConnection;
+use Swift\Security\User\Type\UserEdge;
 use Swift\Security\User\Type\UserInput;
 use Swift\Security\User\Type\UserType;
+use Swift\Security\User\User;
 use Swift\Security\User\UserProviderInterface;
 use Swift\Security\User\UserStorageInterface;
 
@@ -64,10 +68,10 @@ class UserControllerGraphQl extends AbstractController {
      *
      * @param $userInput
      *
-     * @return UserType
+     * @return UserEdge
      */
-    #[Mutation(name: 'UserCreate', type: UserType::class, description: 'Create new user' )]
-    public function create( UserInput $userInput ): UserType {
+    #[Mutation(name: 'UserCreate', type: UserEdge::class, description: 'Create new user' )]
+    public function create( UserInput $userInput ): UserEdge {
         try {
             $data = $this->userProvider->storeUser(...(array) $userInput)->serialize();
             unset($data->password);
@@ -75,16 +79,16 @@ class UserControllerGraphQl extends AbstractController {
             throw new BadRequestException(sprintf('User already exists: %s', $exception->getMessage()));
         }
 
-        return new UserType(...(array) $data);
+        return new UserEdge($data->id, new UserType(...(array) $data));
     }
 
     /**
      * GraphQl endpoint for creating user account
      *
-     * @return UserType
+     * @return UserEdge
      */
     #[Query(name: 'UserMe', isList: false, description: 'Fetch currently authenticated user' )]
-    public function me(): UserType {
+    public function me(): UserEdge {
         // Make sure a user is authenticated
         $this->denyAccessUnlessGranted(
             [AuthorizationTypesEnum::IS_AUTHENTICATED, AuthorizationRolesEnum::ROLE_USER],
@@ -96,7 +100,7 @@ class UserControllerGraphQl extends AbstractController {
         $data = $this->getCurrentUser()->serialize();
         unset($data->password);
 
-        return new UserType(...(array)$data);
+        return new UserEdge($data->id, new UserType(...(array) $data));
     }
 
     /**
@@ -104,10 +108,10 @@ class UserControllerGraphQl extends AbstractController {
      *
      * @param int $id
      *
-     * @return UserType
+     * @return UserEdge
      */
-    #[Query(name: 'User', type: UserType::class, isList: false, description: 'Fetch user by id' )]
-    public function user( int $id ): UserType {
+    #[Query(name: 'User', isList: false, description: 'Fetch user by id' )]
+    public function user( int $id ): UserEdge {
         // Make sure a user is authenticated
         $this->denyAccessUnlessGranted([AuthorizationTypesEnum::IS_AUTHENTICATED, AuthorizationRolesEnum::ROLE_USERS_LIST]);
 
@@ -117,35 +121,51 @@ class UserControllerGraphQl extends AbstractController {
         }
         unset($data->password);
 
-        return new UserType(...(array)$data);
+        return new UserEdge($data->id, new UserType(...(array) $data));
     }
 
     /**
-     * GraphQl endpoint for creating user account
+     * GraphQl endpoint for listing users
      *
      * @param array $filter
      *
-     * @return UserType[]
+     * @return UserConnection
      */
-    #[Query(name: 'Users', type: UserType::class, isList: true, description: 'List all users' )]
-    public function users( #[Argument(type: Arguments::class, generator: EntityArgumentGenerator::class, generatorArguments: ['entity' => UserEntity::class])] array $filter ): array {
+    #[Query(name: 'Users', description: 'List all users' )]
+    public function users( #[Argument(type: Arguments::class, generator: EntityArgumentGenerator::class, generatorArguments: ['entity' => UserEntity::class])] array $filter ): UserConnection {
         // Make sure a user is authenticated
         $this->denyAccessUnlessGranted([AuthorizationRolesEnum::ROLE_USERS_LIST]);
 
+        $filter ??= array();
         $state = $filter['where'] ?? array();
         unset($filter['where']);
 
         if (!$result = $this->userDatabaseStorage->findMany($state, new Arguments(...$filter))) {
-            return array();
+            return new UserConnection($result);
         }
 
-        $users = array();
-        foreach ($result as $value) {
-            unset($value->password);
-            $users[] = new UserType(...(array)$value);
+
+        return new UserConnection($result);
+    }
+
+    /**
+     * GraphQl endpoint for listing users
+     *
+     * @param array|null $filter
+     *
+     * @return UserConnection
+     */
+    #[Query(name: 'UsersRelay', description: 'List all users' )]
+    public function usersRelay( #[Argument(type: Arguments::class, generator: EntityArgumentGenerator::class, generatorArguments: ['entity' => UserEntity::class])] array|null $filter = null ): UserConnection {
+        $filter ??= array();
+        $state = $filter['where'] ?? array();
+        unset($filter['where']);
+
+        if (!$result = $this->userDatabaseStorage->findMany($state, new Arguments(...$filter))) {
+            return new UserConnection($result);
         }
 
-        return $users;
+        return new UserConnection($result);
     }
 
     /**

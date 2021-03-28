@@ -86,7 +86,7 @@ class OAuthRefreshTokenAuthenticator implements AuthenticatorInterface, Authenti
             throw new AuthenticationException('Invalid token');
         }
 
-        $client = new ClientUser(...(array) $client);
+        $client = new ClientUser(...$client->toArray());
 
         return new Passport($client, new RefreshTokenCredentials($token));
     }
