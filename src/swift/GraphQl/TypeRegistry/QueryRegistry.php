@@ -14,11 +14,16 @@ namespace Swift\GraphQl\TypeRegistry;
 use GraphQL\Type\Definition\EnumType;
 use GraphQL\Type\Definition\ObjectType as GraphQlObjectType;
 use GraphQL\Type\Definition\Type;
+use GraphQLRelay\Relay;
+use Swift\GraphQl\ContextInterface;
 use Swift\GraphQl\Exceptions\DuplicateTypeException;
+use Swift\GraphQl\Resolvers\FieldResolver;
 use Swift\GraphQl\TypeRegistryInterface;
+use Swift\GraphQl\Types\NodeTypeInterface;
 use Swift\GraphQl\Types\ObjectType;
 use Swift\Kernel\Attributes\Autowire;
 use Swift\Kernel\Attributes\DI;
+use Swift\Kernel\ServiceLocator;
 use Swift\Kernel\TypeSystem\Enum;
 
 /**
@@ -37,10 +42,16 @@ class QueryRegistry implements TypeRegistryInterface {
      *
      * @param TypeRegistryInterface $inputTypeRegistry
      * @param TypeRegistryInterface $outputTypeRegistry
+     * @param TypeRegistryInterface $interfaceRegistry
+     * @param FieldResolver $fieldResolver
+     * @param ContextInterface $context
      */
     public function __construct(
         private TypeRegistryInterface $inputTypeRegistry,
         private TypeRegistryInterface $outputTypeRegistry,
+        private TypeRegistryInterface $interfaceRegistry,
+        private FieldResolver $fieldResolver,
+        private ContextInterface $context,
     ) {
     }
 
@@ -95,6 +106,7 @@ class QueryRegistry implements TypeRegistryInterface {
 
         return new GraphQlObjectType(array(
             'name' => 'Query',
+            'description' => 'The root entry point into the Graph',
             'fields' => $fields,
         ));
     }
@@ -106,6 +118,14 @@ class QueryRegistry implements TypeRegistryInterface {
         foreach ($this->types as $query) {
             /** @var GraphQlObjectType $queryType */
             $queryType = $this->outputTypeRegistry->getCompiled()->get($query->type);
+
+            if (is_null($queryType) ) {
+                $queryType = $this->interfaceRegistry->getCompiled()->get($query->type);
+            }
+
+            if ($query->name === 'Node') {
+                $query->name = 'node';
+            }
 
             $this->definitions[$query->name] = array(
                 'type' => $query->isList ? \Swift\GraphQl\Types\Type::listOf($queryType) : $queryType,
@@ -135,6 +155,9 @@ class QueryRegistry implements TypeRegistryInterface {
             return $type;
         }
 
+        if ($type->name === 'id') {
+            $type->type = 'id';
+        }
         $type->type ??= $type->declaringClass;
         $identifier ??= $type->type;
 

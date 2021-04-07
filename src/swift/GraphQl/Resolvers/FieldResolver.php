@@ -12,10 +12,13 @@ namespace Swift\GraphQl\Resolvers;
 
 
 use Closure;
+use GraphQL\Type\Definition\FieldArgument;
+use GraphQL\Type\Definition\IDType;
 use GraphQL\Type\Definition\ListOfType;
 use GraphQL\Type\Definition\NonNull;
 use GraphQL\Type\Definition\QueryPlan;
 use GraphQL\Type\Definition\ResolveInfo;
+use GraphQLRelay\Relay;
 use Swift\GraphQl\ContextInterface;
 use Swift\GraphQl\Directives\DirectiveInterface;
 use Swift\Kernel\Attributes\Autowire;
@@ -49,6 +52,8 @@ class FieldResolver {
         $property  = null;
 
         $this->context->setInfo($info);
+
+        //var_dump($fieldName);
 
         // TODO: Implement dataloader principle
         //$queryPlan = new QueryPlan($info->parentType, $info->schema, $info->fieldNodes, $info->variableValues, $info->fragments);
@@ -118,7 +123,7 @@ class FieldResolver {
             } else {
                 $argValue = $args[$arg->name] ?? $arg->defaultValue;
             }
-            $arguments[$arg->name] = $argValue;
+            $arguments[$arg->name] = $this->parseArgValue($argValue, $argType, $arg);
 
             if (method_exists($arg->config['type'], 'getFields') && !empty($arg->config['type']->getFields())) {
                 foreach ($arg->config['type']->getFields() as $fieldName => /** @var \GraphQL\Type\Definition\InputObjectField */ $field) {
@@ -127,10 +132,15 @@ class FieldResolver {
             }
         }
 
+        $this->context->setCurrentArguments(array(
+            'raw' => $args,
+            'parsed' => $arguments,
+        ));
+
         return $arguments;
     }
 
-    public function getClassWithAutowire( object $class ): object {
+    public function getClassWithAutowire( object|string $class ): object {
         $instance = is_object($class) ? $class : new $class();
         if (array_key_exists($instance::class, $this->instances) && is_object($class)) {
             return $class;
@@ -171,6 +181,14 @@ class FieldResolver {
         $this->instances[$instance::class] = true;
 
         return $class;
+    }
+
+    private function parseArgValue( mixed $argValue, mixed $argType, FieldArgument $argument ): mixed {
+        if (($argument->name === 'id') || ($argType::class === IDType::class)) {
+            return Relay::fromGlobalId($argValue)['id'];
+        }
+
+        return $argValue;
     }
 
 }

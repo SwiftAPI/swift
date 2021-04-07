@@ -20,29 +20,36 @@ use Swift\Model\PageInfo;
  * Class PageInfoType
  * @package Swift\GraphQl\Types
  */
-#[Type(name: 'PageInfo')]
+#[Type(name: 'PageInfo', description: 'Information about pagination in a connection')]
 class PageInfoType extends PageInfo implements PageInfoInterface {
 
-    #[Field(name: 'endCursor', description: 'Last cursor in current page')]
+    #[Field(name: 'endCursor', description: 'When paginating forwards, the cursor to continue')]
     public function getEndCursor(): string {
         return Utils::encodeCursor($this->getEndId());
     }
 
-    #[Field(name: 'hasPreviousPage', description: 'Result set has previous page(s)')]
+    #[Field(name: 'hasPreviousPage', description: 'When paginating backwards, are there more items?')]
     public function hasPreviousPage(): bool {
         return parent::hasPreviousPage();
     }
 
-    #[Field(name: 'hasNextPage', description: 'Result set has additional page(s)')]
+    #[Field(name: 'hasNextPage', description: 'When paginating forwards, are there more items?')]
     public function hasNextPage(): bool {
         return parent::hasNextPage();
     }
 
-    #[Field(name: 'startCursor', description: 'First cursor in current page')]
+    #[Field(name: 'startCursor', description: 'When paginating backwards, the cursor to continue')]
     public function getStartCursor(): string {
         return Utils::encodeCursor($this->getStartId());
     }
 
+    /**
+     * Generate PageInfo to use for querying entities
+     *
+     * @param PageInfo $pageInfo
+     *
+     * @return PageInfoType
+     */
     public static function fromModelPageInfo( PageInfo $pageInfo ): PageInfoType {
         return new static(
             $pageInfo->getTotalCount(),

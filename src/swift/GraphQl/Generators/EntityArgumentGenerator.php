@@ -62,7 +62,11 @@ class EntityArgumentGenerator implements GeneratorInterface {
                 $test->name      = $type->declaringMethod . ucfirst( $field->name );
                 $test->generator = EntityEnumGenerator::class;
                 $test->type      = $type->generatorArguments['entity'];
-                $fields[ $name ] = $this->inputTypeRegistry->createObject( type: $test, identifier: $identifier );
+                $fields[ $name ] = array(
+                    'description' => $field->description,
+                    'defaultValue' => $field->defaultValue,
+                    'type' => $this->inputTypeRegistry->createObject( type: $test, identifier: $identifier ),
+                );
                 continue;
             }
 
@@ -75,22 +79,35 @@ class EntityArgumentGenerator implements GeneratorInterface {
                 continue;
             }
 
-            $fields[ $name ] = $this->inputTypeRegistry->createObject( type: $field, identifier: $identifier );
+            $fields[ $name ] = array(
+                'description' => $field->description,
+                'defaultValue' => $field->defaultValue,
+                'type' => $this->inputTypeRegistry->createObject( type: $field, identifier: $identifier ),
+            );
         }
 
         // Add where column
         $entityFields = array();
         foreach ( $entityDefinition->config['declaration']->fields as $item ) {
-            $entityFields[ $item->name ] = Type::listOf( $this->inputTypeRegistry->createObject( type: $item ) );
+            $entityFields[ $item->name ] = array(
+                'description' => $item->description,
+                'defaultValue' => $item->defaultValue,
+                'type' => Type::listOf( $this->inputTypeRegistry->createObject( type: $item ) ),
+            );
         }
-        $fields['where'] = new InputObjectType( array(
-            'name'   => 'Where' . ucfirst( $type->declaringMethod ),
-            'fields' => $entityFields,
-        ) );
+        $fields['where'] = array(
+            'description' => 'Filter results where given fields match provided values',
+            'type' => new InputObjectType( array(
+                'name'   => 'Where' . ucfirst( $type->declaringMethod ),
+                'description' => 'Filter results where given fields match provided values',
+                'fields' => $entityFields,
+            ) )
+        );
 
         $name   = $type->declaringMethod . ucfirst( $type->name ) . 'Input';
         $object = $this->inputTypeRegistry->getCompiled()->get( $name ) ?? new InputObjectType( array(
                 'name'   => ucfirst($name),
+                'description' => 'Filter and/or paginate results for ' . $type->declaringMethod,
                 'fields' => $fields,
                 'alias'  => $type->name,
             ) );

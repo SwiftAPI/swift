@@ -17,7 +17,7 @@ use Swift\GraphQl\Attributes\InterfaceType;
  * Interface ConnectionTypeInterface
  * @package Swift\GraphQl\Types
  */
-#[InterfaceType(name: 'ConnectionInterface')]
+#[InterfaceType(name: 'ConnectionInterface', description: 'A connection to a list of items.')]
 interface ConnectionTypeInterface {
 
     #[Field(name: 'totalCount', description: 'Total count of edges in result set')]
@@ -26,7 +26,7 @@ interface ConnectionTypeInterface {
     #[Field(name: 'edges', type: EdgeInterface::class, isList: true, description: 'Items in result set')]
     public function getEdges(): array;
 
-    #[Field(name: 'pageInfo', description: 'Page meta data')]
+    #[Field(name: 'pageInfo', description: 'Information to aid in pagination')]
     public function getPageInfo(): PageInfoInterface;
 
 }

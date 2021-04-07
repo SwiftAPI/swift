@@ -75,8 +75,8 @@ final class ResultSet extends \ArrayIterator {
                 $this->getTotalCount(),
                 $arguments->limit,
                 $this->count(),
-                $this->getFirst()?->getPrimaryKeyValue(),
-                $this->getLast()?->getPrimaryKeyValue(),
+                $this->getFirst()?->getPrimaryKeyValue() ?? 0,
+                $this->getLast()?->getPrimaryKeyValue() ?? 0,
                 $arguments->offset,
             );
         }
@@ -112,7 +112,7 @@ final class ResultSet extends \ArrayIterator {
      *
      * @return mixed
      */
-    private function getQuery(): Fluent {
+    public function getQuery(): Fluent {
         $ref = $this->queryReference;
 
         return $ref();

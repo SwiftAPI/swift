@@ -137,10 +137,15 @@ class OutputTypeRegistry implements TypeRegistryInterface {
             $generator = $this->generators[$type->generator];
             $object = $generator->generate($type, $this);
         } elseif (array_key_exists($identifier, \Swift\GraphQl\Types\Type::getStandardTypes())) {
-            return \Swift\GraphQl\Types\Type::getStandardTypes()[$identifier];
+            return array(
+                'description' => $type->description,
+                'defaultValue' => $type->defaultValue,
+                'type' => \Swift\GraphQl\Types\Type::getStandardTypes()[$identifier],
+            );
         } elseif (is_a(object_or_class: $identifier, class: Enum::class, allow_string: true)) {
             $object = $this->definitions[$identifier] ?? new EnumType(array(
                 'name' => (new \ReflectionClass($identifier))->getShortName(),
+                'description' => $type->description,
                 'values' => $identifier::keys(),
                 'declaration' => $type,
             ));
@@ -151,6 +156,7 @@ class OutputTypeRegistry implements TypeRegistryInterface {
             }
             $object = new GraphQlObjectType(array(
                 'name' => $type->name,
+                'description' => $type->description,
                 'fields' => $fields,
                 'declaration' => $type,
                 'interfaces' => $this->interfaceRegistry->fromType($type),
@@ -177,6 +183,7 @@ class OutputTypeRegistry implements TypeRegistryInterface {
         }
         $object = new UnionType([
             'name' => $name,
+            'description' => $type->description,
             'types' => $types,
         ]);
         $this->definitions[$name] = $object;

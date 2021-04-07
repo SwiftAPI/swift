@@ -18,7 +18,7 @@ use Swift\HttpFoundation\Response;
  * Class ResetPasswordResponse
  * @package Swift\Security\User\Type
  */
-#[Type]
+#[Type(description: 'After reset password response')]
 class ResetPasswordResponse {
 
     /**
@@ -28,7 +28,7 @@ class ResetPasswordResponse {
      * @param int $code
      */
     public function __construct(
-        #[Field] public string $message = 'Successfully reset password.',
+        #[Field(description: 'Status message')] public string $message = 'Successfully reset password.',
         #[Field(description: 'HTTP status code')] public int $code = Response::HTTP_OK,
     ) {
     }

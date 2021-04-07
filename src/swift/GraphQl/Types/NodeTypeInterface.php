@@ -12,15 +12,26 @@ namespace Swift\GraphQl\Types;
 
 use Swift\GraphQl\Attributes\Field;
 use Swift\GraphQl\Attributes\InterfaceType;
+use Swift\GraphQl\ContextInterface;
 
 /**
  * Class NodeTypeInterface
  * @package Swift\GraphQl\Types
  */
-#[InterfaceType(name: 'Node')]
+#[InterfaceType(name: 'NodeInterface', description: 'An object with an ID')]
 interface NodeTypeInterface {
 
-    #[Field(name: 'id')]
+    #[Field(name: 'id', description: 'The id of the object')]
     public function getId(): string;
+
+    /**
+     * Return classname and method name for resolver function
+     *
+     * @param string|int $id
+     * @param ContextInterface $context
+     *
+     * @return array ["resolver classname", "methodName"]
+     */
+    public static function getNodeResolverClassnameAndMethod( string|int $id, ContextInterface $context ): array;
 
 }

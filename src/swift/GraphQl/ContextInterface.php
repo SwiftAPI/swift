@@ -12,6 +12,7 @@ namespace Swift\GraphQl;
 
 use GraphQL\Language\AST\FieldNode;
 use GraphQL\Type\Definition\ResolveInfo;
+use JetBrains\PhpStorm\ArrayShape;
 use Swift\GraphQl\Directives\DirectiveInterface;
 
 /**
@@ -43,5 +44,13 @@ interface ContextInterface {
      * @return FieldNode
      */
     public function getCurrentField(): FieldNode;
+
+    /**
+     * Get provided arguments
+     *
+     * @return array
+     */
+    #[ArrayShape(shape: ['raw' => array(), 'parsed' => array()])]
+    public function getCurrentArguments(): array;
 
 }

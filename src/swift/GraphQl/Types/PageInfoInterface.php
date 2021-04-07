@@ -17,19 +17,19 @@ use Swift\GraphQl\Attributes\InterfaceType;
  * Interface PageInfoInterface
  * @package Swift\GraphQl\Types
  */
-#[InterfaceType(name: 'PageInfoInterface')]
+#[InterfaceType(name: 'PageInfoInterface', description: 'Information about pagination in a connection')]
 interface PageInfoInterface {
 
-    #[Field(name: 'endCursor')]
+    #[Field(name: 'endCursor', description: 'When paginating forwards, the cursor to continue')]
     public function getEndCursor(): string;
 
-    #[Field(name: 'hasPreviousPage')]
+    #[Field(name: 'hasPreviousPage', description: 'When paginating backwards, are there more items?')]
     public function hasPreviousPage(): bool;
 
-    #[Field(name: 'hasNextPage')]
+    #[Field(name: 'hasNextPage', description: 'When paginating forwards, are there more items?')]
     public function hasNextPage(): bool;
 
-    #[Field(name: 'startCursor')]
+    #[Field(name: 'startCursor', description: 'When paginating backwards, the cursor to continue')]
     public function getStartCursor(): string;
 
 }

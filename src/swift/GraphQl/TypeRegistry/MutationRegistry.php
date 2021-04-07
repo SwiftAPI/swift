@@ -95,6 +95,7 @@ class MutationRegistry implements TypeRegistryInterface {
 
         return new GraphQlObjectType(array(
             'name' => 'Mutation',
+            'description' => 'The root mutation',
             'fields' => $fields,
             'inter'
         ));
@@ -159,12 +160,17 @@ class MutationRegistry implements TypeRegistryInterface {
         }
         if ( array_key_exists($identifier, \Swift\GraphQl\Types\Type::getStandardTypes()) ) {
             $fieldType = \Swift\GraphQl\Types\Type::getStandardTypes()[$identifier];
-            return $type->nullable ? $fieldType : \Swift\GraphQl\Types\Type::nonNull($fieldType);
+            return array(
+                'description' => $type->description,
+                'defaultValue' => $type->defaultValue,
+                'type' => $type->nullable ? $fieldType : \Swift\GraphQl\Types\Type::nonNull($fieldType)
+            );
         }
 
         if ( is_a(object_or_class: $identifier, class: Enum::class, allow_string: true) ) {
             return new EnumType(array(
                 'name' => ucfirst($type->name),
+                'description' => $type->description,
                 'values' => $identifier::keys(),
                 'declaration' => $type,
             ));

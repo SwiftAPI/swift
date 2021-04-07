@@ -64,6 +64,7 @@ class EntityEnumGenerator implements GeneratorInterface {
 
         $object = $this->get($type->name) ?? new EnumType(array(
                 'name' => ucfirst($type->name . 'Enum'),
+                'description' => $type->description,
                 'values' => $values,
             ));
         $this->inputTypeRegistry->getCompiled()->set($type->name, $object);

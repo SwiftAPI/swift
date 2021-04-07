@@ -35,6 +35,7 @@ abstract class AbstractEdgeType implements EdgeInterface {
     /**
      * @TODO Implement this with #[Field] Attribute and linked to the right type
      */
+    #[Field( name: 'node', type: NodeTypeInterface::class, isList: false, description: 'The item at the end of the edge' )]
     abstract public function getNode(): NodeTypeInterface;
 
     #[Field( name: 'cursor', description: 'Edge cursor' )]

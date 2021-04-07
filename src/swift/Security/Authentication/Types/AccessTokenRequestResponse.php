@@ -17,7 +17,7 @@ use Swift\GraphQl\Attributes\Type;
  * Class AccessTokenRequestResponse
  * @package Swift\Security\Authentication\Type
  */
-#[Type]
+#[Type(description: 'Access token to for authenticated session')]
 class AccessTokenRequestResponse extends TokenRequestResponse {
 
     /**
@@ -29,10 +29,10 @@ class AccessTokenRequestResponse extends TokenRequestResponse {
      * @param string $refreshToken
      */
     public function __construct(
-        #[Field] public string $accessToken,
-        #[Field(type: \DateTime::class)] public \DateTimeInterface $expires,
-        #[Field] public string $tokenType,
-        #[Field] public string $refreshToken,
+        #[Field(description: 'Access token value')] public string $accessToken,
+        #[Field(type: \DateTime::class, description: 'Expiry for token')] public \DateTimeInterface $expires,
+        #[Field(description: 'Type of access token')] public string $tokenType,
+        #[Field(description: 'Value for refresh token. Refresh token can be used to retrieve a new access token without re-authentication')] public string $refreshToken,
     ) {
         parent::__construct($this->accessToken, $this->expires, $this->tokenType);
     }

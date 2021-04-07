@@ -18,7 +18,7 @@ use Swift\HttpFoundation\Response;
  * Class ForgotPasswordResponse
  * @package Swift\Security\User\Type
  */
-#[Type]
+#[Type(description: 'Confirmation on success/failure to forgot password request')]
 class ForgotPasswordResponse {
 
     /**

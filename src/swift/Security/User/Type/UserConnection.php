@@ -19,13 +19,13 @@ use Swift\GraphQl\Types\AbstractConnectionType;
  * Class UserConnection
  * @package Swift\Security\User\Type
  */
-#[Type]
+#[Type(description: 'List of users')]
 class UserConnection extends AbstractConnectionType {
 
     /**
      * @return UserEdge[]
      */
-    #[Field(name: 'edges', type: UserEdge::class, isList: true)]
+    #[Field(name: 'edges', type: UserEdge::class, isList: true, description: 'Edges')]
     public function getEdges(): array {
         $edges = array();
         foreach ($this->resultSet as $user) {

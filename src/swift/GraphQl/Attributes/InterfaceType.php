@@ -21,9 +21,11 @@ class InterfaceType {
      * InterfaceType constructor.
      *
      * @param string|null $name
+     * @param string|null $description
      */
     public function __construct(
         public string|null $name = null,
+        public string|null $description = null,
     ) {
         if (is_null($this->name)) {
             $this->name = (new \ReflectionClass($this))->getShortName();

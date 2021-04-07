@@ -14,6 +14,7 @@ namespace Swift\GraphQl\TypeRegistry;
 use GraphQL\Type\Definition\EnumType;
 use GraphQL\Type\Definition\InterfaceType;
 use GraphQL\Type\Definition\ListOfType;
+use GraphQL\Type\Definition\ResolveInfo;
 use GraphQL\Type\Definition\Type;
 use Swift\GraphQl\Attributes\Field;
 use Swift\GraphQl\Exceptions\DuplicateTypeException;
@@ -21,6 +22,7 @@ use Swift\GraphQl\TypeRegistryInterface;
 use Swift\GraphQl\Types\ObjectType;
 use Swift\HttpFoundation\ParameterBag;
 use Swift\Kernel\Attributes\DI;
+use Swift\Kernel\ServiceLocator;
 use Swift\Kernel\TypeSystem\Enum;
 use Swift\GraphQl\Attributes\InterfaceType as InterfaceTypeAttribute;
 
@@ -35,7 +37,7 @@ class InterfaceRegistry implements TypeRegistryInterface {
     private array $definitions = array();
     private array $types = array();
     private ParameterBag $compiled;
-    private TypeRegistryInterface $outputTypeRegistry;
+    private TypeRegistryInterface $outputRegistry;
 
     /**
      * @inheritDoc
@@ -80,7 +82,8 @@ class InterfaceRegistry implements TypeRegistryInterface {
      * @return ParameterBag
      */
     public function getCompiled(): ParameterBag {
-        return $this->compiled ?? new ParameterBag();
+        $compiled = $this->compiled ?? new ParameterBag($this->definitions);
+        return $compiled->count() > 0 ? $compiled : new ParameterBag($this->definitions);
     }
 
     /**
@@ -140,6 +143,7 @@ class InterfaceRegistry implements TypeRegistryInterface {
                     isList: $parameterFieldList,
                     generator: $propertyConfig->generator ?? null,
                     generatorArguments: $propertyConfig->generatorArguments ?? array(),
+                    description: $parameterConfig['description'] ?? '',
                 );
             }
 
@@ -152,6 +156,7 @@ class InterfaceRegistry implements TypeRegistryInterface {
                 isList: $methodConfig->isList ?? false,
                 generator: $propertyConfig->generator ?? null,
                 generatorArguments: $propertyConfig->generatorArguments ?? array(),
+                description: $methodConfig->description ?? '',
             );
         }
 
@@ -187,6 +192,7 @@ class InterfaceRegistry implements TypeRegistryInterface {
                 name: $interfaceAttribute->name,
                 declaringClass: $interfaceReflection->getName(),
                 fields: $fields,
+                description: $interfaceAttribute->description,
             );
             $interfaces[] = $object;
             $this->types[$interfaceReflection->getName()] = $object;
@@ -196,6 +202,9 @@ class InterfaceRegistry implements TypeRegistryInterface {
     }
 
     public function createObject( ObjectType|\GraphQL\Type\Definition\Type $type, string $identifier = null ) {
+        if (!isset($this->outputRegistry)) {
+            $this->outputRegistry = (new ServiceLocator())->get(OutputTypeRegistry::class);
+        }
         if ( is_a( object_or_class: $type, class: \GraphQL\Type\Definition\Type::class, allow_string: false ) ) {
             return $type;
         }
@@ -234,8 +243,12 @@ class InterfaceRegistry implements TypeRegistryInterface {
         } else {
             $object = new InterfaceType( array(
                 'name'        => ucfirst($type->name),
+                'description' => $type->description,
                 'fields'      => $fields,
                 'declaration' => $type,
+                'resolveType' => function($value): \GraphQL\Type\Definition\ObjectType {
+                    return $this->outputRegistry->createObject($this->outputRegistry->getTypeByClass(get_debug_type($value)));
+                }
             ) );
             $object = $type->nullable ? $object : \Swift\GraphQl\Types\Type::nonNull($object);
             $this->definitions[ $identifier ] = $object;

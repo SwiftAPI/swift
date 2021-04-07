@@ -17,7 +17,7 @@ use Swift\GraphQl\Attributes\Type;
  * Class TokenType
  * @package Swift\Security\Authentication\Types
  */
-#[Type]
+#[Type(description: 'Token to represent authenticated session')]
 class TokenType {
 
     /**
@@ -27,8 +27,8 @@ class TokenType {
      * @param \DateTime $expires
      */
     public function __construct(
-        #[Field] public string $token,
-        #[Field] public \DateTime $expires,
+        #[Field(description: 'The token value')] public string $token,
+        #[Field(description: 'Moment the token expires')] public \DateTime $expires,
     ) {
     }
 

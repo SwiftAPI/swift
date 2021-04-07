@@ -19,7 +19,7 @@ use Swift\Kernel\Attributes\DI;
  * Class UserInputType
  * @package Swift\Security\User\Type
  */
-#[DI(autowire: false), InputType]
+#[DI(autowire: false), InputType(description: 'User creation input')]
 class UserInput {
 
     /**

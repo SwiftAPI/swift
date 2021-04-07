@@ -135,6 +135,7 @@ class InputTypeRegistry implements TypeRegistryInterface {
         } elseif ( is_a( object_or_class: $identifier, class: Enum::class, allow_string: true ) ) {
             $object = $this->outputTypeRegistry->createObject( $type ) ?? new EnumType( array(
                     'name'        => ucfirst($type->name),
+                    'description' => $type->description,
                     'values'      => $identifier::keys(),
                     'declaration' => $type,
                 ) );
@@ -142,6 +143,7 @@ class InputTypeRegistry implements TypeRegistryInterface {
         } else {
             $object = new InputObjectType( array(
                 'name'        => ucfirst($type->name),
+                'description' => $type->description,
                 'fields'      => $fields,
                 'declaration' => $type,
                 'defaultValue' => $type->defaultValue,

@@ -44,7 +44,7 @@ final class UserProvider implements UserProviderInterface {
             return null;
         }
 
-        return $this->getUserInstance($userInfo);
+        return $this->getUserInstance($userInfo->toArray());
     }
 
     /**

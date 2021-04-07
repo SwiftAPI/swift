@@ -26,7 +26,7 @@ class UserEdge extends AbstractEdgeType {
     /**
      * @return NodeTypeInterface
      */
-    #[Field( name: 'node', type: UserType::class )]
+    #[Field( name: 'node', type: UserType::class, description: 'The item at the end of the edge' )]
     public function getNode(): NodeTypeInterface {
         return $this->node;
     }

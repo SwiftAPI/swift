@@ -42,13 +42,13 @@ class BarType {
     }
 
     #[Field(name: 'reviews', type: ReviewType::class, isList: true)]
-    public function getReviews(int $limit = 5): array {
+    public function getReviews(int $first = 5): array {
         // Here we can assume $this->fooRepository to autowired
         return array_slice(array(
             new ReviewType(id: '1', username: 'Foo', content: 'Lorem ipsum dolor'),
             new ReviewType(id: '2', username: 'Bar', content: 'Lorem ipsum dolor'),
             new ReviewType(id: '3', username: 'Fubar', content: 'Lorem ipsum dolor'),
-        ), 0, $limit);
+        ), 0, $first);
     }
 
     #[Autowire]

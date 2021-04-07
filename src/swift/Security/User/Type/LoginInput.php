@@ -15,7 +15,7 @@ use Swift\GraphQl\Attributes\InputType;
 use Swift\GraphQl\Attributes\Type;
 use Swift\Kernel\Attributes\DI;
 
-#[DI(autowire: false), InputType]
+#[DI(autowire: false), InputType(description: 'User login input')]
 class LoginInput {
 
     /**

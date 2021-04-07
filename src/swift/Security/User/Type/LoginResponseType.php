@@ -22,31 +22,18 @@ use Swift\Security\Authentication\Types\TokenType;
  * @package Swift\Security\User\Type
  */
 #[DI(autowire: false), Type]
-class LoginResponseType extends UserType {
+class LoginResponseType {
 
     /**
      * LoginResponseType constructor.
      *
-     * @param int|null $id
-     * @param string $username
-     * @param string|null $email
-     * @param string $firstname
-     * @param string $lastname
-     * @param DateTime $created
-     * @param DateTime $modified
+     * @param UserEdge $user
      * @param TokenType $token
      */
     public function __construct(
-        #[Field(nullable: true)] public ?int $id,
-        #[Field] public string $username,
-        #[Field(nullable: true)] public ?string $email,
-        #[Field] public string $firstname,
-        #[Field] public string $lastname,
-        #[Field(type: \Swift\GraphQl\Types\Type::DATETIME)] public DateTime $created,
-        #[Field(type: \Swift\GraphQl\Types\Type::DATETIME)] public DateTime $modified,
-        #[Field] public TokenType $token,
+        #[Field(description: 'User object after authentication')] public UserEdge $user,
+        #[Field(description: 'Authenticated token')] public TokenType $token,
     ) {
-        parent::__construct($this->id, $this->username, $this->email, $this->firstname, $this->lastname, $this->created, $this->modified);
     }
 
 }

@@ -12,6 +12,7 @@ namespace Swift\Security\User\Controller;
 
 use Swift\Controller\AbstractController;
 use Swift\GraphQl\Attributes\Argument;
+use Swift\GraphQl\Attributes\Field;
 use Swift\GraphQl\Attributes\Mutation;
 use Swift\GraphQl\Attributes\Query;
 use Swift\GraphQl\ContextInterface;
@@ -20,6 +21,7 @@ use Swift\GraphQl\Types\PageInfoType;
 use Swift\HttpFoundation\Exception\BadRequestException;
 use Swift\Kernel\Attributes\Autowire;
 use Swift\Model\Entity\Arguments;
+use Swift\Model\Types\ArgumentsType;
 use Swift\Router\Attributes\Route;
 use Swift\Router\Types\RouteMethodEnum;
 use Swift\Security\Authentication\Types\TokenType;
@@ -64,6 +66,26 @@ class UserControllerGraphQl extends AbstractController {
     }
 
     /**
+     * Node field resolver callback function for UserType
+     *
+     * @param string|int $id
+     * @param ContextInterface $context
+     *
+     * @return UserType
+     */
+    public function getUserTypeByNode( string|int $id, ContextInterface $context ): UserType {
+        // Make sure a user is authenticated
+        $this->denyAccessUnlessGranted([AuthorizationTypesEnum::IS_AUTHENTICATED, AuthorizationRolesEnum::ROLE_USERS_LIST]);
+
+        // Get user data
+        if (!$data = $this->userProvider->getUserById((int) $id)?->serialize()) {
+            throw new UserNotFoundException(sprintf('User with id %s not found', $id));
+        }
+
+        return new UserType(...(array) $data);
+    }
+
+    /**
      * GraphQl endpoint for creating user account
      *
      * @param $userInput
@@ -74,7 +96,6 @@ class UserControllerGraphQl extends AbstractController {
     public function create( UserInput $userInput ): UserEdge {
         try {
             $data = $this->userProvider->storeUser(...(array) $userInput)->serialize();
-            unset($data->password);
         } catch (UserAlreadyExistsException $exception) {
             throw new BadRequestException(sprintf('User already exists: %s', $exception->getMessage()));
         }
@@ -98,7 +119,6 @@ class UserControllerGraphQl extends AbstractController {
 
         // Get user data
         $data = $this->getCurrentUser()->serialize();
-        unset($data->password);
 
         return new UserEdge($data->id, new UserType(...(array) $data));
     }
@@ -106,20 +126,19 @@ class UserControllerGraphQl extends AbstractController {
     /**
      * GraphQl endpoint for creating user account
      *
-     * @param int $id
+     * @param string $id
      *
      * @return UserEdge
      */
     #[Query(name: 'User', isList: false, description: 'Fetch user by id' )]
-    public function user( int $id ): UserEdge {
+    public function user( string $id ): UserEdge {
         // Make sure a user is authenticated
         $this->denyAccessUnlessGranted([AuthorizationTypesEnum::IS_AUTHENTICATED, AuthorizationRolesEnum::ROLE_USERS_LIST]);
 
         // Get user data
-        if (!$data = $this->userProvider->getUserById($id)?->serialize()) {
+        if (!$data = $this->userProvider->getUserById((int) $id)?->serialize()) {
             throw new UserNotFoundException(sprintf('User with id %s not found', $id));
         }
-        unset($data->password);
 
         return new UserEdge($data->id, new UserType(...(array) $data));
     }
@@ -132,15 +151,16 @@ class UserControllerGraphQl extends AbstractController {
      * @return UserConnection
      */
     #[Query(name: 'Users', description: 'List all users' )]
-    public function users( #[Argument(type: Arguments::class, generator: EntityArgumentGenerator::class, generatorArguments: ['entity' => UserEntity::class])] array $filter ): UserConnection {
+    public function users( #[Argument(type: ArgumentsType::class, generator: EntityArgumentGenerator::class, generatorArguments: ['entity' => UserEntity::class])] array $filter ): UserConnection {
         // Make sure a user is authenticated
         $this->denyAccessUnlessGranted([AuthorizationRolesEnum::ROLE_USERS_LIST]);
 
         $filter ??= array();
         $state = $filter['where'] ?? array();
         unset($filter['where']);
+        $argumentsType = new ArgumentsType(...$filter);
 
-        if (!$result = $this->userDatabaseStorage->findMany($state, new Arguments(...$filter))) {
+        if (!$result = $this->userDatabaseStorage->findMany($state, $argumentsType->toArgument())) {
             return new UserConnection($result);
         }
 
@@ -156,14 +176,16 @@ class UserControllerGraphQl extends AbstractController {
      * @return UserConnection
      */
     #[Query(name: 'UsersRelay', description: 'List all users' )]
-    public function usersRelay( #[Argument(type: Arguments::class, generator: EntityArgumentGenerator::class, generatorArguments: ['entity' => UserEntity::class])] array|null $filter = null ): UserConnection {
+    public function usersRelay( #[Argument(type: ArgumentsType::class, generator: EntityArgumentGenerator::class, generatorArguments: ['entity' => UserEntity::class])] array|null $filter = null ): UserConnection {
         $filter ??= array();
         $state = $filter['where'] ?? array();
         unset($filter['where']);
+        $argumentsType = new ArgumentsType(...$filter);
 
-        if (!$result = $this->userDatabaseStorage->findMany($state, new Arguments(...$filter))) {
+        if (!$result = $this->userDatabaseStorage->findMany($state, $argumentsType->toArgument())) {
             return new UserConnection($result);
         }
+
 
         return new UserConnection($result);
     }
@@ -178,20 +200,21 @@ class UserControllerGraphQl extends AbstractController {
      * @return LoginResponseType    User data and session token
      */
     #[Mutation(name: 'UserLogin', type: LoginResponseType::class, description: 'User login endpoint (username + password)' )]
-    public function login( LoginInput $credentials ): LoginResponseType {
+    public function login( #[Argument(description: 'User credentials')] LoginInput $credentials ): LoginResponseType {
         // Make sure a direct login occurred instead of a re-authentication or no authentication at all
         $this->authorizationChecker->denyUnlessGranted([AuthorizationTypesEnum::IS_AUTHENTICATED_DIRECTLY]);
 
         // Fetch user data
         $data = $this->getCurrentUser()->serialize();
+        $user = new UserEdge($data->id, new UserType(...(array) $data));
 
         // Append token so client can refer this authenticated session
-        $data->token = new TokenType(
+        $token = new TokenType(
             $this->getSecurityToken()->getTokenString(),
             new \DateTime($this->getSecurityToken()->expiresAt()->format('Y-m-d H:i:s')),
         );
 
-        return new LoginResponseType(...(array)$data);
+        return new LoginResponseType($user, $token);
     }
 
     /**
@@ -204,7 +227,7 @@ class UserControllerGraphQl extends AbstractController {
      * @return ForgotPasswordResponse
      */
     #[Mutation(name: 'ForgotPassword', description: 'Request new password')]
-    public function forgotPassword( string $email ): ForgotPasswordResponse {
+    public function forgotPassword( #[Argument(description: 'E-mail to request new password for')] string $email ): ForgotPasswordResponse {
         $this->denyAccessUnlessGranted([AuthorizationRolesEnum::ROLE_GUEST]);
 
         return new ForgotPasswordResponse();

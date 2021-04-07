@@ -53,7 +53,7 @@ class Utils {
      * @return string
      */
     public static function encodeCursor( string|int $id ) {
-        return base64_encode((string) $id);
+        return base64_encode('arrayconnection:' . $id);
     }
 
     /**
@@ -64,7 +64,9 @@ class Utils {
      * @return string|int
      */
     public static function decodeCursor( string $id ): string|int {
-        return base64_decode($id, true) ?? throw new \TypeError('Cannot decode id, as it not a valid base64 alphabet');
+        $decoded = base64_decode($id, true) ?? throw new \TypeError('Cannot decode id, as it not a valid base64 alphabet');
+        $exploded = explode(':', $decoded);
+        return end($exploded);
     }
 
 }

@@ -40,7 +40,7 @@ abstract class AbstractConnectionType implements ConnectionTypeInterface {
     /**
      * @return PageInfoType
      */
-    #[Field( name: 'pageInfo', description: 'Page meta information' )]
+    #[Field( name: 'pageInfo', description: 'Information to aid in pagination' )]
     public function getPageInfo(): PageInfoType {
         return PageInfoType::fromModelPageInfo($this->resultSet->getPageInfo());
     }

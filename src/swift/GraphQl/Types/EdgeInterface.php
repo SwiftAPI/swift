@@ -17,13 +17,13 @@ use Swift\GraphQl\Attributes\InterfaceType;
  * Interface EdgeInterface
  * @package Swift\GraphQl\Types
  */
-#[InterfaceType(name: 'EdgeInterface')]
+#[InterfaceType(name: 'EdgeInterface', description: 'An edge in a connection')]
 interface EdgeInterface {
 
-    #[Field(name: 'node', type: NodeTypeInterface::class, isList: false)]
+    #[Field(name: 'node', type: NodeTypeInterface::class, isList: false, description: 'The item at the end of the edge')]
     public function getNode(): NodeTypeInterface;
 
-    #[Field(name: 'cursor')]
+    #[Field(name: 'cursor', description: 'A cursor for use in pagination')]
     public function getCursor(): string;
 
 }

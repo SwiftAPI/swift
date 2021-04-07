@@ -18,7 +18,7 @@ use Swift\Kernel\Attributes\DI;
  * Class ResetPasswordInput
  * @package Swift\Security\User\Type
  */
-#[DI(autowire: false), InputType]
+#[DI(autowire: false), InputType(description: 'Reset password input')]
 class ResetPasswordInput {
 
     /**

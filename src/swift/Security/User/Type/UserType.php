@@ -13,14 +13,17 @@ namespace Swift\Security\User\Type;
 use DateTime;
 use Swift\GraphQl\Attributes\Field;
 use Swift\GraphQl\Attributes\Type;
+use Swift\GraphQl\ContextInterface;
 use Swift\GraphQl\Types\NodeTypeInterface;
+use Swift\GraphQl\Utils;
 use Swift\Kernel\Attributes\DI;
+use Swift\Security\User\Controller\UserControllerGraphQl;
 
 /**
  * Class UserType
  * @package Swift\Security\User\Type
  */
-#[DI(autowire: false), Type]
+#[DI(autowire: false), Type(description: 'Represents user data')]
 class UserType implements NodeTypeInterface {
 
     /**
@@ -33,20 +36,30 @@ class UserType implements NodeTypeInterface {
      * @param string $lastname
      * @param DateTime $created
      * @param DateTime $modified
+     * @param string|null $password
      */
     public function __construct(
-        #[Field] public ?int $id,
+        public ?int $id,
         #[Field] public string $username,
         #[Field(nullable: true)] public ?string $email,
         #[Field] public string $firstname,
         #[Field] public string $lastname,
         #[Field] public DateTime $created,
         #[Field] public DateTime $modified,
+        private string|null $password = null,
     ) {
     }
 
-    #[Field( name: 'id' )]
+    #[Field( name: 'id', description: 'The user ID' )]
     public function getId(): string {
-        return base64_encode('UserType:' . $this->id);
+        return Utils::encodeId('UserType', $this->id);
     }
+
+    /**
+     * @inheritDoc
+     */
+    public static function getNodeResolverClassnameAndMethod( int|string $id, ContextInterface $context ): array {
+        return [UserControllerGraphQl::class, 'getUserTypeByNode'];
+    }
+
 }
