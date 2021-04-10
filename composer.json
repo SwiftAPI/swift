@@ -1,27 +1,54 @@
 {
-    "require": {
-        "webonyx/graphql-php": "^14.4",
-        "myclabs/php-enum": "^1.7",
-        "phpdocumentor/reflection-docblock": "^5.2",
-        "bshaffer/oauth2-server-php": "^1.11",
-        "guzzlehttp/guzzle": "^7.2",
-        "symfony/mime": "^5.2",
-        "symfony/rate-limiter": "^5.2",
-        "symfony/cache": "^5.2",
-        "symfony/config": "^5.2",
-        "symfony/dependency-injection": "^5.2",
-        "symfony/yaml": "^5.2",
-        "symfony/console": "^5.2",
-        "dibi/dibi": "^4.1",
-        "monolog/monolog": "^2.1",
-        "mashape/unirest-php": "^3.0",
-        "symfony/event-dispatcher": "^5.2",
-        "symfony/event-dispatcher-contracts": "^2.2",
-        "ramsey/uuid": "^4.1",
-        "ivome/graphql-relay-php": "^0.5.0"
-    },
-    "require-dev": {
-        "symfony/maker-bundle": "^1.14",
-        "roave/security-advisories": "dev-latest"
+  "name": "henrivantsant/swift",
+  "type": "library",
+  "description": "Simple and fast API framework",
+  "keywords": [
+    "api",
+    "framework",
+    "symfony",
+    "simple",
+    "graphql",
+    "swift",
+    "php",
+    "php8",
+    "rest",
+    "rest-api",
+    "graphql-api",
+    "graphql-server",
+    "cli-app"
+  ],
+  "homepage": "https://github.com/HenrivantSant/swift",
+  "license": "MIT",
+  "authors": [
+    {
+      "name": "Henri van t Sant",
+      "email": "henrivantsant@hotmail.nl",
+      "homepage": "https://github.com/HenrivantSant",
+      "role": "Developer"
     }
+  ],
+  "require": {
+    "webonyx/graphql-php": "^14.4",
+    "myclabs/php-enum": "^1.7",
+    "phpdocumentor/reflection-docblock": "^5.2",
+    "bshaffer/oauth2-server-php": "^1.11",
+    "guzzlehttp/guzzle": "^7.2",
+    "symfony/mime": "^5.2",
+    "symfony/rate-limiter": "^5.2",
+    "symfony/cache": "^5.2",
+    "symfony/config": "^5.2",
+    "symfony/dependency-injection": "^5.2",
+    "symfony/yaml": "^5.2",
+    "symfony/console": "^5.2",
+    "dibi/dibi": "^4.1",
+    "monolog/monolog": "^2.1",
+    "mashape/unirest-php": "^3.0",
+    "symfony/event-dispatcher": "^5.2",
+    "symfony/event-dispatcher-contracts": "^2.2",
+    "ramsey/uuid": "^4.1"
+  },
+  "require-dev": {
+    "symfony/maker-bundle": "^1.14",
+    "roave/security-advisories": "dev-latest"
+  }
 }

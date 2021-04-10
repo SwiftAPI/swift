@@ -1,5 +1,0 @@
-honeywell:
-    apikey: bpXQ1NzoSL0pNKAs4PaTBzMYAOOtGtm9
-    apisecret: duwr73bxFxZhUnRL
-    authorization_code: a9hyhX68
-    redirect_uri: 'https://henrivantsant.com/api/honeywell/authorization/update'

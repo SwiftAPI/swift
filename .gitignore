@@ -1,15 +1,4 @@
 .idea
-config.yaml
-!/app/config.yaml
-!/app/honeywell/config.yaml
 composer.lock
 composer.phar
-/pub/*
-!/pub/index.php
-/var/*
 /vendor/*
-/etc/*
-!/vendor/henri
-docs
-.phpdoc
-phpDocumentor.phar

@@ -1,4 +1,0 @@
-imports:
-  - { resource: app/honeywellOld/config.yaml }
-  - { resource: app/Honeywell/config.yaml }
-  - { resource: app/Foo/config.yaml }
