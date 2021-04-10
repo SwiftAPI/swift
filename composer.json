@@ -31,7 +31,6 @@
     "webonyx/graphql-php": "^14.4",
     "myclabs/php-enum": "^1.7",
     "phpdocumentor/reflection-docblock": "^5.2",
-    "bshaffer/oauth2-server-php": "^1.11",
     "guzzlehttp/guzzle": "^7.2",
     "symfony/mime": "^5.2",
     "symfony/rate-limiter": "^5.2",
