@@ -82,12 +82,11 @@ class RequestSubscriber implements EventSubscriberInterface {
      * @throws \Exception
      */
     private function logRequest(ServerRequest $request): void {
-
         $ip         = $request->getClientIp();
         $origin     = $request->getUri()->getPath();
         $time       = date('Y-m-d H:i:s' );
         $method     = $request->getMethod();
-        $headers    = $request->getHeaders()->all();
+        $headers    = array(); //$request->getHeaders()->all(); @TODO Fix data too long exeption
         $body       = $request->getBody()->getContents();
         $code       = 200;
 
