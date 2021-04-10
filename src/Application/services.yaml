@@ -8,5 +8,5 @@ services:
     public: false
 
   Swift\Application\:
-    resource: 'src/swift/Application/*'
-    exclude: 'src/swift/Application/Bootstrap/*'
+    resource: 'vendor/henrivantsant/swift/src/Application/*'
+    exclude: 'vendor/henrivantsant/swift/src/Application/Bootstrap/*'
