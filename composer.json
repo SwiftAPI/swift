@@ -49,5 +49,10 @@
   "require-dev": {
     "symfony/maker-bundle": "^1.14",
     "roave/security-advisories": "dev-latest"
+  },
+  "autoload": {
+    "psr-4": {
+      "Swift\\": "src"
+    }
   }
 }
