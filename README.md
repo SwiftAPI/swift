@@ -25,4 +25,4 @@ composer require henrivantsant/swift
 
 
 ## Documentation
-Find full documentation at https://henrivantsant.github.io/swift-docs/
+Find full documentation at https://henrivantsant.github.io/swift-docs/docs/
