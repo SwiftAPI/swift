@@ -18,4 +18,11 @@ interface RequestInterface extends \Psr\Http\Message\RequestInterface {
 
     public function getContent(): ParameterBag;
 
+    /**
+     * Check whether current request is a preflight request
+     *
+     * @return bool
+     */
+    public function isPreflight(): bool;
+
 }

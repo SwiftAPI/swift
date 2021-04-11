@@ -13,9 +13,6 @@ namespace Swift\Router\Model;
 use Exception;
 use stdClass;
 use Swift\Kernel\Attributes\Autowire;
-use Swift\Model\Entity\EntityManagerList;
-use Swift\Model\Entity\EntityManagerSingle;
-use Swift\Model\HenriModelBase;
 use Swift\Router\Model\Entity\LogRequest;
 
 /**

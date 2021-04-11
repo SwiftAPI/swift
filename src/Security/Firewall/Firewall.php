@@ -10,6 +10,7 @@
 
 namespace Swift\Security\Firewall;
 
+use Swift\Configuration\ConfigurationInterface;
 use Swift\HttpFoundation\RequestInterface;
 use Swift\Events\Attribute\ListenTo;
 use Swift\Kernel\Attributes\Autowire;
@@ -35,6 +36,7 @@ class Firewall implements FirewallInterface {
      * @param RouterInterface $router
      * @param FirewallConfigInterface $firewallConfig
      * @param RequestInterface $request
+     * @param ConfigurationInterface $configuration
      */
     public function __construct(
         private AuthenticationManager $authenticationManager,
@@ -43,6 +45,7 @@ class Firewall implements FirewallInterface {
         private RouterInterface $router,
         private FirewallConfigInterface $firewallConfig,
         private RequestInterface $request,
+        private ConfigurationInterface $configuration,
     ) {
     }
 
@@ -54,7 +57,11 @@ class Firewall implements FirewallInterface {
         // - Login throttling
         //
 
-        $passport = $this->authenticationManager->authenticate($kernelRequestEvent->getRequest());
+        if (!$this->configuration->get('app.allow_cors', 'root') ||
+            ($this->configuration->get('app.allow_cors', 'root') && !$kernelRequestEvent->getRequest()->isPreflight())
+        ) {
+            $passport = $this->authenticationManager->authenticate($kernelRequestEvent->getRequest());
+        }
     }
 
 }

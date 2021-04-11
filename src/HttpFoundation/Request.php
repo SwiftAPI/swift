@@ -293,6 +293,14 @@ class Request implements RequestInterface {
     }
 
     /**
+     * @inheritDoc
+     */
+    public function isPreflight(): bool {
+        return (($this->getMethod() === 'OPTIONS') || ($this->getMethod() === 'HEAD'));
+    }
+
+
+    /**
      * Creates a Request based on a given URI and configuration.
      *
      * The information contained in the URI always take precedence
