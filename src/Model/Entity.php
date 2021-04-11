@@ -26,6 +26,7 @@ use Swift\Kernel\Container\Container;
 use Swift\Kernel\DiTags;
 use Swift\Model\Attributes\DB;
 use Swift\Model\Attributes\DBField;
+use Swift\Model\Attributes\DBTable;
 use Swift\Model\Entity\EntityManager;
 use Swift\Model\Entity\Helper\Query;
 use Swift\Model\Events\EntityOnFieldSerializeEvent;
@@ -37,6 +38,7 @@ use Swift\Model\Exceptions\NoResultException;
 use Swift\Model\Types\FieldTypes;
 use Swift\Model\Entity\Arguments;
 use Swift\Kernel\Attributes\DI;
+use Symfony\Component\Console\Style\SymfonyStyle;
 
 /**
  * Class Entity
@@ -432,19 +434,27 @@ abstract class Entity implements EntityInterface {
      * @return void
      */
     protected function setTable(): void {
+        // Deprecated Attribute
         $annotations = $this->reflectionClass->getAttributes( name: DB::class );
+        if (!empty($annotations)) {
+            $annotation = $annotations[0]->getArguments();
 
-        if ( empty( $annotations ) ) {
-            throw new InvalidConfigurationException( sprintf( 'Entity %s missing DB attribute, this is an invalid use case. Please add %s attribute to class', static::class, DB::class ) );
+            if ( empty( $annotation['table'] ) ) {
+                throw new InvalidConfigurationException( sprintf( 'Entity %s is missing valid %s attribute configuration', static::class, DB::class ) );
+            }
+
+            $this->tableName         = $annotation['table'];
+            $this->tableNamePrefixed = $this->database->getPrefix() . $this->tableName;
+            return;
         }
 
-        $annotation = $annotations[0]->getArguments();
-
-        if ( empty( $annotation['table'] ) ) {
-            throw new InvalidConfigurationException( sprintf( 'Entity %s is missing valid %s attribute configuration', static::class, DB::class ) );
+        // Current attribute
+        if (!$annotation = !empty($this->reflectionClass->getAttributes(DBTable::class)) ?
+            $this->reflectionClass->getAttributes(DBTable::class)[0]->newInstance() : null) {
+            throw new InvalidConfigurationException( sprintf( 'Entity %s missing DBTable attribute, this is an invalid use case. Please add %s attribute to class', static::class, DBTable::class ) );
         }
 
-        $this->tableName         = $annotation['table'];
+        $this->tableName = $annotation->name ?? throw new InvalidConfigurationException( sprintf( 'Entity %s is missing valid %s attribute configuration', static::class, DBTable::class ) );
         $this->tableNamePrefixed = $this->database->getPrefix() . $this->tableName;
     }
 
@@ -595,7 +605,7 @@ abstract class Entity implements EntityInterface {
      *                  Mind this is dangerous in a production environment!
      * @throws \Dibi\Exception
      */
-    public function updateTable( bool $removeNonExistingColumns, bool $dropTableIfExists ): array {
+    public function updateTable( bool $removeNonExistingColumns, bool $dropTableIfExists, SymfonyStyle|null $io = null ): array {
         $currentColumns     = $this->getTableColumns();
         $nonExistingColumns = array();
         $indexesToAdd = array();
@@ -604,13 +614,17 @@ abstract class Entity implements EntityInterface {
         // Table does not exist yet
         if ( is_null( $currentColumns ) ) {
             $this->createTable( false );
-            throw new DatabaseException( 'Table ' . $this->tableNamePrefixed . ' did not exist yet. It has been created.' );
+            if ($io) {
+                $io->info( 'Table ' . $this->tableNamePrefixed . ' did not exist yet. It has been created.' );
+            }
         }
 
         // Table dropped and newly created
         if ( $dropTableIfExists ) {
             $this->createTable( false );
-            throw new DatabaseException( 'Table ' . $this->tableNamePrefixed . ' has been dropped and recreated.' );
+            if ($io) {
+                $io->info( 'Table ' . $this->tableNamePrefixed . ' has been dropped and recreated.' );
+            }
         }
 
         $query = 'ALTER TABLE ' . $this->tableNamePrefixed . ' ';

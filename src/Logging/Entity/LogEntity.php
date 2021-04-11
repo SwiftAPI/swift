@@ -11,8 +11,8 @@
 namespace Swift\Logging\Entity;
 
 use stdClass;
-use Swift\Model\Attributes\DB;
 use Swift\Model\Attributes\DBField;
+use Swift\Model\Attributes\DBTable;
 use Swift\Model\Entity;
 use Swift\Model\Types\FieldTypes;
 use Swift\Model\Types\Serialize;
@@ -21,7 +21,7 @@ use Swift\Model\Types\Serialize;
  * Class Log
  * @package Swift\Logging\Entity\Log
  */
-#[DB(table: 'log')]
+#[DBTable(name: 'log')]
 class LogEntity extends Entity {
 
 	/**

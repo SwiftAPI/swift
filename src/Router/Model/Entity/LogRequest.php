@@ -6,8 +6,8 @@ use stdClass;
 use Swift\GraphQl\Attributes\Field;
 use Swift\GraphQl\Attributes\Type;
 use Swift\GraphQl\Types\Type as GraphQlType;
+use Swift\Model\Attributes\DBTable;
 use Swift\Model\Entity;
-use Swift\Model\Attributes\DB;
 use Swift\Model\Attributes\DBField;
 use Swift\Model\Types\FieldTypes;
 
@@ -15,7 +15,7 @@ use Swift\Model\Types\FieldTypes;
  * Class LogRequest
  * @package Swift\Router\Model\Entity
  */
-#[DB( table: 'log_request' ), Type]
+#[DBTable( name: 'log_request' ), Type]
 class LogRequest extends Entity {
 
     /**

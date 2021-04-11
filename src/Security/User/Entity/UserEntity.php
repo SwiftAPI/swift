@@ -12,8 +12,8 @@ namespace Swift\Security\User\Entity;
 
 use Swift\GraphQl\Attributes\Type;
 use Swift\Kernel\Attributes\DI;
+use Swift\Model\Attributes\DBTable;
 use Swift\Model\Entity;
-use Swift\Model\Attributes\DB;
 use Swift\Model\Attributes\DBField;
 use Swift\Model\EntityInterface;
 use Swift\Model\Types\FieldTypes;
@@ -23,7 +23,7 @@ use Swift\Security\User\UserStorageInterface;
  * Class UserEntity
  * @package Swift\Security\User\Entity
  */
-#[DI(aliases: [EntityInterface::class . ' $userEntity', UserStorageInterface::class . ' $userDatabaseStorage']), DB(table: 'security_users'), Type]
+#[DI(aliases: [EntityInterface::class . ' $userEntity', UserStorageInterface::class . ' $userDatabaseStorage']), DBTable(name: 'security_users'), Type]
 class UserEntity extends Entity implements UserStorageInterface {
 
 	#[DBField( name: 'id', primary: true, type: FieldTypes::INT, length: 11 )]

@@ -11,8 +11,8 @@
 namespace Swift\Security\Authentication\Entity;
 
 use Swift\Kernel\Attributes\DI;
-use Swift\Model\Attributes\DB;
 use Swift\Model\Attributes\DBField;
+use Swift\Model\Attributes\DBTable;
 use Swift\Model\Entity;
 use Swift\Model\EntityInterface;
 use Swift\Model\Types\FieldTypes;
@@ -21,7 +21,7 @@ use Swift\Model\Types\FieldTypes;
  * Class OauthClientsEntity
  * @package Swift\Security\Authentication\Entity
  */
-#[DI( aliases: [ EntityInterface::class . ' $oauthClientsEntity', EntityInterface::class . ' $securityClientsEntity' ] ), DB( table: 'security_clients' )]
+#[DI( aliases: [ EntityInterface::class . ' $oauthClientsEntity', EntityInterface::class . ' $securityClientsEntity' ] ), DBTable( name: 'security_clients' )]
 final class OauthClientsEntity extends Entity {
 
     #[DBField( name: 'id', primary: true, type: FieldTypes::INT, length: 11 )]

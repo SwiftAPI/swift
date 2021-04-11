@@ -3,13 +3,14 @@
 namespace Swift\Model\Attributes;
 
 use Attribute;
+use JetBrains\PhpStorm\Deprecated;
 use Swift\Kernel\Attributes\DI;
 
 /**
  * Class DB
  * @package Swift\Model\Attributes
  */
-#[Attribute(Attribute::TARGET_CLASS), DI(exclude: true)]
+#[Attribute(Attribute::TARGET_CLASS), DI(exclude: true), Deprecated(replacement: DBTable::class)]
 class DB {
 
     /**

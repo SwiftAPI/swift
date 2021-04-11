@@ -12,8 +12,8 @@ namespace Swift\Security\Authentication\Entity;
 
 use DateTime;
 use Swift\Kernel\Attributes\DI;
-use Swift\Model\Attributes\DB;
 use Swift\Model\Attributes\DBField;
+use Swift\Model\Attributes\DBTable;
 use Swift\Model\Entity;
 use Swift\Model\EntityInterface;
 use Swift\Model\Exceptions\DatabaseException;
@@ -26,7 +26,7 @@ use stdClass;
  * Class AccessTokenEntity
  * @package Swift\Authorization\Model
  */
-#[DI(aliases: [EntityInterface::class . ' $accessTokenEntity']), DB(table: 'security_access_tokens')]
+#[DI(aliases: [EntityInterface::class . ' $accessTokenEntity']), DBTable(name: 'security_access_tokens')]
 final class AccessTokenEntity extends Entity {
 
     #[DBField(name: 'id', primary: true, type: FieldTypes::INT, length: 11)]
