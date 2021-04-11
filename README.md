@@ -13,10 +13,16 @@ This framework is not intended for building websites or big applications. The pu
 - CDN
 
 ## Getting started
-Get it from Composer https://packagist.org/packages/henrivantsant/swift.
+Install the starter (also see documentation)
+```php
+composer create-project henrivantsant/swift-start project_name
+```
+
+Or get it from Composer https://packagist.org/packages/henrivantsant/swift.
 ```php
 composer require henrivantsant/swift
 ```
+
 
 ## Documentation
 Find full documentation at https://henrivantsant.github.io/swift-docs/
