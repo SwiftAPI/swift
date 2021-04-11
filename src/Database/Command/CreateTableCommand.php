@@ -10,6 +10,7 @@
 
 namespace Swift\Database\Command;
 
+use JetBrains\PhpStorm\Deprecated;
 use Swift\Console\Command\Command;
 use Swift\Database\DatabaseDriver;
 use Swift\Kernel\Attributes\Autowire;
@@ -22,7 +23,7 @@ use Symfony\Component\Console\Question\Question;
  * Class CreateTableCommand
  * @package Swift\Database\Command
  */
-#[Autowire]
+#[Autowire, Deprecated]
 class CreateTableCommand extends Command {
 
 	/**

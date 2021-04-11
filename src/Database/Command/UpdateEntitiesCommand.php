@@ -10,46 +10,31 @@
 
 namespace Swift\Database\Command;
 
-use Swift\Console\Command\Command;
+use Swift\Console\Command\AbstractCommand;
 use Swift\Kernel\Attributes\Autowire;
-use Swift\Kernel\Attributes\DI;
-use Swift\Kernel\Container\Container;
-use Swift\Kernel\ContainerAwareTrait;
 use Swift\Kernel\DiTags;
 use Swift\Model\Entity;
 use Symfony\Component\Console\Input\InputInterface;
 use Symfony\Component\Console\Output\OutputInterface;
 use Symfony\Component\Console\Input\InputArgument;
-use Symfony\Component\Console\Style\SymfonyStyle;
 
 /**
  * Class UpdateEntitiesCommand
  * @package Swift\Database\Command
  */
 #[Autowire]
-class UpdateEntitiesCommand extends Command {
-
-    //use ContainerAwareTrait;
-    private Container $container;
+class UpdateEntitiesCommand extends AbstractCommand {
 
     /** @var Entity[] */
     private array $entities;
 
-    /**
-	 * the name of the command (the part after "bin/henri")
-	 * @var string $defaultName
-	 */
-	protected static $defaultName = 'database:entities:update';
 
     /**
-     * UpdateEntitiesCommand constructor.
+     * @inheritDoc
      */
-    public function __construct() {
-        global $container;
-        $this->container = $container;
-        parent::__construct();
+    public function getCommandName(): string {
+        return 'database:entities:update';
     }
-
 
     /**
 	 * Method to set command configuration
@@ -71,14 +56,14 @@ class UpdateEntitiesCommand extends Command {
 	}
 
 	protected function execute(InputInterface $input, OutputInterface $output) {
-	    $io = new SymfonyStyle($input, $output);
 		$removeNonExistingColumns   = $input->getArgument('remove_non_existing_columns') ?? '';
 		$removeNonExistingColumns   = strtolower($removeNonExistingColumns) === 'remove_non_existing';
 		$dropTableIfExists          = !is_null($input->getArgument('drop_table_if_exists')) && strtolower($input->getArgument('drop_table_if_exists')) === 'drop_table';
 
 		foreach ($this->entities as $entity) {
 			try {
-				$this->updateEntity($io, $entity, $removeNonExistingColumns, $dropTableIfExists);
+				$this->updateEntity($entity, $removeNonExistingColumns, $dropTableIfExists);
+				$this->io->newLine(1);
 			} catch (\Exception $exception) {
 				$output->writeln($exception->getMessage());
 			}
@@ -87,21 +72,28 @@ class UpdateEntitiesCommand extends Command {
 		return 0;
 	}
 
-	private function updateEntity(SymfonyStyle $io, Entity $entity, bool $removeNonExistingColumns, bool $dropTableIfExists) {
+	private function updateEntity(Entity $entity, bool $removeNonExistingColumns, bool $dropTableIfExists) {
+	    $io = $this->io;
+	    $section = $this->createOutputSection();
 		try {
-			$io->writeln('Updating table ' . $entity->getTableName() . ' for entity ' . $entity::class);
+			$section->writeln('⏳ <fg=blue;options=bold>Updating:</> "' . $entity->getTableName() . '" for entity "' . $entity::class . '"');
 			$nonExistingColumns = $entity->updateTable($removeNonExistingColumns, $dropTableIfExists);
-			$io->writeln('Updated ' . $entity->getTableName() . ' successfully');
+			$section->clear(1);
+            $section->writeln('✅ <fg=green;options=bold>Success:</> Updated "' . $entity->getTableName() . '" for entity "' . $entity::class . '"');
 
 			if (!empty($nonExistingColumns) && !$removeNonExistingColumns) {
-				$nonExistingColumns = implode(', ', $nonExistingColumns);
-				$io->writeln('The following columns are found in the table, but not represented as properties: ' . $nonExistingColumns . '. Remove them or add them as a property to the entity. You can easily remove them by adding the remove_non_existing flag to this command');
+                $this->io->newLine();
+				$io->writeln('❕ The following columns are found in the table, but not represented as properties. Remove them or add them as a property to the entity. You can easily remove them by adding the remove_non_existing flag to this command');
+				$io->listing($nonExistingColumns);
 			} elseif (!empty($nonExistingColumns) && $removeNonExistingColumns) {
-				$nonExistingColumns = implode(', ', $nonExistingColumns);
-				$io->writeln('The following non property represented columns were found and removed from the table: ' . $nonExistingColumns);
+                $this->io->newLine();
+				$io->writeln('❕ The following non property represented columns were found and removed from the table.');
+                $io->listing($nonExistingColumns);
 			}
 
 		} catch (\Exception $exception) {
+		    $section->clear(1);
+            $section->writeln('❌ <fg=red;options=bold>Failed:</> Has not updated "' . $entity->getTableName() . '" for entity "' . $entity::class . '. See: <fg=blue>https://henrivantsant.github.io/swift-docs/docs/database</>"');
 			$io->error($exception->getMessage());
 		}
 	}
@@ -117,4 +109,5 @@ class UpdateEntitiesCommand extends Command {
             $this->entities[$entity::class] = $entity;
         }
 	}
+
 }
