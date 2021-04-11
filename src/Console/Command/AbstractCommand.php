@@ -14,6 +14,7 @@ use Swift\Kernel\Attributes\Autowire;
 use Swift\Kernel\Attributes\DI;
 use Swift\Kernel\DiTags;
 use Symfony\Component\Console\Input\InputInterface;
+use Symfony\Component\Console\Output\ConsoleSectionOutput;
 use Symfony\Component\Console\Output\OutputInterface;
 use Symfony\Component\Console\Style\SymfonyStyle;
 
@@ -26,6 +27,10 @@ abstract class AbstractCommand extends \Symfony\Component\Console\Command\Comman
 
     /** @var SymfonyStyle $io Input/Output helper */
     protected SymfonyStyle $io;
+    protected InputInterface $input;
+    protected OutputInterface $output;
+
+    private float $startTime = 0;
 
     /**
      * AbstractCommand constructor.
@@ -61,8 +66,16 @@ abstract class AbstractCommand extends \Symfony\Component\Console\Command\Comman
      */
     public function run(InputInterface $input, OutputInterface $output): int {
         $this->io = new SymfonyStyle($input, $output);
+        $this->input = $input;
+        $this->output = $output;
 
-        return parent::run($input, $output);
+        $this->beforeRun();
+
+        $response = parent::run($input, $output);
+
+        $this->afterRun();
+
+        return $response;
     }
 
     /**
@@ -72,6 +85,28 @@ abstract class AbstractCommand extends \Symfony\Component\Console\Command\Comman
      */
     protected function getInputOutputHelper(): SymfonyStyle {
         return $this->io;
+    }
+
+    protected function createOutputSection(): ConsoleSectionOutput {
+        return $this->output->section();
+    }
+
+    /**
+     * Before executing command
+     */
+    protected function beforeRun(): void {
+        if ($this->input->getOption('track-timing')) {
+            $this->startTime = microtime(true);
+        }
+    }
+
+    /**
+     * After executing command
+     */
+    protected function afterRun(): void {
+        if ($this->input->getOption('track-timing')) {
+            $this->io->note('Executed in ' . round((microtime(true) - $this->startTime), 2) . 's');
+        }
     }
 
 }
