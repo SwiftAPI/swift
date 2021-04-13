@@ -23,14 +23,14 @@ interface RouterInterface {
     /**
      * Retrieve array of all available routes
      *
-     * @return array
+     * @return RoutesBag
      */
-    public function getRoutes(): array;
+    public function getRoutes(): RoutesBag;
 
     /**
      * Add multiple routes at once
      *
-     * @param array $routes
+     * @param RouteInterface[] $routes
      */
     public function addRoutes(array $routes): void;
 
@@ -87,8 +87,17 @@ interface RouterInterface {
      *
      * @param string $tag
      *
-     * @return array
+     * @return RoutesBag
      */
-    public function getTaggedRoutes( string $tag ): array;
+    public function getTaggedRoutes( string $tag ): RoutesBag;
+
+    /**
+     * Get route by name
+     *
+     * @param string $name
+     *
+     * @return RouteInterface|null
+     */
+    public function getRoute( string $name ): ?RouteInterface;
 
 }

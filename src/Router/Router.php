@@ -29,13 +29,13 @@ class Router implements RouterInterface {
 
     private bool $isCompiled = false;
 
-    /** @var RouteInterface[] $routeHarvest */
-	protected array $routeHarvest = array();
+    /** @var RouteInterface[] $routeCollection */
+	protected array $routeCollection = array();
 
     /**
-     * @var RouteInterface[] Array of all routes (incl. named routes).
+     * @var RoutesBag Array of all routes (incl. named routes).
      */
-    protected array $routes = [];
+    protected RoutesBag $routes;
 
     /**
      * @var array Array of all named routes.
@@ -58,17 +58,18 @@ class Router implements RouterInterface {
     /**
      * Router constructor.
      *
-     * @param Harvester $harvester
+     * @param Collector $collector
      * @param RequestInterface $request
      * @param Configuration $configuration
      * @param EventDispatcher $dispatcher
      */
     public function __construct(
-        private Harvester $harvester,
+        private Collector $collector,
         private RequestInterface $request,
         private Configuration $configuration,
         private EventDispatcher $dispatcher,
     ) {
+        $this->routes = new RoutesBag();
     }
 
     /**
@@ -77,11 +78,11 @@ class Router implements RouterInterface {
 	 * @throws Exception
 	 */
 	private function bindRoutes(): void {
-		if (empty($this->routeHarvest)) {
+		if (empty($this->routeCollection)) {
 			return;
 		}
 
-		foreach ($this->routeHarvest as $route) {
+		foreach ($this->routeCollection as $route) {
 		    $route->setMatchTypes($this->matchTypes);
 		    $route->setRequest($this->request);
 			$this->addRoute($route);
@@ -135,15 +136,15 @@ class Router implements RouterInterface {
      * @throws Exception
      */
     private function compile(): void {
-        $this->routeHarvest = $this->harvester->harvestRoutes();
+        $this->routeCollection = $this->collector->harvestRoutes();
 
         /** @var OnBeforeRoutesCompileEvent $onBeforeCompileRoutes */
-        $onBeforeCompileRoutes = $this->dispatcher->dispatch( new OnBeforeRoutesCompileEvent($this->routeHarvest, $this->matchTypes) );
+        $onBeforeCompileRoutes = $this->dispatcher->dispatch( new OnBeforeRoutesCompileEvent($this->routeCollection, $this->matchTypes) );
 
         /**
          * Reassign possibly changed routes and match types
          */
-        $this->routeHarvest = $onBeforeCompileRoutes->getRoutes();
+        $this->routeCollection = $onBeforeCompileRoutes->getRoutes();
         $this->matchTypes   = $onBeforeCompileRoutes->getMatchTypes();
 
         $this->bindRoutes();
@@ -153,9 +154,13 @@ class Router implements RouterInterface {
     /**
      * Retrieve array of all available routes
      *
-     * @return array
+     * @return RoutesBag
      */
-    public function getRoutes(): array {
+    public function getRoutes(): RoutesBag {
+        if (!$this->isCompiled) {
+            $this->compile();
+        }
+
         return $this->routes;
     }
 
@@ -176,7 +181,7 @@ class Router implements RouterInterface {
      * @param RouteInterface $route
      */
     public function addRoute( RouteInterface $route ): void {
-        $this->routes[] = $route;
+        $this->routes->set($route->getName(), $route);
 
         if ($route->getName()) {
             if (isset($this->namedRoutes[$route->getName()])) {
@@ -299,22 +304,37 @@ class Router implements RouterInterface {
                 $route = str_replace($block, $pattern, $route);
             }
         }
+
         return "`^$route$`u";
     }
 
     /**
      * @inheritDoc
      */
-    public function getTaggedRoutes( string $tag ): array {
-        $tagged = array();
-        foreach ($this->routes as $route) {
-            var_dump($route->getTags());
-            if ( in_array( $tag, $route->getTags(), true ) ) {
-                $tagged[] = $route;
+    public function getTaggedRoutes( string $tag ): RoutesBag {
+        if (!$this->isCompiled) {
+            $this->compile();
+        }
+
+        $tagged = new RoutesBag();
+        foreach ($this->routes as /** @var RouteInterface $route */ $route) {
+            if ($route->getTags()->has($tag)) {
+                $tagged->set($route->getName(), $route);
             }
         }
 
         return $tagged;
+    }
+
+    /**
+     * @inheritDoc
+     */
+    public function getRoute( string $name ): ?RouteInterface {
+        if (!$this->isCompiled) {
+            $this->compile();
+        }
+
+        return $this->routes->get($name);
     }
 
     /**

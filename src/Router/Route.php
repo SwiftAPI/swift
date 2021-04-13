@@ -347,9 +347,9 @@ class Route implements RouteInterface {
     }
 
     /**
-     * @param RouteInterface|null $route
+     * @param RouteInterface $route
      */
-    public function setControllerRoute( RouteInterface|null $route ): void {
+    public function setControllerRoute( RouteInterface $route ): void {
         $this->controllerRoute = $route;
     }
 
