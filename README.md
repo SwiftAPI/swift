@@ -20,7 +20,7 @@ composer create-project swift-api/swift-start project_name
 
 Or get it from Composer https://packagist.org/packages/swift-api/swift.
 ```php
-composer require henrivantsant/swift
+composer require swift-api/swift
 ```
 
 
