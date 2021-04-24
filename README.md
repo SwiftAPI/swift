@@ -15,14 +15,14 @@ This framework is not intended for building websites or big applications. The pu
 ## Getting started
 Install the starter (also see documentation)
 ```php
-composer create-project henrivantsant/swift-start project_name
+composer create-project swift-api/swift-start project_name
 ```
 
-Or get it from Composer https://packagist.org/packages/henrivantsant/swift.
+Or get it from Composer https://packagist.org/packages/swift-api/swift.
 ```php
 composer require henrivantsant/swift
 ```
 
 
 ## Documentation
-Find full documentation at https://henrivantsant.github.io/swift-docs/docs/
+Find full documentation at https://swiftapi.github.io/swift-docs/docs/
