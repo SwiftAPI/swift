@@ -1,5 +1,5 @@
 {
-  "name": "henrivantsant/swift",
+  "name": "swift-api/swift",
   "type": "library",
   "description": "Simple and fast API framework",
   "keywords": [
@@ -22,7 +22,7 @@
   "authors": [
     {
       "name": "Henri van t Sant",
-      "email": "henrivantsant@hotmail.nl",
+      "email": "henri@henrivantsant.dev",
       "homepage": "https://github.com/HenrivantSant",
       "role": "Developer"
     }
