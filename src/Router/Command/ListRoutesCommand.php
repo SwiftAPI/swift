@@ -40,7 +40,7 @@ class ListRoutesCommand extends AbstractCommand {
 
     protected function configure(): void {
         $this
-            ->setDescription('List all available route(s)')
+            ->setDescription('List all or any available route(s)')
             ->setHelp('List all available routes (or filter by tag or name)')
             ->addOption('--tag', null, InputOption::VALUE_OPTIONAL)
             ->addOption('--name', null, InputOption::VALUE_OPTIONAL)

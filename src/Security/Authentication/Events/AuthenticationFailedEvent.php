@@ -3,7 +3,7 @@
 /*
  * This file is part of the Swift Framework
  *
- * (c) Henri van 't Sant <henri@henrivantsant.com>
+ * (c) Henri van 't Sant <henri@henrivantsant.dev>
  *
  * For the full copyright and license information, please view the LICENSE file that was distributed with this source code.
  */
@@ -11,19 +11,19 @@
 namespace Swift\Security\Authentication\Events;
 
 
+use Swift\Events\AbstractEvent;
 use Swift\HttpFoundation\RequestInterface;
 use Swift\Security\Authentication\Authenticator\AuthenticatorInterface;
 use Swift\Security\Authentication\Exception\AuthenticationException;
-use Swift\Security\Authentication\Passport\PassportInterface;
-use Swift\Security\Authentication\Token\TokenInterface;
-use Symfony\Contracts\EventDispatcher\Event;
 
 /**
  * Class AuthenticationFailedEvent
  * @package Swift\Security\Authentication\Events
  */
-class AuthenticationFailedEvent extends Event {
+class AuthenticationFailedEvent extends AbstractEvent {
 
+    protected static string $eventDescription = 'Authentication has failed. This could be due to an error or access could be denied';
+    protected static string $eventLongDescription = '';
 
     /**
      * AuthenticationSuccessEvent constructor.
@@ -59,7 +59,6 @@ class AuthenticationFailedEvent extends Event {
     public function getAuthenticationException(): AuthenticationException {
         return $this->authenticationException;
     }
-
 
 
 

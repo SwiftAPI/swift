@@ -3,7 +3,7 @@
 /*
  * This file is part of the Swift Framework
  *
- * (c) Henri van 't Sant <henri@henrivantsant.com>
+ * (c) Henri van 't Sant <henri@henrivantsant.dev>
  *
  * For the full copyright and license information, please view the LICENSE file that was distributed with this source code.
  */
@@ -38,6 +38,9 @@ final class Result extends stdClass {
             if (property_exists($this, $name)) {
                 $values[$name] = $this->{$name};
             }
+        }
+        foreach ($this->getEntity()->getJoinsMap() as $name => $join) {
+            $values[$name] = $this->{$name};
         }
 
         return $values;

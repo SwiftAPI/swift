@@ -1,17 +1,27 @@
 <?php declare(strict_types=1);
+/*
+ * This file is part of the Swift Framework
+ *
+ * (c) Henri van 't Sant <henri@henrivantsant.dev>
+ *
+ * For the full copyright and license information, please view the LICENSE file that was distributed with this source code.
+ */
 
 namespace Swift\Router\Event;
 
+use Swift\Events\AbstractEvent;
 use Swift\Kernel\Attributes\DI;
 use Swift\Router\Route;
-use Symfony\Contracts\EventDispatcher\Event;
 
 /**
  * Class OnBeforeRouteEnterEvent
  * @package Swift\Router\Event
  */
 #[DI(exclude: true)]
-class OnBeforeRouteEnterEvent extends Event {
+class OnBeforeRouteEnterEvent extends AbstractEvent {
+
+    protected static string $eventDescription = 'Route is matched, but not the Controller has not been called yet';
+    protected static string $eventLongDescription = '';
 
     /**
      * OnBeforeRouteEnter constructor.
@@ -36,4 +46,6 @@ class OnBeforeRouteEnterEvent extends Event {
     public function setRoute( Route $route ): void {
         $this->route = $route;
     }
+
+
 }

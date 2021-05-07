@@ -20,6 +20,9 @@ use Swift\GraphQl\Attributes\InterfaceType;
 #[InterfaceType(name: 'PageInfoInterface', description: 'Information about pagination in a connection')]
 interface PageInfoInterface {
 
+    #[Field(name: 'total', description: 'Total number of items available')]
+    public function getTotal(): int;
+
     #[Field(name: 'endCursor', description: 'When paginating forwards, the cursor to continue')]
     public function getEndCursor(): string;
 

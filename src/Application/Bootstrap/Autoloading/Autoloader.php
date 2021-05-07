@@ -3,12 +3,16 @@
 /*
  * This file is part of the Swift Framework
  *
- * (c) Henri van 't Sant <henri@henrivantsant.com>
+ * (c) Henri van 't Sant <henri@henrivantsant.dev>
  *
  * For the full copyright and license information, please view the LICENSE file that was distributed with this source code.
  */
 
 namespace Swift\Application\Bootstrap\Autoloading;
+
+use Swift\Application\Bootstrap\Bootstrap;
+use Swift\Kernel\Utils\ClassNameMapper;
+use Symfony\Component\Filesystem\Filesystem;
 
 require_once INCLUDE_DIR . '/vendor/autoload.php';
 
@@ -60,6 +64,16 @@ class Autoloader {
             }
             if ( file_exists( INCLUDE_DIR . '/app/' . $classPathUc ) ) {
                 include_once INCLUDE_DIR . '/app/' . $classPathUc;
+
+                return;
+            }
+            if ( file_exists( INCLUDE_DIR . '/app/' . str_replace('app\\', '', $classPathLc) ) ) {
+                include_once INCLUDE_DIR . '/app/' . str_replace('app\\', '', $classPathLc);
+
+                return;
+            }
+            if ( file_exists( INCLUDE_DIR . '/app/' . str_replace('App\\', '', $classPathUc) ) ) {
+                include_once INCLUDE_DIR . '/app/' . str_replace('App\\', '', $classPathUc);
 
                 return;
             }

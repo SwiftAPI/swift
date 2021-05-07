@@ -3,7 +3,7 @@
 /*
  * This file is part of the Swift Framework
  *
- * (c) Henri van 't Sant <henri@henrivantsant.com>
+ * (c) Henri van 't Sant <henri@henrivantsant.dev>
  *
  * For the full copyright and license information, please view the LICENSE file that was distributed with this source code.
  */
@@ -11,8 +11,8 @@
 namespace Swift\Kernel\Event;
 
 use Psr\Http\Message\ServerRequestInterface;
+use Swift\Events\AbstractEvent;
 use Swift\HttpFoundation\ResponseInterface;
-use Symfony\Contracts\EventDispatcher\Event;
 use Swift\Kernel\Attributes\DI;
 
 /**
@@ -20,7 +20,10 @@ use Swift\Kernel\Attributes\DI;
  * @package Swift\Kernel\Event
  */
 #[DI(exclude: true)]
-class KernelOnBeforeShutdown extends Event {
+class KernelOnBeforeShutdown extends AbstractEvent {
+
+    protected static string $eventDescription = 'Before Kernel is terminated after sending response';
+    protected static string $eventLongDescription = 'Last event before Kernel terminates after response has been sent';
 
     /**
      * KernelRequest constructor.
@@ -49,5 +52,6 @@ class KernelOnBeforeShutdown extends Event {
     public function getResponse( ResponseInterface $response ): ResponseInterface {
         return $this->response;
     }
+
 
 }

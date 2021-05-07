@@ -3,7 +3,7 @@
 /*
  * This file is part of the Swift Framework
  *
- * (c) Henri van 't Sant <henri@henrivantsant.com>
+ * (c) Henri van 't Sant <henri@henrivantsant.dev>
  *
  * For the full copyright and license information, please view the LICENSE file that was distributed with this source code.
  */
@@ -142,13 +142,11 @@ class FieldResolver {
 
     public function getClassWithAutowire( object|string $class ): object {
         $instance = is_object($class) ? $class : new $class();
-        if (array_key_exists($instance::class, $this->instances) && is_object($class)) {
-            return $class;
-        }
 
         $reflection = $this->serviceLocator->getReflectionClass($instance::class);
         foreach ($reflection->getMethods() as $reflectionMethod) {
             $attributes = $reflectionMethod->getAttributes(Autowire::class);
+
             if (empty($attributes)) {
                 continue;
             }

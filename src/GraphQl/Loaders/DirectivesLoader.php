@@ -12,6 +12,7 @@ namespace Swift\GraphQl\Loaders;
 
 
 use GraphQL\Type\Definition\Directive;
+use Swift\GraphQl\GraphQlDiTags;
 use Swift\GraphQl\LoaderInterface;
 use Swift\GraphQl\TypeRegistryInterface;
 use Swift\Kernel\Attributes\Autowire;
@@ -44,7 +45,7 @@ class DirectivesLoader implements LoaderInterface {
     }
 
     #[Autowire]
-    public function setDirectives( #[Autowire(tag: 'graphql.directive')] iterable $directives ): void {
+    public function setDirectives( #[Autowire(tag: GraphQlDiTags::GRAPHQL_DIRECTIVE)] iterable $directives ): void {
         foreach ($directives as $directive) {
             $this->directives[] = $directive;
         }

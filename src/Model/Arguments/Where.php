@@ -3,7 +3,7 @@
 /*
  * This file is part of the Swift Framework
  *
- * (c) Henri van 't Sant <henri@henrivantsant.com>
+ * (c) Henri van 't Sant <henri@henrivantsant.dev>
  *
  * For the full copyright and license information, please view the LICENSE file that was distributed with this source code.
  */
@@ -44,11 +44,12 @@ class Where implements ArgumentInterface {
      * Apply query
      *
      * @param Fluent $query
+     * @param array $properties
      *
      * @return Fluent
      */
-    public function apply( Fluent $query ): Fluent {
-        return $query->where($this->fieldName . ' ' . $this->comparison . ' %s ', $this->value);
+    public function apply( Fluent $query, array $properties ): Fluent {
+        return $query->where($properties[$this->fieldName] . ' ' . $this->comparison . ' %s ', $this->value);
     }
 
 }

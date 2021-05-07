@@ -3,7 +3,7 @@
 /*
  * This file is part of the Swift Framework
  *
- * (c) Henri van 't Sant <henri@henrivantsant.com>
+ * (c) Henri van 't Sant <henri@henrivantsant.dev>
  *
  * For the full copyright and license information, please view the LICENSE file that was distributed with this source code.
  */
@@ -160,12 +160,8 @@ class UserControllerGraphQl extends AbstractController {
         unset($filter['where']);
         $argumentsType = new ArgumentsType(...$filter);
 
-        if (!$result = $this->userDatabaseStorage->findMany($state, $argumentsType->toArgument())) {
-            return new UserConnection($result);
-        }
 
-
-        return new UserConnection($result);
+        return new UserConnection($this->userDatabaseStorage->findMany($state, $argumentsType->toArgument()));
     }
 
     /**

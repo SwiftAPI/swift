@@ -13,6 +13,7 @@ namespace Swift\GraphQl\Loaders;
 use Swift\GraphQl\Attributes\Field;
 use Swift\GraphQl\Attributes\InputType;
 use Swift\GraphQl\Attributes\Type;
+use Swift\GraphQl\GraphQlDiTags;
 use Swift\GraphQl\LoaderInterface;
 use Swift\GraphQl\ResolveHelper;
 use Swift\GraphQl\TypeRegistryInterface;
@@ -45,7 +46,7 @@ class InputTypeLoader implements LoaderInterface {
     }
 
     public function load( TypeRegistryInterface $typeRegistry ): void {
-        $types = $this->serviceLocator->getServicesByTag( 'graphql.input_type' );
+        $types = $this->serviceLocator->getServicesByTag( GraphQlDiTags::GRAPHQL_INPUT_TYPE );
 
         foreach ( $types as $type ) {
             if ($this->inputTypeRegistry->getTypeByClass($type)) {

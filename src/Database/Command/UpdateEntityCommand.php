@@ -3,7 +3,7 @@
 /*
  * This file is part of the Swift Framework
  *
- * (c) Henri van 't Sant <henri@henrivantsant.com>
+ * (c) Henri van 't Sant <henri@henrivantsant.dev>
  *
  * For the full copyright and license information, please view the LICENSE file that was distributed with this source code.
  */
@@ -41,7 +41,7 @@ class UpdateEntityCommand extends AbstractCommand {
     /**
 	 * Method to set command configuration
 	 */
-	protected function configure() {
+	protected function configure(): void {
 		$this
 			// the short description shown while running "php bin/console list"
 			->setDescription('Update a table from an entity')
@@ -56,7 +56,7 @@ class UpdateEntityCommand extends AbstractCommand {
 		;
 	}
 
-	protected function execute(InputInterface $input, OutputInterface $output) {
+	protected function execute(InputInterface $input, OutputInterface $output): int {
 		$entityName = $input->getArgument('entity');
 		$removeNonExistingColumns   = $input->getArgument('remove_non_existing_columns') ?? '';
 		$removeNonExistingColumns   = strtolower($removeNonExistingColumns) === 'remove_non_existing';

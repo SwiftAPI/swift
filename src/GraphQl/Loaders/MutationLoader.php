@@ -13,6 +13,7 @@ namespace Swift\GraphQl\Loaders;
 
 use Swift\GraphQl\Attributes\Argument;
 use Swift\GraphQl\Attributes\Mutation;
+use Swift\GraphQl\GraphQlDiTags;
 use Swift\GraphQl\LoaderInterface;
 use Swift\GraphQl\ResolveHelper;
 use Swift\GraphQl\TypeRegistryInterface;
@@ -50,7 +51,7 @@ class MutationLoader implements LoaderInterface {
      * @param TypeRegistryInterface $typeRegistry
      */
     public function load( TypeRegistryInterface $typeRegistry ): void {
-        $mutations = $this->serviceLocator->getServicesByTag('graphql.mutation');
+        $mutations = $this->serviceLocator->getServicesByTag(GraphQlDiTags::GRAPHQL_MUTATION);
 
         foreach ($mutations as $mutation) {
             $classReflection = $this->serviceLocator->getReflectionClass($mutation);

@@ -3,7 +3,7 @@
 /*
  * This file is part of the Swift Framework
  *
- * (c) Henri van 't Sant <henri@henrivantsant.com>
+ * (c) Henri van 't Sant <henri@henrivantsant.dev>
  *
  * For the full copyright and license information, please view the LICENSE file that was distributed with this source code.
  */
@@ -12,13 +12,16 @@ namespace Swift\Logging\Event;
 
 
 use Monolog\Handler\AbstractProcessingHandler;
-use Symfony\Contracts\EventDispatcher\Event;
+use Swift\Events\AbstractEvent;
 
 /**
  * Class OnBeforeLoggerHandlersEvent
  * @package Swift\Logging\Event
  */
-class OnBeforeLoggerHandlersEvent extends Event {
+class OnBeforeLoggerHandlersEvent extends AbstractEvent {
+
+    protected static string $eventDescription = 'On Logger construction. Optionally add or remove Logger Handlers';
+    protected static string $eventLongDescription = '';
 
     /**
      * @var array Array of handlers assigned to the logger

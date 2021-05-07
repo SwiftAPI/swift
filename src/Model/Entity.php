@@ -3,7 +3,7 @@
 /*
  * This file is part of the Swift Framework
  *
- * (c) Henri van 't Sant <henri@henrivantsant.com>
+ * (c) Henri van 't Sant <henri@henrivantsant.dev>
  *
  * For the full copyright and license information, please view the LICENSE file that was distributed with this source code.
  */
@@ -24,8 +24,11 @@ use Swift\Events\EventDispatcher;
 use Swift\Kernel\Attributes\Autowire;
 use Swift\Kernel\Container\Container;
 use Swift\Kernel\DiTags;
+use Swift\Kernel\ServiceLocatorInterface;
+use Swift\Model\Arguments\Where;
 use Swift\Model\Attributes\DB;
 use Swift\Model\Attributes\DBField;
+use Swift\Model\Attributes\DBJoin;
 use Swift\Model\Attributes\DBTable;
 use Swift\Model\Entity\EntityManager;
 use Swift\Model\Entity\Helper\Query;
@@ -53,7 +56,7 @@ abstract class Entity implements EntityInterface {
      * @param DatabaseDriver $database
      * @param EventDispatcher $dispatcher
      * @param Query $helperQuery
-     * @param Container|null $container
+     * @param ServiceLocatorInterface $serviceLocator
      * @param ReflectionClass|null $reflectionClass Reflection of current class
      * @param string|null $primaryKey the primary key in the table
      * @param array $propertyMap map of properties and their belonging name in the table
@@ -62,12 +65,14 @@ abstract class Entity implements EntityInterface {
      * @param string|null $tableName table name without prefix
      * @param string|null $tableNamePrefixed prefixed version of the table name
      * @param array $indexes columns with indexes, referred by db_key
+     * @param array $joins
+     * @param string $entityName
      */
     public function __construct(
         protected DatabaseDriver $database,
         protected EventDispatcher $dispatcher,
         protected Query $helperQuery,
-        protected ?Container $container,
+        protected ServiceLocatorInterface $serviceLocator,
         protected ?ReflectionClass $reflectionClass = null,
         protected ?string $primaryKey = null,
         protected array $propertyMap = array(),
@@ -76,6 +81,8 @@ abstract class Entity implements EntityInterface {
         protected ?string $tableName = null,
         protected ?string $tableNamePrefixed = null,
         protected array $indexes = array(),
+        protected array $joins = array(),
+        protected string $entityName = '',
     ) {
         $this->reflectionClass = new ReflectionClass( static::class );
         $this->cache = new QueryCacheBag();
@@ -111,7 +118,7 @@ abstract class Entity implements EntityInterface {
      */
     public function findMany( array|stdClass $state, Arguments|null $arguments = null, bool $exceptionOnNotFound = false ): ResultSet {
         $state = (array) $state;
-        $query = $this->database->select( implode(',', array_values($this->propertyMap)) )->from( '[' . $this->tableNamePrefixed . ']' );
+        $query = $this->database->select( $this->getFieldsSelectionForQuery() )->from( '[' . $this->tableNamePrefixed . '] as ' . $this->entityName );
 
         foreach ( $state as $propertyName => $value ) {
             if (is_array($value)) {
@@ -119,13 +126,13 @@ abstract class Entity implements EntityInterface {
                     $valueItem = $this->onBeforeSave( $valueItem, $propertyName );
 
                     $func = $valKey > 0 ? 'or' : 'where';
-                    $query->{$func}( $this->getPropertyDBName( $propertyName ) . ' = %s', $valueItem );
+                    $query->{$func}( $this->getPropertyDBName( $propertyName, true ) . ' = %s', $valueItem );
                 }
                 continue;
             }
             $value = $this->onBeforeSave( $value, $propertyName );
 
-            $query->where( $this->getPropertyDBName( $propertyName ) . ' = %s', $value );
+            $query->where( $this->getPropertyDBName( $propertyName, true ) . ' = %s', $value );
         }
 
         if ( $arguments ) {
@@ -152,6 +159,14 @@ abstract class Entity implements EntityInterface {
                     $item->{$property} = $this->onAfterLoad( $value, $property );
                 }
             }
+            foreach ($this->joins as $name => $join) {
+                $item->{$name} = $join->instance->findMany(
+                    array(),
+                    new Arguments(null, null, null, null, null, array(
+                       new Where($join->joiningEntityField, Where::EQUALS, $item->{$join->currentEntityField})
+                    )),
+                );
+            }
             $items[] = $item;
         }
 
@@ -162,20 +177,6 @@ abstract class Entity implements EntityInterface {
         ));
 
         return $items;
-    }
-
-    /**
-     * Fetch all rows matching the given state and arguments
-     *
-     * @param array|stdClass $state
-     * @param Arguments|null $arguments
-     * @param bool $exceptionOnNotFound
-     *
-     * @return ResultSet
-     */
-    #[Deprecated( reason: 'Improve naming consistency by renaming method to findMany', replacement: 'Replaced by findMany()' )]
-    public function find( array|stdClass $state, Arguments|null $arguments = null, bool $exceptionOnNotFound = false ): ResultSet {
-        return $this->findMany($state, $arguments, $exceptionOnNotFound);
     }
 
     /**
@@ -233,6 +234,11 @@ abstract class Entity implements EntityInterface {
         }
     }
 
+    public function getFieldsSelectionForQuery(): string {
+        return $this->entityName . '.' . implode( ', ' . $this->entityName . '.', array_values($this->propertyMap));
+    }
+
+
     /**
      * @return string|null
      */
@@ -288,6 +294,10 @@ abstract class Entity implements EntityInterface {
         }
 
         return $values;
+    }
+
+    public function getJoinsMap(): array {
+        return $this->joins;
     }
 
     /**
@@ -379,7 +389,8 @@ abstract class Entity implements EntityInterface {
      *
      * @return bool
      */
-    #[Pure] public function hasField( string $fieldName ): bool {
+    #[Pure]
+    public function hasField( string $fieldName ): bool {
         return array_key_exists( $fieldName, $this->propertyMap );
     }
 
@@ -410,10 +421,11 @@ abstract class Entity implements EntityInterface {
      * Method to get property's db name
      *
      * @param string $property
+     * @param bool $prefixWithEntityName
      *
      * @return string
      */
-    public function getPropertyDBName( string $property ): string {
+    public function getPropertyDBName( string $property, bool $prefixWithEntityName = false ): string {
         // Only this class itself or EntityManager are allowed access
         $calling_class = debug_backtrace( 1, 1 )[0]['class'];
         if ( ! is_a( $calling_class, EntityManager::class, true ) &&
@@ -425,7 +437,7 @@ abstract class Entity implements EntityInterface {
             throw new InvalidArgumentException( 'Property ' . $property . ' does not exist for ' . get_class( $this ), 500 );
         }
 
-        return $this->propertyMap[ $property ];
+        return $prefixWithEntityName ? $this->entityName . '.' . $this->propertyMap[ $property ] : $this->propertyMap[ $property ];
     }
 
     /**
@@ -434,6 +446,7 @@ abstract class Entity implements EntityInterface {
      * @return void
      */
     protected function setTable(): void {
+        $this->entityName = strtolower(str_replace('\\', '_', $this->reflectionClass->getName()));
         // Deprecated Attribute
         $annotations = $this->reflectionClass->getAttributes( name: DB::class );
         if (!empty($annotations)) {
@@ -469,6 +482,10 @@ abstract class Entity implements EntityInterface {
         return $prefixed ? $this->tableNamePrefixed : $this->tableName;
     }
 
+    public function getEntityName(): string {
+        return $this->entityName;
+    }
+
     /**
      * Method to map object properties to table columns
      *
@@ -478,41 +495,33 @@ abstract class Entity implements EntityInterface {
         $this->propertyActions['serialize'] = array();
         $properties                         = $this->reflectionClass->getProperties();
         foreach ( $properties as $property ) {
-            $annotation = ! empty( $property->getAttributes( name: DBField::class ) ) ? $property->getAttributes( name: DBField::class )[0]->getArguments() : null;
-
-            if ( empty( $annotation ) ) {
-                continue;
+            if (!empty($property->getAttributes(DBJoin::class))) {
+                $join = ($property->getAttributes(DBJoin::class)[0]->newInstance())->toObject();
+                $join->instance = $this->serviceLocator->get($join->entity);
+                $this->joins[$property->getName()] = $join;
             }
 
-            $annotation = (object) $annotation;
+            /** @var DBField|null $attribute */
+            $attribute = ! empty( $property->getAttributes( name: DBField::class ) ) ? ($property->getAttributes( name: DBField::class )[0]->newInstance())->toObject() : null;
 
-            if ( isset( $property->name, $annotation->name ) ) {
-                $this->propertyMap[ $property->name ] = $annotation->name;
+            $attribute = (object) $attribute;
+            if ( isset( $property->name, $attribute->name ) ) {
+                $this->propertyMap[ $property->name ] = $attribute->name;
+                
+                $this->propertyProps[ $property->name ] = $attribute;
 
-                $propertyProps                          = new stdClass();
-                $propertyProps->name                    = $annotation->name;
-                $propertyProps->type                    = $annotation->type ?? FieldTypes::TEXT;
-                $propertyProps->length                  = $annotation->length ?? 0;
-                $propertyProps->primary                 = $annotation->primary ?? false;
-                $propertyProps->serialize               = $annotation->serialize ?? array();
-                $propertyProps->empty                   = $annotation->empty ?? false;
-                $propertyProps->unique                  = $annotation->unique ?? false;
-                $propertyProps->index                   = $annotation->index ?? false;
-                $propertyProps->enum                    = $annotation->enum ?? null;
-                $this->propertyProps[ $property->name ] = $propertyProps;
-
-                if ($propertyProps->index) {
-                    $this->indexes[] = $propertyProps->name;
+                if ($attribute->index) {
+                    $this->indexes[] = $attribute->name;
                 }
 
                 // Add default serializations
-                if (($propertyProps->type === FieldTypes::TIMESTAMP) && ! in_array( FieldTypes::TIMESTAMP, $propertyProps->serialize, true ) ) {
+                if (($attribute->type === FieldTypes::TIMESTAMP) && ! in_array( FieldTypes::TIMESTAMP, $attribute->serialize, true ) ) {
                     if (!isset($this->propertyActions['serialize'][$property->name])) {
                         $this->propertyActions['serialize'][$property->name] = array();
                     }
                     $this->propertyActions['serialize'][$property->name][] = FieldTypes::TIMESTAMP;
                 }
-                if (($propertyProps->type === FieldTypes::DATETIME) && ! in_array( FieldTypes::DATETIME, $propertyProps->serialize, true ) ) {
+                if (($attribute->type === FieldTypes::DATETIME) && ! in_array( FieldTypes::DATETIME, $attribute->serialize, true ) ) {
                     if (!isset($this->propertyActions['serialize'][$property->name])) {
                         $this->propertyActions['serialize'][$property->name] = array();
                     }
@@ -520,18 +529,18 @@ abstract class Entity implements EntityInterface {
                 }
             }
 
-            if ( isset( $property->name, $annotation->serialize ) && $annotation && ! empty( $annotation->serialize ) ) {
+            if ( isset( $property->name, $attribute->serialize ) && $attribute && ! empty( $attribute->serialize ) ) {
                 // Set serialize actions
-                $this->propertyActions['serialize'][ $property->name ] = $annotation->serialize;
+                $this->propertyActions['serialize'][ $property->name ] = $attribute->serialize;
             }
 
             // Check for primary key
-            if ( isset( $property->name, $annotation->primary ) && $annotation ) {
-                if ( $annotation->primary && isset( $this->primaryKey ) ) {
+            if ( isset( $property->name, $attribute->primary ) && $attribute ) {
+                if ( $attribute->primary && isset( $this->primaryKey ) ) {
                     throw new InvalidConfigurationException( 'Multiple primary keys found' );
                 }
 
-                if ( $annotation->primary ) {
+                if ( $attribute->primary ) {
                     $this->primaryKey = $property->name;
                 }
             }
@@ -617,6 +626,7 @@ abstract class Entity implements EntityInterface {
             if ($io) {
                 $io->info( 'Table ' . $this->tableNamePrefixed . ' did not exist yet. It has been created.' );
             }
+            return array();
         }
 
         // Table dropped and newly created

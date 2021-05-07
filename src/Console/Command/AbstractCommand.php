@@ -3,7 +3,7 @@
 /*
  * This file is part of the Swift Framework
  *
- * (c) Henri van 't Sant <henri@henrivantsant.com>
+ * (c) Henri van 't Sant <henri@henrivantsant.dev>
  *
  * For the full copyright and license information, please view the LICENSE file that was distributed with this source code.
  */
@@ -108,5 +108,15 @@ abstract class AbstractCommand extends \Symfony\Component\Console\Command\Comman
             $this->io->note('Executed in ' . round((microtime(true) - $this->startTime), 2) . 's');
         }
     }
+
+    protected function configure(): void {
+        parent::configure();
+    }
+
+    protected function execute( InputInterface $input, OutputInterface $output ): int {
+        parent::execute( $input, $output );
+    }
+
+
 
 }

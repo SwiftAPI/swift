@@ -3,7 +3,7 @@
 /*
  * This file is part of the Swift Framework
  *
- * (c) Henri van 't Sant <henri@henrivantsant.com>
+ * (c) Henri van 't Sant <henri@henrivantsant.dev>
  *
  * For the full copyright and license information, please view the LICENSE file that was distributed with this source code.
  */
@@ -11,14 +11,16 @@
 namespace Swift\Application;
 
 if (!defined('INCLUDE_DIR')) {
-    define('INCLUDE_DIR', dirname(__DIR__, 5));
+    define('INCLUDE_DIR', dirname(__DIR__, 3));
+}
+if (!defined('SWIFT_ROOT')) {
+    define('SWIFT_ROOT', dirname(__DIR__, 1));
 }
 
 require_once 'Bootstrap/Bootstrap.php';
 
 use Exception;
 use Swift\Application\Bootstrap\Bootstrap;
-use Swift\Kernel\Kernel;
 
 /**
  * Class Application
@@ -33,11 +35,8 @@ class Application {
 	 */
 	public function run() : void {
         $bootstrap = new Bootstrap();
-        $bootstrap->initialize();
+        $app = $bootstrap->initialize();
 
-        // Build to application
-        /** @var Kernel $app */
-        $app = $bootstrap->getContainer()->get( Kernel::class );
         $app->run();
 	}
 

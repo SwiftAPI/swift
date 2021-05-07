@@ -3,7 +3,7 @@
 /*
  * This file is part of the Swift Framework
  *
- * (c) Henri van 't Sant <henri@henrivantsant.com>
+ * (c) Henri van 't Sant <henri@henrivantsant.dev>
  *
  * For the full copyright and license information, please view the LICENSE file that was distributed with this source code.
  */
@@ -41,7 +41,7 @@ final class AccessTokenEntity extends Entity {
     #[DBField(name: 'user_id', type: FieldTypes::INT, length: 11, empty: true)]
     private ?int $userId;
 
-    #[DBField(name: 'expires', type: FieldTypes::TIMESTAMP, empty: false)]
+    #[DBField(name: 'expires', type: FieldTypes::DATETIME, empty: false)]
     private DateTime $expires;
 
     #[DBField(name: 'scope', type: FieldTypes::LONGTEXT, length: 4000, empty: true)]

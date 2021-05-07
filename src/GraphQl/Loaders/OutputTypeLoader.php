@@ -12,6 +12,7 @@ namespace Swift\GraphQl\Loaders;
 
 use Swift\GraphQl\Attributes\Field;
 use Swift\GraphQl\Attributes\Type;
+use Swift\GraphQl\GraphQlDiTags;
 use Swift\GraphQl\LoaderInterface;
 use Swift\GraphQl\ResolveHelper;
 use Swift\GraphQl\TypeRegistryInterface;
@@ -44,7 +45,7 @@ class OutputTypeLoader implements LoaderInterface {
     }
 
     public function load( TypeRegistryInterface $typeRegistry ): void {
-        $types = $this->serviceLocator->getServicesByTag( 'graphql.type' );
+        $types = $this->serviceLocator->getServicesByTag( GraphQlDiTags::GRAPHQL_TYPE );
 
         foreach ( $types as $type ) {
             if ($typeRegistry->getTypeByClass($type)) {
@@ -84,6 +85,7 @@ class OutputTypeLoader implements LoaderInterface {
                 type: $fieldType,
                 defaultValue: $propertyConfig->defaultValue ?? $this->helper->getDefaultValue($reflectionProperty),
                 nullable: $nullable,
+                isList: $propertyConfig->isList ?? false,
                 generator: $propertyConfig->generator ?? null,
                 generatorArguments: $propertyConfig->generatorArguments ?? array(),
                 description: $propertyConfig->description ?? null,

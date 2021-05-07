@@ -3,25 +3,24 @@
 /*
  * This file is part of the Swift Framework
  *
- * (c) Henri van 't Sant <henri@henrivantsant.com>
+ * (c) Henri van 't Sant <henri@henrivantsant.dev>
  *
  * For the full copyright and license information, please view the LICENSE file that was distributed with this source code.
  */
 
-namespace Swift\Kernel\Container\CompilerPass;
+namespace Swift\Events\DI;
 
 use Swift\Events\Attribute\ListenTo;
 use Swift\Events\EventDispatcher;
+use Swift\Kernel\Container\CompilerPass\PostCompilerPassInterface;
 use Swift\Kernel\DiTags;
 use Symfony\Component\DependencyInjection\ContainerBuilder;
-use Symfony\Component\DependencyInjection\Compiler\CompilerPassInterface;
-use Symfony\Component\EventDispatcher\EventSubscriberInterface;
 
 /**
  * Class EventRegistrationCompilerPass
- * @package Swift\Kernel\ContainerService\CompilerPass
+ * @package Swift\Events\DI
  */
-class EventRegistrationCompilerPass implements CompilerPassInterface {
+class EventRegistrationCompilerPass implements PostCompilerPassInterface {
 
     /**
      * @inheritDoc
@@ -41,7 +40,6 @@ class EventRegistrationCompilerPass implements CompilerPassInterface {
                 if (!empty($reflectionMethod->getAttributes(ListenTo::class))) {
                     $attribute = $reflectionMethod->getAttributes(ListenTo::class)[0]->getArguments();
                     $eventDispatcher->addListener($attribute['event'], [$container->get($definition->getClass()), $reflectionMethod->getName()]);
-                    //$eventDispatcher->addListener($attribute['event'], [$subscriber, $params])
                 }
             }
         }

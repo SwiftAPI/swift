@@ -28,8 +28,8 @@
     }
   ],
   "require": {
-    "webonyx/graphql-php": "^14.4",
-    "myclabs/php-enum": "^1.7",
+    "webonyx/graphql-php": "^v14.6.2",
+    "myclabs/php-enum": "^1.8.0",
     "phpdocumentor/reflection-docblock": "^5.2",
     "guzzlehttp/guzzle": "^7.2",
     "symfony/mime": "^5.2",
@@ -45,7 +45,10 @@
     "symfony/event-dispatcher": "^5.2",
     "symfony/event-dispatcher-contracts": "^2.2",
     "ramsey/uuid": "^4.1",
-    "symfony/http-foundation": "^5.2"
+    "symfony/http-foundation": "^5.2",
+    "doctrine/orm": "^2.8",
+    "psr/simple-cache": "^1.0",
+    "mouf/classname-mapper": "^1.0"
   },
   "require-dev": {
     "symfony/maker-bundle": "^1.14",

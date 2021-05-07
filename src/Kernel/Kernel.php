@@ -3,7 +3,7 @@
 /*
  * This file is part of the Swift Framework
  *
- * (c) Henri van 't Sant <henri@henrivantsant.com>
+ * (c) Henri van 't Sant <henri@henrivantsant.dev>
  *
  * For the full copyright and license information, please view the LICENSE file that was distributed with this source code.
  */
@@ -17,7 +17,6 @@ use Swift\Controller\ControllerInterface;
 use Swift\Events\EventDispatcher;
 use Swift\HttpFoundation\Exception\BadRequestException;
 use Swift\HttpFoundation\JsonResponse;
-use Swift\HttpFoundation\RequestInterface;
 use Swift\HttpFoundation\Response;
 use Swift\HttpFoundation\ResponseInterface;
 use Swift\HttpFoundation\ServerRequest;
@@ -35,7 +34,6 @@ use Swift\Router\Route;
 use Swift\Router\RouteInterface;
 use Swift\Router\Router;
 use Swift\Security\Security;
-use Swift\Security\User\UserInterface;
 
 /**
  * Class Application
@@ -97,8 +95,7 @@ final class Kernel {
             $response = new JsonResponse(['message' => $this->isDebug() ? $exception->getMessage() : Response::$reasonPhrases[Response::HTTP_INTERNAL_SERVER_ERROR], 'code' => $exception->getCode()], status: Response::HTTP_INTERNAL_SERVER_ERROR);
         }
 
-        $response->send();
-        $this->shutdown($response);
+        $this->finalize($response);
     }
 
     /**
@@ -132,9 +129,8 @@ final class Kernel {
 
         /** @var ResponseInterface $response */
         $response = $controller->{$route->getAction()}( $route->getParams() );
-        $response = ( $this->dispatcher->dispatch( new BeforeResponseEvent( $response ), BeforeResponseEvent::class ) )->getResponse();
 
-        return $response;
+        return ( $this->dispatcher->dispatch( new BeforeResponseEvent( $response ), BeforeResponseEvent::class ) )->getResponse();
     }
 
     /**

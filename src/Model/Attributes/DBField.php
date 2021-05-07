@@ -1,5 +1,13 @@
 <?php declare(strict_types=1);
 
+/*
+ * This file is part of the Swift Framework
+ *
+ * (c) Henri van 't Sant <henri@henrivantsant.dev>
+ *
+ * For the full copyright and license information, please view the LICENSE file that was distributed with this source code.
+ */
+
 namespace Swift\Model\Attributes;
 
 use Attribute;
@@ -39,8 +47,17 @@ class DBField {
         public bool $index = false,
         public ?string $enum = null,
     ) {
-        if (!is_null($this->enum) && (!$this->enum instanceof Enum)) {
+        if (!is_null($this->enum) && (!is_a($this->enum, Enum::class, true))) {
             throw new InvalidArgumentException(sprintf('%s should be a valid instance of %s', $this->enum, Enum::class));
         }
+    }
+
+    public function toObject(): \stdClass {
+        $object = new \stdClass();
+        foreach (get_object_vars($this) as $name => $var) {
+            $object->{$name} = $var;
+        }
+
+        return $object;
     }
 }

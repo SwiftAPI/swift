@@ -3,7 +3,7 @@
 /*
  * This file is part of the Swift Framework
  *
- * (c) Henri van 't Sant <henri@henrivantsant.com>
+ * (c) Henri van 't Sant <henri@henrivantsant.dev>
  *
  * For the full copyright and license information, please view the LICENSE file that was distributed with this source code.
  */
@@ -11,6 +11,7 @@
 namespace Swift\HttpFoundation;
 
 use GraphQL\Language\Parser;
+use GraphQL\Language\Source;
 use GraphQL\Server\Helper;
 use GraphQL\Utils\Utils;
 use Swift\Configuration\Configuration;
@@ -2064,7 +2065,7 @@ class Request implements RequestInterface {
             'variables' => $this->getContent()->get( key: 'variables' ),
         );
 
-        $parser = new Parser($this->getContent()->get( key: 'query' ));
+        $parser = new Parser(new Source($this->getContent()->get( key: 'query' )));
 
         if (!empty($this->getContent()->get( key: 'query' ))) {
             $parsedContent = $parser::parse($this->getContent()->get( key: 'query' ));

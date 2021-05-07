@@ -23,6 +23,11 @@ use Swift\Model\PageInfo;
 #[Type(name: 'PageInfo', description: 'Information about pagination in a connection')]
 class PageInfoType extends PageInfo implements PageInfoInterface {
 
+    #[Field(name: 'total', description: 'Total number of items available')]
+    public function getTotal(): int {
+        return $this->getTotalCount();
+    }
+
     #[Field(name: 'endCursor', description: 'When paginating forwards, the cursor to continue')]
     public function getEndCursor(): string {
         return Utils::encodeCursor($this->getEndId());

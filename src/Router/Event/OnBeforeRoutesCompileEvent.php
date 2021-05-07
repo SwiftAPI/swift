@@ -3,25 +3,28 @@
 /*
  * This file is part of the Swift Framework
  *
- * (c) Henri van 't Sant <henri@henrivantsant.com>
+ * (c) Henri van 't Sant <henri@henrivantsant.dev>
  *
  * For the full copyright and license information, please view the LICENSE file that was distributed with this source code.
  */
 
 namespace Swift\Router\Event;
 
+use Swift\Events\AbstractEvent;
 use Swift\Kernel\Attributes\DI;
 use Swift\Router\MatchTypes\MatchTypeInterface;
 use Swift\Router\Route;
 use Swift\Router\RouteInterface;
-use Symfony\Contracts\EventDispatcher\Event;
 
 /**
  * Class OnBeforeRoutesCompileEvent
  * @package Swift\Router\Event
  */
 #[DI(exclude: true)]
-class OnBeforeRoutesCompileEvent extends Event {
+class OnBeforeRoutesCompileEvent extends AbstractEvent {
+
+    protected static string $eventDescription = 'Routes have been collected from Controller, but have not been Compiled yet. Add, modify or remove routes';
+    protected static string $eventLongDescription = '';
 
     /**
      * OnBeforeRoutesCompile constructor.
@@ -80,5 +83,7 @@ class OnBeforeRoutesCompileEvent extends Event {
     public function setMatchTypes( array $matchTypes ): void {
         $this->matchTypes = $matchTypes;
     }
+
+
 
 }

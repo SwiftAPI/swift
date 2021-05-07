@@ -1,17 +1,17 @@
 <?php declare( strict_types=1 );
 
+/*
+ * This file is part of the Swift Framework
+ *
+ * (c) Henri van 't Sant <henri@henrivantsant.dev>
+ *
+ * For the full copyright and license information, please view the LICENSE file that was distributed with this source code.
+ */
 
 namespace Swift\Kernel\Container\CompilerPass;
 
-use Honeywell\Controller\ConditionController;
-use Swift\Event\Attribute\ListenTo;
 use Swift\Kernel\Attributes\Autowire;
 use Swift\Kernel\Container\Container;
-use Swift\Kernel\Container\TaggedServices;
-use Swift\Kernel\ServiceLocator;
-use Swift\Kernel\ServiceLocatorInterface;
-use Swift\Security\Authentication\Entity\AccessTokenEntity;
-use Swift\Users\Controller\User;
 use Symfony\Component\DependencyInjection\Argument\TaggedIteratorArgument;
 use Symfony\Component\DependencyInjection\Reference;
 use Symfony\Component\EventDispatcher\EventSubscriberInterface;
@@ -20,12 +20,11 @@ use Swift\Kernel\Attributes\DI;
 use Swift\Kernel\Helpers\Utils;
 use Symfony\Component\Console\Command\Command;
 use Symfony\Component\DependencyInjection\ContainerBuilder;
-use Symfony\Component\DependencyInjection\Compiler\CompilerPassInterface;
 use Symfony\Component\DependencyInjection\Definition;
 use Symfony\Component\DependencyInjection\Loader\Configurator;
 use function Symfony\Component\DependencyInjection\Loader\Configurator\tagged_iterator;
 
-class DependencyInjectionCompilerPass implements CompilerPassInterface {
+class DependencyInjectionCompilerPass implements \Symfony\Component\DependencyInjection\Compiler\CompilerPassInterface {
 
     /**
      * @inheritDoc

@@ -3,7 +3,7 @@
 /*
  * This file is part of the Swift Framework
  *
- * (c) Henri van 't Sant <henri@henrivantsant.com>
+ * (c) Henri van 't Sant <henri@henrivantsant.dev>
  *
  * For the full copyright and license information, please view the LICENSE file that was distributed with this source code.
  */
@@ -90,10 +90,10 @@ class Arguments {
             $query->desc();
         }
         foreach ($this->arguments as $argument) {
-            if (!$argument instanceof ArgumentInterface) {
+            if (!is_a($argument, ArgumentInterface::class, true)) {
                 continue;
             }
-            $query = $argument->apply($query);
+            $query = $argument->apply($query, $properties);
         }
     }
 

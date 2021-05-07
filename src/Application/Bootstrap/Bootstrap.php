@@ -3,7 +3,7 @@
 /*
  * This file is part of the Swift Framework
  *
- * (c) Henri van 't Sant <henri@henrivantsant.com>
+ * (c) Henri van 't Sant <henri@henrivantsant.dev>
  *
  * For the full copyright and license information, please view the LICENSE file that was distributed with this source code.
  */
@@ -15,7 +15,8 @@ require_once 'DependencyInjection/DependencyInjection.php';
 use Swift\Application\Bootstrap\Autoloading\Autoloader;
 use Swift\Application\Bootstrap\DependencyInjection\DependencyInjection;
 use Swift\Kernel\Container\Container;
-use function Composer\Autoload\includeFile;
+use Swift\Kernel\Kernel;
+use Symfony\Component\DependencyInjection\Loader\Configurator\ContainerConfigurator;
 
 /**
  * Class Bootstrap
@@ -28,7 +29,7 @@ class Bootstrap {
     /**
      * Bootstrap Application
      */
-    public function initialize(): void {
+    public function initialize(): Kernel {
         /**
          * Define the application's minimum supported PHP version as a constant so it can be referenced within the application.
          */
@@ -56,15 +57,11 @@ class Bootstrap {
         // set up DI
         $DiBootstrap = new DependencyInjection();
         $this->container = $DiBootstrap->initialize();
+
+        /** @var Kernel $app */
+        $app = $this->container->get(Kernel::class);
+
+        return $app;
     }
-
-    /**
-     * @return Container
-     */
-    public function getContainer(): Container {
-        return $this->container;
-    }
-
-
     
 }

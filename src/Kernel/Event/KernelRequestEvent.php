@@ -3,24 +3,27 @@
 /*
  * This file is part of the Swift Framework
  *
- * (c) Henri van 't Sant <henri@henrivantsant.com>
+ * (c) Henri van 't Sant <henri@henrivantsant.dev>
  *
  * For the full copyright and license information, please view the LICENSE file that was distributed with this source code.
  */
 
 namespace Swift\Kernel\Event;
 
+use Swift\Events\AbstractEvent;
 use Swift\HttpFoundation\RequestInterface;
 use Swift\Kernel\Attributes\DI;
 use Swift\Router\RouteInterface;
-use Symfony\Contracts\EventDispatcher\Event;
 
 /**
  * Class KernelRequestEvent
  * @package Swift\Kernel\Event
  */
 #[DI(autowire: false)]
-class KernelRequestEvent extends Event {
+class KernelRequestEvent extends AbstractEvent {
+
+    protected static string $eventDescription = 'Entry into Kernel, before routing and authentication has started';
+    protected static string $eventLongDescription = '';
 
     /**
      * KernelRequest constructor.
@@ -54,5 +57,6 @@ class KernelRequestEvent extends Event {
     public function setRoute( RouteInterface $route ): void {
         $this->route = $route;
     }
+
 
 }

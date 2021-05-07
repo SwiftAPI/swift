@@ -3,7 +3,7 @@
 /*
  * This file is part of the Swift Framework
  *
- * (c) Henri van 't Sant <henri@henrivantsant.com>
+ * (c) Henri van 't Sant <henri@henrivantsant.dev>
  *
  * For the full copyright and license information, please view the LICENSE file that was distributed with this source code.
  */
@@ -209,6 +209,7 @@ class OutputTypeRegistry implements TypeRegistryInterface {
                 $config['type'] = $field->nullable ?
                     \Swift\GraphQl\Types\Type::getStandardTypes()[ $field->type ] :
                     \Swift\GraphQl\Types\Type::nonNull(\Swift\GraphQl\Types\Type::getStandardTypes()[ $field->type ]);
+                $config['type'] = $field->isList ? \Swift\GraphQl\Types\Type::listOf($config['type']) : $config['type'];
                 $fields[ $field->name ] = $config;
                 continue;
             }

@@ -14,17 +14,15 @@ namespace Swift\GraphQl\TypeRegistry;
 use GraphQL\Type\Definition\EnumType;
 use GraphQL\Type\Definition\ObjectType as GraphQlObjectType;
 use GraphQL\Type\Definition\Type;
-use GraphQLRelay\Relay;
 use Swift\GraphQl\ContextInterface;
 use Swift\GraphQl\Exceptions\DuplicateTypeException;
 use Swift\GraphQl\Resolvers\FieldResolver;
 use Swift\GraphQl\TypeRegistryInterface;
-use Swift\GraphQl\Types\NodeTypeInterface;
 use Swift\GraphQl\Types\ObjectType;
 use Swift\Kernel\Attributes\Autowire;
 use Swift\Kernel\Attributes\DI;
-use Swift\Kernel\ServiceLocator;
 use Swift\Kernel\TypeSystem\Enum;
+use Swift\ORM\EntityManager;
 
 /**
  * Class QueryRegistry
@@ -52,6 +50,7 @@ class QueryRegistry implements TypeRegistryInterface {
         private TypeRegistryInterface $interfaceRegistry,
         private FieldResolver $fieldResolver,
         private ContextInterface $context,
+        private EntityManager $entityManager,
     ) {
     }
 

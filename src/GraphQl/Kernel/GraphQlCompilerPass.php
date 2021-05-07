@@ -11,20 +11,20 @@
 namespace Swift\GraphQl\Kernel;
 
 use Swift\GraphQl\Attributes\InputType;
-use Swift\GraphQl\Attributes\InterfaceType;
 use Swift\GraphQl\Attributes\Mutation;
 use Swift\GraphQl\Attributes\Query;
 use Swift\GraphQl\Attributes\Type;
+use Swift\GraphQl\GraphQlDiTags;
 use Swift\Kernel\Attributes\DI;
-use Swift\Kernel\DiTags;
+use Swift\Kernel\Container\CompilerPass\CompilerPassInterface;
+use Swift\Kernel\KernelDiTags;
 use Symfony\Component\DependencyInjection\ContainerBuilder;
-use Symfony\Component\DependencyInjection\Compiler\CompilerPassInterface;
 
 /**
  * Class GraphQlCompilerPass
  * @package Swift\GraphQl\Kernel
  */
-#[DI(tags: [DiTags::COMPILER_PASS])]
+#[DI(tags: [KernelDiTags::COMPILER_PASS])]
 class GraphQlCompilerPass implements CompilerPassInterface {
 
     /**
@@ -35,19 +35,19 @@ class GraphQlCompilerPass implements CompilerPassInterface {
             $classReflection = $container->getReflectionClass($definition->getClass());
 
             if (!empty($classReflection?->getAttributes(name: Type::class))) {
-                $definition->addTag(name: 'graphql.type');
+                $definition->addTag(name: GraphQlDiTags::GRAPHQL_TYPE);
             }
 
             if (!empty($classReflection?->getAttributes(name: InputType::class))) {
-                $definition->addTag( name: 'graphql.input_type' );
+                $definition->addTag( name: GraphQlDiTags::GRAPHQL_INPUT_TYPE );
             }
 
             foreach ($classReflection?->getMethods() as $reflectionMethod) {
                 if (!empty($reflectionMethod->getAttributes(name: Query::class))) {
-                    $definition->addTag(name: 'graphql.query');
+                    $definition->addTag(name: GraphQlDiTags::GRAPHQl_QUERY);
                 }
                 if (!empty($reflectionMethod->getAttributes(name: Mutation::class))) {
-                    $definition->addTag(name: 'graphql.mutation');
+                    $definition->addTag(name: GraphQlDiTags::GRAPHQL_MUTATION);
                 }
             }
         }

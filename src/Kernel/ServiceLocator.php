@@ -3,7 +3,7 @@
 /*
  * This file is part of the Swift Framework
  *
- * (c) Henri van 't Sant <henri@henrivantsant.com>
+ * (c) Henri van 't Sant <henri@henrivantsant.dev>
  *
  * For the full copyright and license information, please view the LICENSE file that was distributed with this source code.
  */
@@ -84,7 +84,17 @@ class ServiceLocator implements ServiceLocatorInterface {
      * @return ReflectionClass
      */
     public function getReflectionClass( string $serviceId ): ReflectionClass {
-        return $this->container->getReflectionClass($serviceId);
+        $class = $this->container->getReflectionClass($serviceId);
+
+        return $class ? $this->reflectionFactory->getReflectionClass($class->getName()) : $class;
     }
+
+    /**
+     * @inheritDoc
+     */
+    public function getResourcePaths(): array {
+        return $this->container->getResourcePaths();
+    }
+
 
 }

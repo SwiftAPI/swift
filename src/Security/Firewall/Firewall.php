@@ -3,7 +3,7 @@
 /*
  * This file is part of the Swift Framework
  *
- * (c) Henri van 't Sant <henri@henrivantsant.com>
+ * (c) Henri van 't Sant <henri@henrivantsant.dev>
  *
  * For the full copyright and license information, please view the LICENSE file that was distributed with this source code.
  */
@@ -50,7 +50,7 @@ class Firewall implements FirewallInterface {
     }
 
 
-    #[ListenTo(event: KernelRequestEvent::class)]
+    #[ListenTo(event: KernelRequestEvent::class, priority: -20)]
     public function start( KernelRequestEvent $kernelRequestEvent ): void {
         // Pre request execute
         // - Rate limiter

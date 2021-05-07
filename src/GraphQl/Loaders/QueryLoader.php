@@ -13,6 +13,7 @@ namespace Swift\GraphQl\Loaders;
 
 use Swift\GraphQl\Attributes\Argument;
 use Swift\GraphQl\Attributes\Query;
+use Swift\GraphQl\GraphQlDiTags;
 use Swift\GraphQl\LoaderInterface;
 use Swift\GraphQl\ResolveHelper;
 use Swift\GraphQl\TypeRegistryInterface;
@@ -47,7 +48,7 @@ class QueryLoader implements LoaderInterface {
     }
 
     public function load( TypeRegistryInterface $typeRegistry ): void {
-        $queries = $this->serviceLocator->getServicesByTag('graphql.query');
+        $queries = $this->serviceLocator->getServicesByTag(GraphQlDiTags::GRAPHQl_QUERY);
 
         foreach ($queries as $query) {
             $classReflection = $this->serviceLocator->getReflectionClass($query);

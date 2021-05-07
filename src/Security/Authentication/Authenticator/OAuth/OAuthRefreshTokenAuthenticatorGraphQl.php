@@ -3,7 +3,7 @@
 /*
  * This file is part of the Swift Framework
  *
- * (c) Henri van 't Sant <henri@henrivantsant.com>
+ * (c) Henri van 't Sant <henri@henrivantsant.dev>
  *
  * For the full copyright and license information, please view the LICENSE file that was distributed with this source code.
  */
@@ -88,7 +88,7 @@ class OAuthRefreshTokenAuthenticatorGraphQl implements AuthenticatorInterface, A
             throw new AuthenticationException('Invalid token');
         }
 
-        $client = new ClientUser(...(array) $client);
+        $client = new ClientUser(...$client->toArray());
 
         return new Passport($client, new RefreshTokenCredentials($token));
     }

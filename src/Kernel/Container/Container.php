@@ -3,7 +3,7 @@
 /*
  * This file is part of the Swift Framework
  *
- * (c) Henri van 't Sant <henri@henrivantsant.com>
+ * (c) Henri van 't Sant <henri@henrivantsant.dev>
  *
  * For the full copyright and license information, please view the LICENSE file that was distributed with this source code.
  */
@@ -11,10 +11,10 @@
 namespace Swift\Kernel\Container;
 
 use Swift\Kernel\Container\CompilerPass\DependencyInjectionCompilerPass;
-use Swift\Kernel\Container\CompilerPass\EventRegistrationCompilerPass;
 use Swift\Kernel\Container\CompilerPass\ExtensionsCompilerPass;
-use Swift\Kernel\ServiceLocatorInterface;
-use Symfony\Component\DependencyInjection\Compiler\CompilerPassInterface;
+use Swift\Kernel\Container\CompilerPass\ExtensionsPostCompilerPass;
+use Symfony\Component\Config\Resource\GlobResource;
+use Symfony\Component\Config\Resource\ReflectionClassResource;
 use Symfony\Component\DependencyInjection\ContainerBuilder;
 use Swift\Events\EventDispatcher;
 
@@ -22,7 +22,9 @@ use Swift\Events\EventDispatcher;
  * Class Container
  * @package Swift\Kernel\Container
  */
-class Container extends ContainerBuilder {
+final class Container extends ContainerBuilder {
+
+    private array $resourcePaths;
 
 	/**
 	 * Compiles the container.
@@ -58,11 +60,7 @@ class Container extends ContainerBuilder {
 
 
         // Post compile
-        /** @var CompilerPassInterface[] $post_compile */
-        $post_compile = array(new EventRegistrationCompilerPass());
-		foreach ($post_compile as $compilerPass) {
-		    $compilerPass->process($this);
-        }
+        (new ExtensionsPostCompilerPass())->process($this);
 	}
 
 	/**
@@ -111,6 +109,24 @@ class Container extends ContainerBuilder {
         }
 
         return $definitions;
+	}
+
+    /**
+     * @return array
+     */
+    public function getResourcePaths(): array {
+        if (!isset($this->resourcePaths)) {
+            $resources = array();
+            foreach ($this->getResources() as $resource) {
+                if ( $resource instanceof GlobResource ) {
+                    $resources[] = $resource->getPrefix();
+                }
+            }
+
+            $this->resourcePaths = $resources;
+        }
+
+        return $this->resourcePaths;
 	}
 
 
