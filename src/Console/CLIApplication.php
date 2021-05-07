@@ -11,7 +11,7 @@
 namespace Swift\Console;
 
 if (!defined('INCLUDE_DIR')) {
-    define('INCLUDE_DIR', dirname(__DIR__, 3));
+    define('INCLUDE_DIR', dirname(__DIR__, 5));
 }
 
 require_once INCLUDE_DIR . '/vendor/autoload.php';
