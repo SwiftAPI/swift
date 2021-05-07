@@ -11,7 +11,7 @@
 namespace Swift\Application;
 
 if (!defined('INCLUDE_DIR')) {
-    define('INCLUDE_DIR', dirname(__DIR__, 3));
+    define('INCLUDE_DIR', dirname(__DIR__, 5));
 }
 if (!defined('SWIFT_ROOT')) {
     define('SWIFT_ROOT', dirname(__DIR__, 1));

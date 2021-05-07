@@ -1,5 +1,5 @@
 imports:
-  - { resource: vendor/henrivantsant/swift/src/Application/services.yaml}
+  - { resource: vendor/swift-api/swift/src/Application/services.yaml}
 
 parameters:
 # ...
@@ -11,5 +11,5 @@ services:
     public: true
 
   Swift\:
-    resource: 'vendor/henrivantsant/swift/src/*'
+    resource: 'vendor/swift-api/swift/src/*'
     exclude: [ 'Monolog/Logger' ]

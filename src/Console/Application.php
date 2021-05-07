@@ -10,15 +10,12 @@
 
 namespace Swift\Console;
 
-use Doctrine\ORM\Tools\Console\ConsoleRunner;
 use Swift\Kernel\Attributes\Autowire;
 use Swift\Kernel\ServiceLocatorInterface;
-use Swift\ORM\EntityManager;
 use Symfony\Component\Console\Input\InputDefinition;
 use Symfony\Component\Console\Input\InputInterface;
 use Symfony\Component\Console\Input\InputOption;
 use Symfony\Component\Console\Output\OutputInterface;
-use Symfony\Component\Console\Helper\HelperSet;
 
 /**
  * Class Application
@@ -34,7 +31,6 @@ final class Application extends \Symfony\Component\Console\Application {
      */
     public function __construct(
         private ServiceLocatorInterface $serviceLocator,
-        private EntityManager $entityManager,
     ) {
         parent::__construct('<fg=green;options=bold>SWIFT CONSOLE 🚀</>');
     }
@@ -58,16 +54,6 @@ final class Application extends \Symfony\Component\Console\Application {
         return $definition;
     }
 
-    public function getDefaultHelperSet(): HelperSet {
-        $parentSet = parent::getDefaultHelperSet()->getIterator()->getArrayCopy();
-
-        $doctrineCommands = ConsoleRunner::createHelperSet($this->entityManager);
-
-        $commands = $doctrineCommands->getIterator()->getArrayCopy();
-
-        return new HelperSet(array_merge($parentSet, $commands));
-    }
-
     /**
      * Method to register commands
      *
@@ -85,7 +71,7 @@ final class Application extends \Symfony\Component\Console\Application {
             $this->addCommands($commands);
         }
 
-        ConsoleRunner::addCommands($this);
+        //ConsoleRunner::addCommands($this);
     }
 
     public function getHelp(): string {
