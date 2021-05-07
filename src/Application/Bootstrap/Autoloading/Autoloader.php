@@ -10,10 +10,6 @@
 
 namespace Swift\Application\Bootstrap\Autoloading;
 
-use Swift\Application\Bootstrap\Bootstrap;
-use Swift\Kernel\Utils\ClassNameMapper;
-use Symfony\Component\Filesystem\Filesystem;
-
 require_once INCLUDE_DIR . '/vendor/autoload.php';
 
 /**
