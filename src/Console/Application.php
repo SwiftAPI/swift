@@ -13,12 +13,10 @@ namespace Swift\Console;
 use Doctrine\ORM\Tools\Console\ConsoleRunner;
 use Swift\Kernel\Attributes\Autowire;
 use Swift\Kernel\ServiceLocatorInterface;
-use Swift\ORM\EntityManager;
 use Symfony\Component\Console\Input\InputDefinition;
 use Symfony\Component\Console\Input\InputInterface;
 use Symfony\Component\Console\Input\InputOption;
 use Symfony\Component\Console\Output\OutputInterface;
-use Symfony\Component\Console\Helper\HelperSet;
 
 /**
  * Class Application
@@ -34,7 +32,6 @@ final class Application extends \Symfony\Component\Console\Application {
      */
     public function __construct(
         private ServiceLocatorInterface $serviceLocator,
-        private EntityManager $entityManager,
     ) {
         parent::__construct('<fg=green;options=bold>SWIFT CONSOLE 🚀</>');
     }

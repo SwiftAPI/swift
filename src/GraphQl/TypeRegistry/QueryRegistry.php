@@ -22,7 +22,6 @@ use Swift\GraphQl\Types\ObjectType;
 use Swift\Kernel\Attributes\Autowire;
 use Swift\Kernel\Attributes\DI;
 use Swift\Kernel\TypeSystem\Enum;
-use Swift\ORM\EntityManager;
 
 /**
  * Class QueryRegistry
@@ -50,7 +49,6 @@ class QueryRegistry implements TypeRegistryInterface {
         private TypeRegistryInterface $interfaceRegistry,
         private FieldResolver $fieldResolver,
         private ContextInterface $context,
-        private EntityManager $entityManager,
     ) {
     }
 

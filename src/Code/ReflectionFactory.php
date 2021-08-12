@@ -30,7 +30,7 @@ final class ReflectionFactory {
      */
     public function __construct(
         private AttributeReader $attributeReader,
-        private DocBlockFactory $docBlockFactory,
+        //private DocBlockFactory $docBlockFactory,
     ) {
         $this->objectStorage = new SplObjectStorage();
     }
@@ -68,25 +68,25 @@ final class ReflectionFactory {
         return $this->attributeReader;
     }
 
-    /**
-     * @return DocBlockFactory
-     */
-    public function getDocBlockFactory(): DocBlockFactory {
-        return $this->docBlockFactory;
-    }
+//    /**
+//     * @return DocBlockFactory
+//     */
+//    public function getDocBlockFactory(): DocBlockFactory {
+//        return $this->docBlockFactory;
+//    }
 
     private function createReflection( string $class ): ReflectionClass {
         $classReflector = new ReflectionClass($class);
 
         $attributeReader = $this->attributeReader;
-        $docBlockFactory = $this->docBlockFactory;
+        //$docBlockFactory = $this->docBlockFactory;
 
         $classReflector->setAttributeReader(function () use ($attributeReader) {
             return $attributeReader;
         });
-        $classReflector->setDocBlockFactory(function () use ($docBlockFactory) {
-            return $docBlockFactory;
-        });
+//        $classReflector->setDocBlockFactory(function () use ($docBlockFactory) {
+//            return $docBlockFactory;
+//        });
 
         return $classReflector;
     }
