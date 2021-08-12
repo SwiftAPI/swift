@@ -32,6 +32,7 @@ class Field {
      * @param string|null $generator
      * @param array $generatorArguments
      * @param string|null $description
+     * @param bool $hidden
      */
     public function __construct(
         public string|null $name = null,
@@ -42,6 +43,73 @@ class Field {
         public string|null $generator = null,
         public array $generatorArguments = array(),
         public string|null $description = null,
+        public bool $hidden = false,
     ) {
     }
+
+    /**
+     * @return string|null
+     */
+    public function getName(): ?string {
+        return $this->name;
+    }
+
+    /**
+     * @return Type|string|null
+     */
+    public function getType(): Type|string|null {
+        return $this->type;
+    }
+
+    /**
+     * @return mixed
+     */
+    public function getDefaultValue(): mixed {
+        return $this->defaultValue;
+    }
+
+    /**
+     * @return bool
+     */
+    public function isNullable(): bool {
+        return $this->nullable;
+    }
+
+    /**
+     * @return bool
+     */
+    public function isList(): bool {
+        return $this->isList;
+    }
+
+    /**
+     * @return string|null
+     */
+    public function getGenerator(): ?string {
+        return $this->generator;
+    }
+
+    /**
+     * @return array
+     */
+    public function getGeneratorArguments(): array {
+        return $this->generatorArguments;
+    }
+
+    /**
+     * @return string|null
+     */
+    public function getDescription(): ?string {
+        return $this->description;
+    }
+
+    /**
+     * @return bool
+     */
+    public function isHidden(): bool {
+        return $this->hidden;
+    }
+
+
+
 }

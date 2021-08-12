@@ -20,7 +20,7 @@ final class CorsResponse extends Response {
         $origin = $_SERVER['HTTP_ORIGIN'] ?? '*';
 
         header('Access-Control-Allow-Origin: ' . $origin);
-        header('Access-Control-Allow-Methods: GET, PUT, POST, DELETE, OPTIONS');
+        header('Access-Control-Allow-Methods: GET, PUT, POST, DELETE, OPTIONS, HEAD');
         header('Access-Control-Max-Age: 1000');
         header('Access-Control-Allow-Headers: Content-Type, Authorization, X-Requested-With');
     }

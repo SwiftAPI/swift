@@ -3,7 +3,7 @@
 /*
  * This file is part of the Swift Framework
  *
- * (c) Henri van 't Sant <henri@henrivantsant.dev>
+ * (c) Henri van 't Sant <hello@henrivantsant.dev>
  *
  * For the full copyright and license information, please view the LICENSE file that was distributed with this source code.
  */
@@ -14,8 +14,8 @@ namespace Swift\Controller;
 use Swift\HttpFoundation\RequestInterface;
 use Swift\HttpFoundation\ServerRequest;
 use Swift\Kernel\Attributes\Autowire;
-use Swift\Kernel\DiTags;
 use Swift\Kernel\Attributes\DI;
+use Swift\Kernel\KernelDiTags;
 use Swift\Router\RouteInterface;
 use Swift\Security\Authentication\Token\TokenInterface;
 use Swift\Security\Authorization\AuthorizationCheckerInterface;
@@ -26,7 +26,7 @@ use Swift\Security\User\UserInterface;
  * Class AbstractController
  * @package Swift\Controller
  */
-#[DI(tags: [DiTags::CONTROLLER]), Autowire]
+#[DI(tags: [KernelDiTags::CONTROLLER]), Autowire]
 abstract class AbstractController implements ControllerInterface {
 
     protected RouteInterface $route;

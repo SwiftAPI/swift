@@ -11,6 +11,7 @@
 namespace Swift\Security\Firewall;
 
 use Swift\Events\Attribute\ListenTo;
+use Swift\Events\EventListenerInterface;
 use Swift\HttpFoundation\Exception\NotAuthorizedException;
 use Swift\HttpFoundation\Response;
 use Swift\Kernel\Attributes\Autowire;
@@ -24,7 +25,7 @@ use Swift\Security\Security;
  * @package Swift\Security\Firewall
  */
 #[Autowire]
-class AccessListener {
+class AccessListener implements EventListenerInterface {
 
     /**
      * AccessListener constructor.

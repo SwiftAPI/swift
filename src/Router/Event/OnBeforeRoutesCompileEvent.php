@@ -20,7 +20,7 @@ use Swift\Router\RouteInterface;
  * Class OnBeforeRoutesCompileEvent
  * @package Swift\Router\Event
  */
-#[DI(exclude: true)]
+#[DI(autowire: false)]
 class OnBeforeRoutesCompileEvent extends AbstractEvent {
 
     protected static string $eventDescription = 'Routes have been collected from Controller, but have not been Compiled yet. Add, modify or remove routes';

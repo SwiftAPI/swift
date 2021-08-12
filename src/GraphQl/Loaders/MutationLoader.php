@@ -102,6 +102,8 @@ class MutationLoader implements LoaderInterface {
                     type: $queryType,
                     isList: $methodConfig->isList ?? false,
                     description: $methodConfig->description ?? null,
+                    authTypes: $methodConfig?->getAuthTypes(),
+                    isGranted: $methodConfig?->getIsGranted(),
                 );
 
                 $this->mutationRegistry->addType($objectType);

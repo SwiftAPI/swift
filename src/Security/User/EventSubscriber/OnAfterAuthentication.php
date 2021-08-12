@@ -10,18 +10,17 @@
 
 namespace Swift\Security\User\EventSubscriber;
 
-use Swift\Configuration\ConfigurationInterface;
 use Swift\Events\Attribute\ListenTo;
+use Swift\Events\EventListenerInterface;
 use Swift\Kernel\Attributes\Autowire;
 use Swift\Security\Authentication\Events\AuthenticationTokenCreatedEvent;
-use Swift\Security\Authentication\Token\ResetPasswordToken;
 
 /**
  * Class OnAfterAuthentication
  * @package Swift\Security\User\EventSubscriber
  */
 #[Autowire]
-class OnAfterAuthentication {
+class OnAfterAuthentication implements EventListenerInterface {
 
     /**
      * Assign user roles after token has been created for user

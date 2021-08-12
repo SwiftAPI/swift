@@ -3,95 +3,38 @@
 /*
  * This file is part of the Swift Framework
  *
- * (c) Henri van 't Sant <henri@henrivantsant.dev>
+ * (c) Henri van 't Sant <hello@henrivantsant.dev>
  *
  * For the full copyright and license information, please view the LICENSE file that was distributed with this source code.
  */
 
 namespace Swift\Model;
 
-use Dibi\UniqueConstraintViolationException;
-use Exception;
-use InvalidArgumentException;
-use JetBrains\PhpStorm\ArrayShape;
-use JetBrains\PhpStorm\Deprecated;
-use JetBrains\PhpStorm\Pure;
-use ReflectionClass;
-use RuntimeException;
 use stdClass;
-use Swift\Database\DatabaseDriver;
-use Swift\Events\EventDispatcher;
 use Swift\Kernel\Attributes\Autowire;
-use Swift\Kernel\Container\Container;
-use Swift\Kernel\DiTags;
-use Swift\Kernel\ServiceLocatorInterface;
-use Swift\Model\Arguments\Where;
-use Swift\Model\Attributes\DB;
-use Swift\Model\Attributes\DBField;
-use Swift\Model\Attributes\DBJoin;
-use Swift\Model\Attributes\DBTable;
-use Swift\Model\Entity\EntityManager;
-use Swift\Model\Entity\Helper\Query;
-use Swift\Model\Events\EntityOnFieldSerializeEvent;
-use Swift\Model\Events\EntityOnFieldUnSerializeEvent;
-use Swift\Model\Exceptions\DatabaseException;
-use Swift\Model\Exceptions\DuplicateEntryException;
-use Swift\Model\Exceptions\InvalidConfigurationException;
-use Swift\Model\Exceptions\NoResultException;
-use Swift\Model\Types\FieldTypes;
-use Swift\Model\Entity\Arguments;
 use Swift\Kernel\Attributes\DI;
-use Symfony\Component\Console\Style\SymfonyStyle;
+use Swift\Kernel\KernelDiTags;
+use Swift\Model\Entity\Arguments;
 
 /**
  * Class Entity
  * @package Swift\Model\Entity
  */
-#[DI( tags: [ DiTags::ENTITY ] ), Autowire]
+#[DI( tags: [ KernelDiTags::ENTITY ] ), Autowire]
 abstract class Entity implements EntityInterface {
 
+    protected EntityManager $entityManager;
+
     /**
-     * Entity constructor.
+     * Method to save/update based on the current state
      *
-     * @param DatabaseDriver $database
-     * @param EventDispatcher $dispatcher
-     * @param Query $helperQuery
-     * @param ServiceLocatorInterface $serviceLocator
-     * @param ReflectionClass|null $reflectionClass Reflection of current class
-     * @param string|null $primaryKey the primary key in the table
-     * @param array $propertyMap map of properties and their belonging name in the table
-     * @param array $propertyActions actions to related to properties
-     * @param array $propertyProps properties and their props/settings
-     * @param string|null $tableName table name without prefix
-     * @param string|null $tableNamePrefixed prefixed version of the table name
-     * @param array $indexes columns with indexes, referred by db_key
-     * @param array $joins
-     * @param string $entityName
+     * @param array|stdClass $state
+     *
+     * @return \Swift\Model\Query\Result
      */
-    public function __construct(
-        protected DatabaseDriver $database,
-        protected EventDispatcher $dispatcher,
-        protected Query $helperQuery,
-        protected ServiceLocatorInterface $serviceLocator,
-        protected ?ReflectionClass $reflectionClass = null,
-        protected ?string $primaryKey = null,
-        protected array $propertyMap = array(),
-        protected array $propertyActions = array(),
-        protected array $propertyProps = array(),
-        protected ?string $tableName = null,
-        protected ?string $tableNamePrefixed = null,
-        protected array $indexes = array(),
-        protected array $joins = array(),
-        protected string $entityName = '',
-    ) {
-        $this->reflectionClass = new ReflectionClass( static::class );
-        $this->cache = new QueryCacheBag();
-
-        $this->setTable();
-        $this->mapProperties();
+    public function save( array|stdClass $state ): \Swift\Model\Query\Result {
+        return $this->entityManager->save( static::class, $state );
     }
-
-    private QueryCacheBag $cache;
 
     /**
      * Fetch a single row by the given state
@@ -101,10 +44,8 @@ abstract class Entity implements EntityInterface {
      *
      * @return stdClass|null
      */
-    public function findOne( array|stdClass $state, bool $exceptionOnNotFound = false ): ?Result {
-        $result = $this->findMany( $state, new Arguments( limit: 1 ), $exceptionOnNotFound );
-
-        return $result[0] ?? null;
+    public function findOne( array|stdClass $state, bool $exceptionOnNotFound = false ): \Swift\Model\Query\Result|null {
+        return $this->entityManager->findOne( static::class, $state, $exceptionOnNotFound );
     }
 
     /**
@@ -114,610 +55,27 @@ abstract class Entity implements EntityInterface {
      * @param Arguments|null $arguments
      * @param bool $exceptionOnNotFound
      *
-     * @return array
+     * @return \Swift\Model\Query\ResultSet
      */
-    public function findMany( array|stdClass $state, Arguments|null $arguments = null, bool $exceptionOnNotFound = false ): ResultSet {
-        $state = (array) $state;
-        $query = $this->database->select( $this->getFieldsSelectionForQuery() )->from( '[' . $this->tableNamePrefixed . '] as ' . $this->entityName );
-
-        foreach ( $state as $propertyName => $value ) {
-            if (is_array($value)) {
-                foreach ($value as $valKey => $valueItem) {
-                    $valueItem = $this->onBeforeSave( $valueItem, $propertyName );
-
-                    $func = $valKey > 0 ? 'or' : 'where';
-                    $query->{$func}( $this->getPropertyDBName( $propertyName, true ) . ' = %s', $valueItem );
-                }
-                continue;
-            }
-            $value = $this->onBeforeSave( $value, $propertyName );
-
-            $query->where( $this->getPropertyDBName( $propertyName, true ) . ' = %s', $value );
-        }
-
-        if ( $arguments ) {
-            $arguments->apply( $query, $this->propertyMap, $this->primaryKey );
-        }
-
-        $results = $query->fetchAll();
-
-        if ( $exceptionOnNotFound && is_null( $results ) ) {
-            throw new NoResultException( sprintf( 'No result found for search in %s', __CLASS__ ) );
-        }
-
-        $items = new ResultSet(
-            $this->getReferenceCallback($this),
-            $this->getReferenceCallback($query),
-            $this->getReferenceCallback($state),
-            $this->getReferenceCallback($arguments),
-        );
-        foreach ( $results as $result ) {
-            $item = new Result($this->getReferenceCallback($this));
-            foreach ( $result->toArray() as $key => $value ) {
-                $property = array_search( $key, $this->propertyMap, true );
-                if ( $property && property_exists( $this, $property ) ) {
-                    $item->{$property} = $this->onAfterLoad( $value, $property );
-                }
-            }
-            foreach ($this->joins as $name => $join) {
-                $item->{$name} = $join->instance->findMany(
-                    array(),
-                    new Arguments(null, null, null, null, null, array(
-                       new Where($join->joiningEntityField, Where::EQUALS, $item->{$join->currentEntityField})
-                    )),
-                );
-            }
-            $items[] = $item;
-        }
-
-        $this->cache->set((string) time(), array(
-            'state' => $state,
-            'arguments' => $arguments,
-            'result' => $items,
-        ));
-
-        return $items;
-    }
-
-    /**
-     * Method to save/update based on the current state
-     *
-     * @param array|stdClass $state
-     *
-     * @return Result
-     */
-    public function save( array|stdClass $state ): Result {
-        $state = (array) $state;
-
-        // Check if record is new
-        $isNew = empty( $state[ $this->primaryKey ] );
-
-        try {
-            if ( $isNew ) {
-                // Insert
-                $this->database->query( 'INSERT INTO ' . $this->tableNamePrefixed, $this->getValuesForDatabase( $state ) );
-
-                return $this->findOne( array( $this->primaryKey => $this->database->getInsertId() ) );
-            }
-
-            // Update
-            $this->database->query(
-                'UPDATE ' . $this->tableNamePrefixed . ' SET',
-                $this->getValuesForDatabase( $state ),
-                'WHERE ' . $this->primaryKey . ' = ?', $state[ $this->primaryKey ]
-            );
-            return $this->findOne( array( $this->primaryKey => $state[ $this->primaryKey ] ) );
-        } catch(UniqueConstraintViolationException $exception) {
-            throw new DuplicateEntryException($exception->getMessage(), $exception->getCode());
-        } catch ( \Dibi\Exception $exception ) {
-            throw new DatabaseException( $exception->getMessage(), $exception->getCode() );
-        }
+    public function findMany( array|stdClass $state, Arguments|null $arguments = null, bool $exceptionOnNotFound = false ): \Swift\Model\Query\ResultSet {
+        return $this->entityManager->findMany( static::class, $state, $arguments, $exceptionOnNotFound );
     }
 
     /**
      * Method to delete a row from the database
      *
-     * @param mixed $key
+     * @param array|\stdClass $state
      *
      * @return int  number of affected rows by deletion
      */
-    public function delete( mixed $key ): int {
-        try {
-            $this->database->query(
-                'DELETE FROM ' . $this->tableNamePrefixed . ' 
-					WHERE ' . $this->primaryKey . ' = ' . $key
-            );
-
-            return $this->database->getAffectedRows();
-        } catch ( \Dibi\Exception $exception ) {
-            throw new DatabaseException( $exception->getMessage(), $exception->getCode(), $exception );
-        }
-    }
-
-    public function getFieldsSelectionForQuery(): string {
-        return $this->entityName . '.' . implode( ', ' . $this->entityName . '.', array_values($this->propertyMap));
+    public function delete( array|stdClass $state ): int {
+        return $this->entityManager->delete( static::class, $state );
     }
 
 
-    /**
-     * @return string|null
-     */
-    public function getPrimaryKey(): ?string {
-        return $this->primaryKey;
-    }
-
-    /**
-     * Get reference callback
-     *
-     * @param mixed $subject
-     *
-     * @return \Closure
-     */
-    public function getReferenceCallback(mixed $subject): \Closure {
-        $reference = $subject;
-        return static function () use($reference) {
-            return $reference;
-        };
-    }
-
-    public function getPropertyMap(): array {
-        return $this->propertyMap;
-    }
-
-    /**
-     * Method to get all properties as array
-     *
-     * @param bool $serialized
-     *
-     * @return array
-     */
-    public function getPropertiesAsArray( bool $serialized = false ): array {
-        $values = array();
-        foreach ( $this->propertyMap as $propertyName => $dbBinding ) {
-            $value                   = $serialized && $this->{$propertyName} ? $this->onBeforeSave( $this->{$propertyName}, $propertyName ) : $this->{$propertyName};
-            $values[ $propertyName ] = $value;
-        }
-
-        return $values;
-    }
-
-    /**
-     * @param bool $serialized
-     *
-     * @return stdClass
-     */
-    public function getPropertiesAsObject( bool $serialized = false ): stdClass {
-        $values = new stdClass();
-        foreach ( $this->propertyMap as $propertyName => $dbBinding ) {
-            $value                   = $serialized && $this->{$propertyName} ? $this->onBeforeSave( $this->{$propertyName}, $propertyName ) : $this->{$propertyName};
-            $values->{$propertyName} = $value;
-        }
-
-        return $values;
-    }
-
-    public function getJoinsMap(): array {
-        return $this->joins;
-    }
-
-    /**
-     * Method to get all properties as array with db bindings as key
-     *
-     * @param array $state
-     *
-     * @return array
-     */
-    protected function getValuesForDatabase( array $state ): array {
-        $values = array();
-        foreach ( $this->propertyMap as $propertyName => $dbBinding ) {
-            if ( array_key_exists( key: $propertyName, array: $state ) ) {
-                $values[ $dbBinding ] = $this->onBeforeSave( $state[ $propertyName ], $propertyName );
-            }
-        }
-
-        return $values;
-    }
-
-    /**
-     * On before save event
-     *
-     * @param $value
-     * @param $propertyName
-     *
-     * @return mixed
-     */
-    protected function onBeforeSave( $value, $propertyName ): mixed {
-        // If enum; test validity
-        if ( $this->propertyProps[ $propertyName ]->enum ) {
-            $enumClass = $this->propertyProps[ $propertyName ]->enum;
-            new $enumClass($value);
-        }
-        if ( array_key_exists( $propertyName, $this->propertyActions['serialize'] ) ) {
-            foreach ( $this->propertyActions['serialize'][ $propertyName ] as $action ) {
-                /** @var EntityOnFieldSerializeEvent $response */
-                $response = $this->dispatcher->dispatch( new EntityOnFieldSerializeEvent( entity: $this, action: $action, name: $propertyName, value: $value ) );
-                $value    = $response->value;
-            }
-        }
-
-        return $value;
-    }
-
-    /**
-     * On after load event
-     *
-     * @param $value
-     * @param $propertyName
-     *
-     * @return mixed
-     */
-    protected function onAfterLoad( $value, $propertyName ): mixed {
-        if ( array_key_exists( $propertyName, $this->propertyActions['serialize'] ) ) {
-            foreach ( $this->propertyActions['serialize'][ $propertyName ] as $action ) {
-                /** @var EntityOnFieldUnSerializeEvent $response */
-                $response = $this->dispatcher->dispatch( new EntityOnFieldUnSerializeEvent( entity: $this, action: $action, name: $propertyName, value: $value ) );
-                $value    = $response->value;
-            }
-        }
-
-        return $value;
-    }
-
-    /**
-     * Method to get property where clause
-     *
-     * @param string $propertyName name of the property to get
-     *
-     * @return array
-     */
-    #[ArrayShape( [ 'prepare' => "string", 'value' => "mixed" ] )]
-    public function getPropertyWhereClause( string $propertyName ): array {
-        if ( ! $this->hasField( $propertyName ) ) {
-            throw new InvalidArgumentException( 'Property ' . $propertyName . ' not found', 500 );
-        }
-
-        return array(
-            'prepare' => $this->propertyMap[ $propertyName ] . ' = %s ',
-            'value'   => $this->{$propertyName}
-        );
-    }
-
-    /**
-     * Method to validate if a fieldName(property) is available
-     *
-     * @param string $fieldName
-     *
-     * @return bool
-     */
-    #[Pure]
-    public function hasField( string $fieldName ): bool {
-        return array_key_exists( $fieldName, $this->propertyMap );
-    }
-
-    /**
-     * Method to get property from object
-     *
-     * @param string $property
-     *
-     * @return mixed
-     * @throws Exception
-     */
-    public function get( string $property ): mixed {
-        // Only this class itself or EntityManager are allowed access
-        $calling_class = debug_backtrace( 1, 1 )[0]['class'];
-        if ( ! is_a( $calling_class, EntityManager::class, true ) &&
-             ! is_a( $calling_class, __CLASS__, true ) ) {
-            throw new RuntimeException( 'Access to method not allowed', 500 );
-        }
-
-        if ( ! property_exists( $this, $property ) ) {
-            throw new InvalidArgumentException( 'Property not found', 500 );
-        }
-
-        return $this->{$property};
-    }
-
-    /**
-     * Method to get property's db name
-     *
-     * @param string $property
-     * @param bool $prefixWithEntityName
-     *
-     * @return string
-     */
-    public function getPropertyDBName( string $property, bool $prefixWithEntityName = false ): string {
-        // Only this class itself or EntityManager are allowed access
-        $calling_class = debug_backtrace( 1, 1 )[0]['class'];
-        if ( ! is_a( $calling_class, EntityManager::class, true ) &&
-             ! is_a( $calling_class, __CLASS__, true ) ) {
-            throw new RuntimeException( 'Access to method not allowed', 500 );
-        }
-
-        if ( ! $this->hasField( $property ) ) {
-            throw new InvalidArgumentException( 'Property ' . $property . ' does not exist for ' . get_class( $this ), 500 );
-        }
-
-        return $prefixWithEntityName ? $this->entityName . '.' . $this->propertyMap[ $property ] : $this->propertyMap[ $property ];
-    }
-
-    /**
-     * Populate table name from DB attribute
-     *
-     * @return void
-     */
-    protected function setTable(): void {
-        $this->entityName = strtolower(str_replace('\\', '_', $this->reflectionClass->getName()));
-        // Deprecated Attribute
-        $annotations = $this->reflectionClass->getAttributes( name: DB::class );
-        if (!empty($annotations)) {
-            $annotation = $annotations[0]->getArguments();
-
-            if ( empty( $annotation['table'] ) ) {
-                throw new InvalidConfigurationException( sprintf( 'Entity %s is missing valid %s attribute configuration', static::class, DB::class ) );
-            }
-
-            $this->tableName         = $annotation['table'];
-            $this->tableNamePrefixed = $this->database->getPrefix() . $this->tableName;
-            return;
-        }
-
-        // Current attribute
-        if (!$annotation = !empty($this->reflectionClass->getAttributes(DBTable::class)) ?
-            $this->reflectionClass->getAttributes(DBTable::class)[0]->newInstance() : null) {
-            throw new InvalidConfigurationException( sprintf( 'Entity %s missing DBTable attribute, this is an invalid use case. Please add %s attribute to class', static::class, DBTable::class ) );
-        }
-
-        $this->tableName = $annotation->name ?? throw new InvalidConfigurationException( sprintf( 'Entity %s is missing valid %s attribute configuration', static::class, DBTable::class ) );
-        $this->tableNamePrefixed = $this->database->getPrefix() . $this->tableName;
-    }
-
-    /**
-     * Method to get table name
-     *
-     * @param bool $prefixed
-     *
-     * @return string
-     */
-    public function getTableName( bool $prefixed = true ): string {
-        return $prefixed ? $this->tableNamePrefixed : $this->tableName;
-    }
-
-    public function getEntityName(): string {
-        return $this->entityName;
-    }
-
-    /**
-     * Method to map object properties to table columns
-     *
-     * @return void
-     */
-    protected function mapProperties(): void {
-        $this->propertyActions['serialize'] = array();
-        $properties                         = $this->reflectionClass->getProperties();
-        foreach ( $properties as $property ) {
-            if (!empty($property->getAttributes(DBJoin::class))) {
-                $join = ($property->getAttributes(DBJoin::class)[0]->newInstance())->toObject();
-                $join->instance = $this->serviceLocator->get($join->entity);
-                $this->joins[$property->getName()] = $join;
-            }
-
-            /** @var DBField|null $attribute */
-            $attribute = ! empty( $property->getAttributes( name: DBField::class ) ) ? ($property->getAttributes( name: DBField::class )[0]->newInstance())->toObject() : null;
-
-            $attribute = (object) $attribute;
-            if ( isset( $property->name, $attribute->name ) ) {
-                $this->propertyMap[ $property->name ] = $attribute->name;
-                
-                $this->propertyProps[ $property->name ] = $attribute;
-
-                if ($attribute->index) {
-                    $this->indexes[] = $attribute->name;
-                }
-
-                // Add default serializations
-                if (($attribute->type === FieldTypes::TIMESTAMP) && ! in_array( FieldTypes::TIMESTAMP, $attribute->serialize, true ) ) {
-                    if (!isset($this->propertyActions['serialize'][$property->name])) {
-                        $this->propertyActions['serialize'][$property->name] = array();
-                    }
-                    $this->propertyActions['serialize'][$property->name][] = FieldTypes::TIMESTAMP;
-                }
-                if (($attribute->type === FieldTypes::DATETIME) && ! in_array( FieldTypes::DATETIME, $attribute->serialize, true ) ) {
-                    if (!isset($this->propertyActions['serialize'][$property->name])) {
-                        $this->propertyActions['serialize'][$property->name] = array();
-                    }
-                    $this->propertyActions['serialize'][$property->name][] = FieldTypes::DATETIME;
-                }
-            }
-
-            if ( isset( $property->name, $attribute->serialize ) && $attribute && ! empty( $attribute->serialize ) ) {
-                // Set serialize actions
-                $this->propertyActions['serialize'][ $property->name ] = $attribute->serialize;
-            }
-
-            // Check for primary key
-            if ( isset( $property->name, $attribute->primary ) && $attribute ) {
-                if ( $attribute->primary && isset( $this->primaryKey ) ) {
-                    throw new InvalidConfigurationException( 'Multiple primary keys found' );
-                }
-
-                if ( $attribute->primary ) {
-                    $this->primaryKey = $property->name;
-                }
-            }
-        }
-    }
-
-    /**
-     * Method to get property name by db name
-     *
-     * @param string $dbName
-     *
-     * @return string|null
-     */
-    #[Pure] private function getPropertyNameByDbName( string $dbName ): ?string {
-        $property = array_search( $dbName, $this->propertyMap, true );
-
-        return ( $property && property_exists( $this, $property ) ) ? $property : null;
-    }
-
-    /**
-     * Method to reset properties
-     */
-    public function reset(): void {
-        foreach ( $this->propertyMap as $propertyName => $dbName ) {
-            $this->{$propertyName} = null;
-        }
-    }
-
-    /**
-     * Method to create entity table
-     *
-     * @param bool $dropTableIfExists
-     *
-     * @return bool
-     * @throws \Dibi\Exception
-     */
-    public function createTable( bool $dropTableIfExists = false ): bool {
-        if ( $dropTableIfExists ) {
-            $this->database->query( 'DROP TABLE if EXISTS ' . $this->tableNamePrefixed );
-        }
-
-        $query = 'CREATE TABLE ' . $this->tableNamePrefixed . ' (';
-        $count = 1;
-        foreach ( $this->propertyProps as $propertyProp ) {
-            $query .= $this->helperQuery->getCreateQueryForProperty( $propertyProp );
-            $query .= $count < count( $this->propertyProps ) ? ',' : '';
-            $count ++;
-        }
-        if ( $this->primaryKey ) {
-            $query .= ',PRIMARY KEY (' . $this->propertyMap[ $this->primaryKey ] . ')';
-        }
-        $query .= ' );';
-
-        $this->database->query( $query );
-
-        if (!empty($this->indexes)) {
-            $this->updateTable(false, false);
-        }
-
-        return true;
-    }
-
-    /**
-     * Method to update a table by entity properties
-     *
-     * @param bool $removeNonExistingColumns
-     * @param bool $dropTableIfExists
-     *
-     * @return array    Array of non properties which only exist in the database and are not present as properties.
-     *                  If $removeNonExistingColumns = true, then will have been dropped from the table.
-     *                  Mind this is dangerous in a production environment!
-     * @throws \Dibi\Exception
-     */
-    public function updateTable( bool $removeNonExistingColumns, bool $dropTableIfExists, SymfonyStyle|null $io = null ): array {
-        $currentColumns     = $this->getTableColumns();
-        $nonExistingColumns = array();
-        $indexesToAdd = array();
-        $indexesToRemove = array();
-
-        // Table does not exist yet
-        if ( is_null( $currentColumns ) ) {
-            $this->createTable( false );
-            if ($io) {
-                $io->info( 'Table ' . $this->tableNamePrefixed . ' did not exist yet. It has been created.' );
-            }
-            return array();
-        }
-
-        // Table dropped and newly created
-        if ( $dropTableIfExists ) {
-            $this->createTable( false );
-            if ($io) {
-                $io->info( 'Table ' . $this->tableNamePrefixed . ' has been dropped and recreated.' );
-            }
-        }
-
-        $query = 'ALTER TABLE ' . $this->tableNamePrefixed . ' ';
-
-        $count = 1;
-        foreach ( $this->propertyProps as $propertyProp ) {
-            if ( array_key_exists( $propertyProp->name, $currentColumns ) ) {
-                // Column already present, create update query
-                $query .= $this->helperQuery->getUpdateQueryForProperty( $propertyProp, true );
-            } else {
-                // Column is new, create add query
-                $query .= $this->helperQuery->getUpdateQueryForProperty( $propertyProp, false );
-            }
-            $query .= $count < count( $this->propertyProps ) ? ',' : '';
-
-            $count ++;
-        }
-
-        foreach ( $currentColumns as $column ) {
-            $propertyName = $this->getPropertyNameByDbName( $column->COLUMN_NAME );
-            if ( ! $propertyName || ! $this->hasField( $propertyName ) ) {
-                // Column present in database but not in entity
-                $nonExistingColumns[] = $column->COLUMN_NAME;
-                if ( $removeNonExistingColumns ) {
-                    $query .= ',' . $this->helperQuery->getRemoveQueryForProperty( $column->COLUMN_NAME );
-                }
-            }
-
-            // Field has no index yet, but should have one
-            if ($propertyName && !in_array( $column->COLUMN_KEY, array('MUL', 'UNI'), true ) && $this->hasField( $propertyName ) && in_array($column->COLUMN_NAME, $this->indexes, true)) {
-                $indexesToAdd[] = $column->COLUMN_NAME;
-            }
-            // Field has index, but should not have one
-            if ($propertyName && in_array( $column->COLUMN_KEY, array('MUL', 'UNI'), true ) && $this->hasField( $propertyName ) && !in_array($column->COLUMN_NAME, $this->indexes, true)) {
-                $indexesToRemove[] = $column->COLUMN_NAME;
-            }
-        }
-
-        if (!empty($indexesToAdd)) {
-            foreach ($indexesToAdd as $index) {
-                $query .= ', ADD INDEX(';
-                $query .= $index;
-                $query .= ')';
-            }
-        }
-        if (!empty($indexesToRemove)) {
-            foreach ($indexesToRemove as $index) {
-                $query .= ', DROP INDEX ';
-                $query .= $index;
-            }
-        }
-
-        $this->database->query( $query );
-
-        return $nonExistingColumns;
-    }
-
-    /**
-     * Method to get table columns for entity
-     *
-     * @return array|null   associative array of columns, null when table does not exist
-     */
-    private function getTableColumns(): ?array {
-        $query = 'SELECT COLUMN_NAME, DATA_TYPE, COLUMN_TYPE, COLUMN_KEY FROM INFORMATION_SCHEMA.COLUMNS WHERE TABLE_NAME = N\'' . $this->tableNamePrefixed . '\' AND TABLE_SCHEMA = N\'' . $this->database->getConfig( "database" ) . '\'';
-
-        try {
-            $columns = $this->database->query( $query );
-        } catch ( \Dibi\Exception $exception ) {
-            throw new DatabaseException( $exception->getMessage(), $exception->getCode(), $exception );
-        }
-
-        $columnsArr = array();
-        foreach ( $columns as $column ) {
-            if ( property_exists( $column, 'COLUMN_NAME' ) ) {
-                $columnsArr[ $column->COLUMN_NAME ] = $column;
-            }
-            if ( property_exists( $column, 'column_name' ) ) {
-                $column->COLUMN_NAME                = $column->column_name;
-                $columnsArr[ $column->COLUMN_NAME ] = $column;
-            }
-        }
-
-        return ! empty( $columnsArr ) ? $columnsArr : null;
+    #[Autowire]
+    public function setEntityManager( EntityManager $entityManager ): void {
+        $this->entityManager = $entityManager;
     }
 
 

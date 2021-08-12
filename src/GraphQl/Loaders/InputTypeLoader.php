@@ -12,17 +12,14 @@ namespace Swift\GraphQl\Loaders;
 
 use Swift\GraphQl\Attributes\Field;
 use Swift\GraphQl\Attributes\InputType;
-use Swift\GraphQl\Attributes\Type;
 use Swift\GraphQl\GraphQlDiTags;
 use Swift\GraphQl\LoaderInterface;
 use Swift\GraphQl\ResolveHelper;
 use Swift\GraphQl\TypeRegistryInterface;
 use Swift\GraphQl\Types\ObjectType;
 use Swift\Kernel\Attributes\Autowire;
-use Swift\Kernel\ContainerAwareTrait;
 use Swift\Kernel\ServiceLocatorInterface;
-use Swift\Model\Attributes\DBField;
-use Swift\Security\User\Type\TokenType;
+use Swift\Model\Attributes\Field as DBField;
 
 /**
  * Class InputTypeLoader
@@ -74,6 +71,10 @@ class InputTypeLoader implements LoaderInterface {
                 continue;
             }
 
+            if ( $propertyConfig?->isHidden() ) {
+                continue;
+            }
+
             $fieldName = $propertyConfig->name ?? $reflectionProperty->getName();
             $fieldType = $this->helper->getArgumentType($propertyConfig?->type, $reflectionProperty?->getType());
             $nullable  = $propertyConfig->nullable ?? $reflectionProperty->hasDefaultValue();
@@ -100,6 +101,10 @@ class InputTypeLoader implements LoaderInterface {
 
             /** @var Field $methodConfig */
             $methodConfig = $methodConfig[0]->newInstance();
+
+            if ( $methodConfig?->isHidden() ) {
+                continue;
+            }
 
             $fieldName = $methodConfig->name ?? $reflectionMethod->getName();
             $fieldType = $methodConfig->type ?? $reflectionMethod->getReturnType()?->getName();

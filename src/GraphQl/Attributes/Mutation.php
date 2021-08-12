@@ -12,6 +12,7 @@ namespace Swift\GraphQl\Attributes;
 
 use Attribute;
 use Swift\Kernel\Attributes\DI;
+use Swift\Security\Authorization\AuthorizationTypesEnum;
 
 /**
  * Class Mutation
@@ -35,6 +36,64 @@ class Mutation {
         public string|null $generator = null,
         public array $generatorArguments = array(),
         public string|null $description = null,
+        public array $authTypes = [],
+        public array $isGranted = [],
     ) {
+        $authorizationToEnums = [];
+        foreach ($authTypes as $authType) {
+            $authorizationToEnums[] = new AuthorizationTypesEnum($authType);
+        }
+        $this->authTypes = $authorizationToEnums;
     }
+
+    /**
+     * @return string|null
+     */
+    public function getName(): ?string {
+        return $this->name;
+    }
+
+    /**
+     * @return string|null
+     */
+    public function getType(): ?string {
+        return $this->type;
+    }
+
+    /**
+     * @return string|null
+     */
+    public function getGenerator(): ?string {
+        return $this->generator;
+    }
+
+    /**
+     * @return array
+     */
+    public function getGeneratorArguments(): array {
+        return $this->generatorArguments;
+    }
+
+    /**
+     * @return string|null
+     */
+    public function getDescription(): ?string {
+        return $this->description;
+    }
+
+    /**
+     * @return AuthorizationTypesEnum[]
+     */
+    public function getAuthTypes(): array {
+        return $this->authTypes;
+    }
+
+    /**
+     * @return array
+     */
+    public function getIsGranted(): array {
+        return $this->isGranted;
+    }
+
+
 }

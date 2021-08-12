@@ -42,6 +42,8 @@ class UserRoleVoter implements VoterInterface {
     public function vote( TokenInterface $token, mixed $subject, array $attributes ): string {
         $vote = VoterInterface::ACCESS_ABSTAIN;
 
+        $attributes = array_map( static fn($value) => $value instanceof AuthorizationRolesEnum ? $value->getValue() : $value, $attributes);
+
         if (in_array(AuthorizationRolesEnum::ROLE_GUEST, $attributes, true)) {
             return VoterInterface::ACCESS_GRANTED;
         }

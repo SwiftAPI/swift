@@ -12,16 +12,13 @@ namespace Swift\Security\User\Controller;
 
 use Swift\Controller\AbstractController;
 use Swift\GraphQl\Attributes\Argument;
-use Swift\GraphQl\Attributes\Field;
 use Swift\GraphQl\Attributes\Mutation;
 use Swift\GraphQl\Attributes\Query;
 use Swift\GraphQl\ContextInterface;
 use Swift\GraphQl\Generators\EntityArgumentGenerator;
-use Swift\GraphQl\Types\PageInfoType;
 use Swift\HttpFoundation\Exception\BadRequestException;
 use Swift\Kernel\Attributes\Autowire;
-use Swift\Model\Entity\Arguments;
-use Swift\Model\Types\ArgumentsType;
+use Swift\Model\Arguments\ArgumentsType;
 use Swift\Router\Attributes\Route;
 use Swift\Router\Types\RouteMethodEnum;
 use Swift\Security\Authentication\Types\TokenType;
@@ -40,7 +37,6 @@ use Swift\Security\User\Type\UserConnection;
 use Swift\Security\User\Type\UserEdge;
 use Swift\Security\User\Type\UserInput;
 use Swift\Security\User\Type\UserType;
-use Swift\Security\User\User;
 use Swift\Security\User\UserProviderInterface;
 use Swift\Security\User\UserStorageInterface;
 
@@ -130,11 +126,8 @@ class UserControllerGraphQl extends AbstractController {
      *
      * @return UserEdge
      */
-    #[Query(name: 'User', isList: false, description: 'Fetch user by id' )]
+    #[Query(name: 'User', isList: false, description: 'Fetch user by id', authTypes: [AuthorizationTypesEnum::IS_AUTHENTICATED], isGranted: [AuthorizationRolesEnum::ROLE_USERS_LIST] )]
     public function user( string $id ): UserEdge {
-        // Make sure a user is authenticated
-        $this->denyAccessUnlessGranted([AuthorizationTypesEnum::IS_AUTHENTICATED, AuthorizationRolesEnum::ROLE_USERS_LIST]);
-
         // Get user data
         if (!$data = $this->userProvider->getUserById((int) $id)?->serialize()) {
             throw new UserNotFoundException(sprintf('User with id %s not found', $id));

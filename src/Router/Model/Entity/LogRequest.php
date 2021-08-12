@@ -1,8 +1,9 @@
 <?php declare( strict_types=1 );
+
 /*
  * This file is part of the Swift Framework
  *
- * (c) Henri van 't Sant <henri@henrivantsant.dev>
+ * (c) Henri van 't Sant <hello@henrivantsant.dev>
  *
  * For the full copyright and license information, please view the LICENSE file that was distributed with this source code.
  */
@@ -10,72 +11,68 @@
 namespace Swift\Router\Model\Entity;
 
 use stdClass;
-use Swift\GraphQl\Attributes\Field;
+use Swift\GraphQl\Attributes\Field as GraphQlField;
 use Swift\GraphQl\Attributes\Type;
 use Swift\GraphQl\Types\Type as GraphQlType;
-use Swift\Model\Attributes\DBTable;
+use Swift\Model\Attributes\Table;
 use Swift\Model\Entity;
-use Swift\Model\Attributes\DBField;
+use Swift\Model\Attributes\Field;
 use Swift\Model\Types\FieldTypes;
+use Swift\Model\Types\Serialize;
 
 /**
  * Class LogRequest
  * @package Swift\Router\Model\Entity
  */
-#[DBTable( name: 'log_request' ), Type]
+#[Table( name: 'log_request' ), Type]
 class LogRequest extends Entity {
 
     /**
      * @var int $id
      */
-    #[DBField( name: 'id', primary: true, type: FieldTypes::INT, length: 11 )]
+    #[Field( name: 'id', primary: true, type: FieldTypes::INT, length: 11 )]
     protected int $id;
 
     /**
      * @var string $ip
      */
-    #[DBField( name: 'ip', type: FieldTypes::TEXT, length: 255 )]
+    #[Field( name: 'ip', type: FieldTypes::TEXT, length: 255 )]
     protected string $ip;
 
     /**
      * @var string $origin
      */
-    #[DBField( name: 'origin', type: FieldTypes::TEXT, length: 255 )]
+    #[Field( name: 'origin', type: FieldTypes::TEXT, length: 255 )]
     protected string $origin;
 
     /**
-     * @var string $time
+     * @var \DateTime $time
      */
-    #[DBField( name: 'time', type: FieldTypes::DATETIME, serialize: [ 'datetime' ] )]
-    protected string $time;
+    #[Field( name: 'time', type: FieldTypes::DATETIME )]
+    protected \DateTime $time;
 
     /**
      * @var string $method
      */
-    #[DBField( name: 'method', type: FieldTypes::TEXT, length: 255 )]
+    #[Field( name: 'method', type: FieldTypes::TEXT, length: 255 )]
     protected string $method;
 
     /**
      * @var stdClass $headers
      */
-    #[DBField( name: 'headers', type: FieldTypes::TEXT, serialize: [ 'json' ] )]
+    #[Field( name: 'headers', type: FieldTypes::JSON )]
     protected stdClass $headers;
 
     /**
      * @var array $body
      */
-    #[DBField( name: 'body', type: FieldTypes::JSON, serialize: [ 'json' ] ), Field(type: GraphQlType::STDCLASS)]
+    #[Field( name: 'body', type: FieldTypes::JSON ), GraphQlField(type: GraphQlType::STDCLASS)]
     protected array $body;
 
     /**
      * @var int $code
      */
-    #[DBField( name: 'code', type: FieldTypes::INT, length: 11 )]
+    #[Field( name: 'code', type: FieldTypes::INT, length: 11 )]
     protected int $code;
-
-    #[Field]
-    public function test( string $lorem ): string {
-        return $lorem;
-    }
 
 }

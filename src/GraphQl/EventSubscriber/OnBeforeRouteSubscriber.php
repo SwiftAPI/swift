@@ -11,15 +11,14 @@
 namespace Swift\GraphQl\EventSubscriber;
 
 
-use Swift\AuthenticationDeprecated\Types\AuthenticationLevelsEnum;
 use Swift\Configuration\ConfigurationInterface;
 use Swift\Events\EventDispatcher;
+use Swift\Events\EventSubscriberInterface;
 use Swift\GraphQl\Kernel;
 use Swift\Kernel\Attributes\Autowire;
 use Swift\Router\Event\OnBeforeRoutesCompileEvent;
 use Swift\Router\Route;
 use Swift\Security\Authorization\AuthorizationTypesEnum;
-use Symfony\Component\EventDispatcher\EventSubscriberInterface;
 
 /**
  * Class OnBeforeRouteSubscriber

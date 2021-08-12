@@ -12,7 +12,7 @@ namespace Swift\Console\Command;
 
 use Swift\Kernel\Attributes\Autowire;
 use Swift\Kernel\Attributes\DI;
-use Swift\Kernel\DiTags;
+use Swift\Kernel\KernelDiTags;
 use Symfony\Component\Console\Input\InputInterface;
 use Symfony\Component\Console\Output\ConsoleSectionOutput;
 use Symfony\Component\Console\Output\OutputInterface;
@@ -22,7 +22,7 @@ use Symfony\Component\Console\Style\SymfonyStyle;
  * Class AbstractCommand
  * @package Swift\Console\Command
  */
-#[DI(tags: [DiTags::COMMAND]), Autowire]
+#[DI(tags: [KernelDiTags::COMMAND]), Autowire]
 abstract class AbstractCommand extends \Symfony\Component\Console\Command\Command {
 
     /** @var SymfonyStyle $io Input/Output helper */

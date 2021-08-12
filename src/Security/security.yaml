@@ -5,6 +5,10 @@ firewalls:
     # limit login attempts, defaults to 5 per minute. Set to 0 to disable throttling
     login_throttling:
       max_attempts: 5
+    token:
+      # Default time in which a token expires in hours
+      validity: 24
+
 
 role_hierarchy:
   ROLE_GUEST:

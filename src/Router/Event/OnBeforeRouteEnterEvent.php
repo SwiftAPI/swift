@@ -17,7 +17,7 @@ use Swift\Router\Route;
  * Class OnBeforeRouteEnterEvent
  * @package Swift\Router\Event
  */
-#[DI(exclude: true)]
+#[DI(autowire: false)]
 class OnBeforeRouteEnterEvent extends AbstractEvent {
 
     protected static string $eventDescription = 'Route is matched, but not the Controller has not been called yet';

@@ -3,7 +3,7 @@
 /*
  * This file is part of the Swift Framework
  *
- * (c) Henri van 't Sant <henri@henrivantsant.dev>
+ * (c) Henri van 't Sant <hello@henrivantsant.dev>
  *
  * For the full copyright and license information, please view the LICENSE file that was distributed with this source code.
  */
@@ -11,8 +11,8 @@
 namespace Swift\Logging\Entity;
 
 use stdClass;
-use Swift\Model\Attributes\DBField;
-use Swift\Model\Attributes\DBTable;
+use Swift\Model\Attributes\Field;
+use Swift\Model\Attributes\Table;
 use Swift\Model\Entity;
 use Swift\Model\Types\FieldTypes;
 use Swift\Model\Types\Serialize;
@@ -21,49 +21,49 @@ use Swift\Model\Types\Serialize;
  * Class Log
  * @package Swift\Logging\Entity\Log
  */
-#[DBTable(name: 'log')]
+#[Table(name: 'log')]
 class LogEntity extends Entity {
 
 	/**
 	 * @var int $id
 	 */
-	#[DBField( name: 'id', primary: true, type: FieldTypes::INT, length: 11 )]
+	#[Field( name: 'id', primary: true, type: FieldTypes::INT, length: 11 )]
 	protected int $id;
 
 	/**
 	 * @var string  $channel
 	 */
-	#[DBField(name: 'channel', type: FieldTypes::TEXT, length: 255)]
+	#[Field(name: 'channel', type: FieldTypes::TEXT, length: 255)]
 	protected string $channel;
 
 	/**
 	 * @var string  $message
 	 */
-	#[DBField(name: 'message', type: FieldTypes::TEXT)]
+	#[Field(name: 'message', type: FieldTypes::TEXT)]
 	protected string $message;
 
     /**
      * @var int $level
      */
-    #[DBField(name: 'level', type: FieldTypes::INT, length: 11)]
+    #[Field(name: 'level', type: FieldTypes::INT, length: 11)]
 	protected int $level;
 
     /**
      * @var string  $levelName
      */
-    #[DBField(name: 'level_name', type: FieldTypes::TEXT, length: 255)]
+    #[Field(name: 'level_name', type: FieldTypes::TEXT, length: 255)]
     protected string $levelName;
 
     /**
      * @var stdClass   $context
      */
-    #[DBField(name: 'context', type: FieldTypes::JSON, serialize: [Serialize::JSON])]
+    #[Field(name: 'context', type: FieldTypes::JSON, serialize: [Serialize::JSON])]
     protected stdClass $context;
 
     /**
-     * @var string  $datetime
+     * @var \DateTime  $datetime
      */
-    #[DBField(name: 'datetime', type: FieldTypes::DATETIME, serialize: [Serialize::DATETIME])]
-    protected string $datetime;
+    #[Field(name: 'datetime', type: FieldTypes::DATETIME, serialize: [Serialize::DATETIME])]
+    protected \DateTime $datetime;
 
 }

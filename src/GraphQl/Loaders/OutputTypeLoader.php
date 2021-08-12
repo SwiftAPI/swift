@@ -19,7 +19,7 @@ use Swift\GraphQl\TypeRegistryInterface;
 use Swift\GraphQl\Types\ObjectType;
 use Swift\Kernel\Attributes\Autowire;
 use Swift\Kernel\ServiceLocatorInterface;
-use Swift\Model\Attributes\DBField;
+use Swift\Model\Attributes\Field as DBField;
 
 /**
  * Class OutputTypeLoader
@@ -75,6 +75,10 @@ class OutputTypeLoader implements LoaderInterface {
                 continue;
             }
 
+            if ( $propertyConfig?->isHidden() ) {
+                continue;
+            }
+
             $fieldName = $propertyConfig->name ?? $reflectionProperty->getName();
             $fieldType = $propertyConfig->type ?? $reflectionProperty->getType()->getName();
             $nullable  = $propertyConfig->nullable ?? $reflectionProperty->hasDefaultValue();
@@ -102,6 +106,10 @@ class OutputTypeLoader implements LoaderInterface {
 
             /** @var Field $methodConfig */
             $methodConfig = $methodConfig[0]->newInstance();
+
+            if ( $methodConfig?->isHidden() ) {
+                continue;
+            }
 
             $fieldName = $methodConfig->name ?? $reflectionMethod->getName();
             $fieldType = $methodConfig->type ?? $reflectionMethod->getReturnType()?->getName();

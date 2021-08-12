@@ -19,7 +19,7 @@ use Swift\Kernel\Attributes\DI;
  * Class KernelOnBeforeShutdown
  * @package Swift\Kernel\Event
  */
-#[DI(exclude: true)]
+#[DI(autowire: false)]
 class KernelOnBeforeShutdown extends AbstractEvent {
 
     protected static string $eventDescription = 'Before Kernel is terminated after sending response';

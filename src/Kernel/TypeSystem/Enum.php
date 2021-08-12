@@ -1,8 +1,9 @@
 <?php declare(strict_types=1);
+
 /*
  * This file is part of the Swift Framework
  *
- * (c) Henri van 't Sant <henri@henrivantsant.dev>
+ * (c) Henri van 't Sant <hello@henrivantsant.dev>
  *
  * For the full copyright and license information, please view the LICENSE file that was distributed with this source code.
  */
@@ -188,6 +189,9 @@ abstract class Enum implements \JsonSerializable
      */
     public static function isValid($value)
     {
+        if ($value instanceof static) {
+            $value = $value->getValue();
+        }
         return \in_array($value, static::toArray(), true);
     }
 

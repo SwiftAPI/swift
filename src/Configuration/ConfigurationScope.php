@@ -12,6 +12,7 @@ namespace Swift\Configuration;
 
 use Swift\Configuration\Tree\TreeInterface;
 use Swift\Events\Attribute\ListenTo;
+use Swift\Events\EventListenerInterface;
 use Swift\Kernel\Event\KernelOnBeforeShutdown;
 use Symfony\Component\Filesystem\Filesystem;
 
@@ -19,7 +20,7 @@ use Symfony\Component\Filesystem\Filesystem;
  * Class ConfigurationScope
  * @package Swift\Configuration
  */
-abstract class ConfigurationScope {
+abstract class ConfigurationScope implements EventListenerInterface {
 
     protected TreeInterface $runtimeConfig;
     protected TreeInterface|null $appConfig;

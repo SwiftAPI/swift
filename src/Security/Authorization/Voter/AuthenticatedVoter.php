@@ -39,6 +39,9 @@ class AuthenticatedVoter implements VoterInterface {
     public function vote( TokenInterface $token, mixed $subject, array $attributes ): string {
         $vote = VoterInterface::ACCESS_ABSTAIN;
 
+        // Cast enums to strings
+        $attributes = array_map( static fn($value) => $value instanceof AuthorizationTypesEnum ? $value->getValue() : $value, $attributes);
+
         if (in_array(AuthorizationTypesEnum::PUBLIC_ACCESS, $attributes, true)) {
             return VoterInterface::ACCESS_GRANTED;
         }

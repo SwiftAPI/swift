@@ -18,7 +18,7 @@ use Swift\GraphQl\TypeRegistryInterface;
 use Swift\GraphQl\Types\ObjectType;
 use Swift\Kernel\ServiceLocator;
 use Swift\Kernel\ServiceLocatorInterface;
-use Swift\Model\Attributes\DBField;
+use Swift\Model\Attributes\Field;
 use Swift\Model\Entity;
 
 /**
@@ -57,7 +57,7 @@ class EntityEnumGenerator implements GeneratorInterface {
 
         $values = array();
         foreach ($classReflection->getProperties() as $reflectionProperty) {
-            if (!empty($reflectionProperty->getAttributes(name: DBField::class))) {
+            if (!empty($reflectionProperty->getAttributes(name: Field::class))) {
                 $values[] = $reflectionProperty->getName();
             }
         }

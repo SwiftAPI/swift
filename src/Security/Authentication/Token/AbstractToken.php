@@ -15,6 +15,7 @@ use stdClass;
 use Swift\Kernel\Attributes\DI;
 use Swift\Security\User\UserInterface;
 use Swift\Security\Utils;
+use Swift\Security\Authentication\Utils as AuthenticationUtils;
 
 
 /**
@@ -45,7 +46,7 @@ abstract class AbstractToken implements TokenInterface {
     ) {
         $this->token ??= $this->generateToken();
         if (!isset($this->expires)) {
-            $this->expires = (new DateTime())->modify('+ 5 hours');
+            $this->expires = AuthenticationUtils::getNewTokenExpiry();
         }
         $this->userId = $this->user->getId();
     }

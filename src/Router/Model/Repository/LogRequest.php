@@ -1,4 +1,5 @@
 <?php declare( strict_types=1 );
+
 /*
  * This file is part of the Swift Framework
  *
@@ -14,12 +15,9 @@ use Doctrine\ORM\Mapping\Entity;
 use Doctrine\ORM\Mapping\GeneratedValue;
 use Doctrine\ORM\Mapping\Id;
 use Doctrine\ORM\Mapping\Table;
-use stdClass;
 use Swift\GraphQl\Attributes\Field;
 use Swift\GraphQl\Attributes\Type;
 use Swift\GraphQl\Types\Type as GraphQlType;
-use Swift\Model\Attributes\DBField;
-use Swift\Model\Types\FieldTypes;
 
 /**
  * Class LogRequest
@@ -75,10 +73,5 @@ class LogRequest {
      */
     #[Column( name: 'code', type: 'integer', length: 11 )]
     protected int $code;
-
-    #[Field]
-    public function test( string $lorem ): string {
-        return $lorem;
-    }
 
 }

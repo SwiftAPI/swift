@@ -3,7 +3,7 @@
 /*
  * This file is part of the Swift Framework
  *
- * (c) Henri van 't Sant <henri@henrivantsant.dev>
+ * (c) Henri van 't Sant <hello@henrivantsant.dev>
  *
  * For the full copyright and license information, please view the LICENSE file that was distributed with this source code.
  */
@@ -19,6 +19,7 @@ require_once INCLUDE_DIR . '/vendor/autoload.php';
 use Exception;
 use Swift\Application\Bootstrap\Autoloading\Autoloader;
 use Swift\Application\Bootstrap\DependencyInjection\DependencyInjection;
+use Swift\Configuration\Configuration;
 use Swift\Kernel\ServiceLocator;
 
 /**
@@ -52,6 +53,12 @@ final class CLIApplication {
         try {
             // Build to application
             $serviceLocator = new ServiceLocator();
+    
+            // Set timezone
+            /** @var Configuration|null $configuration */
+            $configuration = $serviceLocator->get(Configuration::class);
+            date_default_timezone_set( $configuration?->get('app.timezone', 'root') ?? 'Europe/Amsterdam' );
+            
             $app = $serviceLocator->get( Application::class );
             $app->run();
         } catch (Exception $e) {

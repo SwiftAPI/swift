@@ -3,7 +3,7 @@
 /*
  * This file is part of the Swift Framework
  *
- * (c) Henri van 't Sant <henri@henrivantsant.dev>
+ * (c) Henri van 't Sant <hello@henrivantsant.dev>
  *
  * For the full copyright and license information, please view the LICENSE file that was distributed with this source code.
  */
@@ -11,11 +11,14 @@
 namespace Swift\Model\Events;
 
 use Swift\Events\AbstractEvent;
-use Swift\Model\Entity;
-use Swift\Model\Entity\Entity as DeprecatedEntity;
+use Swift\Model\Mapping\Field;
 use Swift\Kernel\Attributes\DI;
 
-#[DI(exclude: true)]
+/**
+ * Class EntityOnFieldSerializeEvent
+ * @package Swift\Model\Events
+ */
+#[DI(autowire: false)]
 class EntityOnFieldSerializeEvent extends AbstractEvent {
 
     protected static string $eventDescription = 'Before entity serializes field';
@@ -24,16 +27,16 @@ class EntityOnFieldSerializeEvent extends AbstractEvent {
     /**
      * OnFieldSerializeEvent constructor.
      *
-     * @param Entity|DeprecatedEntity $entity
-     * @param string $action
-     * @param string $name
-     * @param mixed $value
+     * @param string                          $entity
+     * @param string                          $actionOrType
+     * @param \Swift\Model\Mapping\Field|null $field
+     * @param mixed                           $value
      */
     public function __construct(
-        public Entity|DeprecatedEntity $entity,
-        public string $action,
-        public string $name,
-        public mixed $value,
+        public string $entity,
+        public string $actionOrType,
+        public ?Field  $field = null,
+        public mixed $value = null,
     ) {
     }
 

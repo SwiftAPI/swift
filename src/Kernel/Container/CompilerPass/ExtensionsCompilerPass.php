@@ -11,7 +11,7 @@
 namespace Swift\Kernel\Container\CompilerPass;
 
 use Swift\Kernel\Container\Container;
-use Swift\Kernel\DiTags;
+use Swift\Kernel\KernelDiTags;
 use Symfony\Component\DependencyInjection\ContainerBuilder;
 
 /**
@@ -25,7 +25,7 @@ class ExtensionsCompilerPass implements \Symfony\Component\DependencyInjection\C
      */
     public function process( ContainerBuilder $container ) {
         /** @var Container $container */
-        foreach ($container->getServicesByTag(DiTags::COMPILER_PASS) as $pass) {
+        foreach ($container->getServicesByTag(KernelDiTags::COMPILER_PASS) as $pass) {
             /** @var CompilerPassInterface $pass */
             $compilerPass = $container->get($pass);
             $compilerPass?->process($container);

@@ -15,16 +15,13 @@ use Swift\GraphQl\Attributes\Mutation;
 use Swift\GraphQl\Attributes\Query;
 use Swift\GraphQl\Attributes\Type;
 use Swift\GraphQl\GraphQlDiTags;
-use Swift\Kernel\Attributes\DI;
 use Swift\Kernel\Container\CompilerPass\CompilerPassInterface;
-use Swift\Kernel\KernelDiTags;
 use Symfony\Component\DependencyInjection\ContainerBuilder;
 
 /**
  * Class GraphQlCompilerPass
  * @package Swift\GraphQl\Kernel
  */
-#[DI(tags: [KernelDiTags::COMPILER_PASS])]
 class GraphQlCompilerPass implements CompilerPassInterface {
 
     /**

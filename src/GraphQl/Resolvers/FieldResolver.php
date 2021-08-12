@@ -16,13 +16,14 @@ use GraphQL\Type\Definition\FieldArgument;
 use GraphQL\Type\Definition\IDType;
 use GraphQL\Type\Definition\ListOfType;
 use GraphQL\Type\Definition\NonNull;
-use GraphQL\Type\Definition\QueryPlan;
 use GraphQL\Type\Definition\ResolveInfo;
-use GraphQLRelay\Relay;
 use Swift\GraphQl\ContextInterface;
 use Swift\GraphQl\Directives\DirectiveInterface;
+use Swift\GraphQl\Types\ObjectType;
 use Swift\Kernel\Attributes\Autowire;
 use Swift\Kernel\ServiceLocatorInterface;
+use Swift\Security\Authorization\AuthorizationCheckerInterface;
+use Swift\Security\Security;
 
 /**
  * Class FieldResolver
@@ -36,11 +37,14 @@ class FieldResolver {
      *
      * @param ServiceLocatorInterface $serviceLocator
      * @param ContextInterface $context
+     * @param AuthorizationCheckerInterface $authorizationChecker
      * @param array $instances
      */
     public function __construct(
         private ServiceLocatorInterface $serviceLocator,
         private ContextInterface $context,
+        private AuthorizationCheckerInterface $authorizationChecker,
+        private Security $security,
         private array $instances = array(),
     ) {
     }
@@ -50,10 +54,18 @@ class FieldResolver {
         $type      = $info->fieldDefinition->getType() instanceof ListOfType || $info->fieldDefinition->getType() instanceof NonNull ?
             $info->fieldDefinition->getType()->getOfType() : $info->fieldDefinition->getType();
         $property  = null;
+        /** @var ObjectType $declaration */
+        $declaration = $info->fieldDefinition->config['declaration'] ?? null;
 
         $this->context->setInfo($info);
 
-        //var_dump($fieldName);
+        if (!empty($declaration?->getAuthTypes())) {
+            $this->authorizationChecker->denyUnlessGranted($declaration->getAuthTypes());
+        }
+        if (!empty($declaration?->getIsGranted())) {
+            $this->authorizationChecker->denyUnlessGranted($declaration->getIsGranted());
+        }
+
 
         // TODO: Implement dataloader principle
         //$queryPlan = new QueryPlan($info->parentType, $info->schema, $info->fieldNodes, $info->variableValues, $info->fragments);
@@ -76,8 +88,7 @@ class FieldResolver {
         }
 
         // Find the field resolver (defining class and method of Query or Mutation) and executing
-        $resolver = array_key_exists(key: 'declaration', array: $info->fieldDefinition->config) ?
-            $this->serviceLocator->get($info->fieldDefinition->config['declaration']->declaringClass) : null;
+        $resolver = $declaration ? $this->serviceLocator->get($declaration->declaringClass) : null;
         if ($resolver && method_exists(object_or_class: $resolver, method: $info->fieldDefinition->config['declaration']->resolve)) {
             return $resolver?->{$info->fieldDefinition->config['declaration']->resolve}(...$args);
         }
@@ -107,19 +118,33 @@ class FieldResolver {
     }
 
     /**
-     * @param array $args
+     * @param array|object $args
      * @param \GraphQL\Type\Definition\FieldArgument[] $fieldArgs
      *
      * @return array
      */
-    private function resolveArgs( array $args, array $fieldArgs ): array {
+    private function resolveArgs( array|object $args, array $fieldArgs ): array {
+        if (is_object($args)) {
+            $this->context->setCurrentArguments([
+                'raw' => [$args],
+                'parsed' => [$args],
+            ]);
+
+            return [$args];
+        }
+
         // Arguments will always be in array form no matter the declaration. If marked as such, instance the desired classes
-        $arguments = array();
+        $arguments = [];
         foreach ($fieldArgs as $arg) {
             $argType = $arg->getType() instanceof NonNull ? $arg->getType()->getOfType() : $arg->getType();
+
             if (array_key_exists('declaration', $argType->config)) {
                 $className = $argType->config['declaration']->declaringClass;
-                $argValue = new $className(...$args[$arg->name]);
+                if (isset($args[$arg->name])) {
+                    $argValue = is_array($args[$arg->name]) ? new $className(...$args[$arg->name]) : new $className($args[$arg->name]);
+                } elseif ($arg->defaultValueExists()) {
+                    $argValue = is_array($arg->defaultValue) ? new $className(...$arg->defaultValue) : new $className($arg->defaultValue);
+                }
             } else {
                 $argValue = $args[$arg->name] ?? $arg->defaultValue;
             }
@@ -127,15 +152,19 @@ class FieldResolver {
 
             if (method_exists($arg->config['type'], 'getFields') && !empty($arg->config['type']->getFields())) {
                 foreach ($arg->config['type']->getFields() as $fieldName => /** @var \GraphQL\Type\Definition\InputObjectField */ $field) {
-                    $arguments[$arg->name][$fieldName] = $args[$arg->name][$field->name] ?? $field->defaultValue;
+                    if (is_object($arguments[$arg->name])) {
+                        $arguments[$arg->name]->{$fieldName} = $args[$arg->name][$field->name] ?? $field->defaultValue;
+                    } else {
+                        $arguments[$arg->name][$fieldName] = $args[$arg->name][$field->name] ?? $field->defaultValue;
+                    }
                 }
             }
         }
 
-        $this->context->setCurrentArguments(array(
+        $this->context->setCurrentArguments([
             'raw' => $args,
             'parsed' => $arguments,
-        ));
+        ]);
 
         return $arguments;
     }
@@ -182,9 +211,12 @@ class FieldResolver {
     }
 
     private function parseArgValue( mixed $argValue, mixed $argType, FieldArgument $argument ): mixed {
-        if (($argument->name === 'id') || ($argType::class === IDType::class)) {
-            return Relay::fromGlobalId($argValue)['id'];
+        if (get_debug_type($argValue) !== 'string') {
+            return $argValue;
         }
+//        if (($argument->name === 'id') || ($argType::class === IDType::class)) {
+//            return Relay::fromGlobalId($argValue)['id'];
+//        }
 
         return $argValue;
     }

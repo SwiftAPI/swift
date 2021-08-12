@@ -3,7 +3,7 @@
 /*
  * This file is part of the Swift Framework
  *
- * (c) Henri van 't Sant <henri@henrivantsant.dev>
+ * (c) Henri van 't Sant <hello@henrivantsant.dev>
  *
  * For the full copyright and license information, please view the LICENSE file that was distributed with this source code.
  */
@@ -14,9 +14,9 @@ require_once 'Autoloading/Autoloader.php';
 require_once 'DependencyInjection/DependencyInjection.php';
 use Swift\Application\Bootstrap\Autoloading\Autoloader;
 use Swift\Application\Bootstrap\DependencyInjection\DependencyInjection;
+use Swift\Configuration\Configuration;
 use Swift\Kernel\Container\Container;
 use Swift\Kernel\Kernel;
-use Symfony\Component\DependencyInjection\Loader\Configurator\ContainerConfigurator;
 
 /**
  * Class Bootstrap
@@ -45,8 +45,6 @@ class Bootstrap {
         $startTime = microtime(true);
         $startMem  = memory_get_usage();
 
-        date_default_timezone_set('Europe/Amsterdam');
-
         include_once __DIR__ . '/Functions.php';
 
 
@@ -57,6 +55,11 @@ class Bootstrap {
         // set up DI
         $DiBootstrap = new DependencyInjection();
         $this->container = $DiBootstrap->initialize();
+    
+        // Set timezone
+        /** @var Configuration|null $configuration */
+        $configuration = $this->container->get(Configuration::class);
+        date_default_timezone_set( $configuration?->get('app.timezone', 'root') ?? 'Europe/Amsterdam' );
 
         /** @var Kernel $app */
         $app = $this->container->get(Kernel::class);

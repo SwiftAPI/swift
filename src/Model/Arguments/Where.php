@@ -12,7 +12,8 @@ namespace Swift\Model\Arguments;
 
 use Dibi\Fluent;
 use Swift\Kernel\Attributes\DI;
-use Swift\Model\Types\ArgumentComparisonTypesEnum;
+use Swift\Model\Mapping\Table;
+use Swift\Model\Query\QueryBuilder;
 
 /**
  * Class Where
@@ -24,6 +25,7 @@ class Where implements ArgumentInterface {
     public const GREATER_THAN = '>';
     public const LESS_THAN = '<';
     public const EQUALS = '=';
+    public const LIKE = 'LIKE';
 
     /**
      * Where constructor.
@@ -43,13 +45,19 @@ class Where implements ArgumentInterface {
     /**
      * Apply query
      *
-     * @param Fluent $query
-     * @param array $properties
+     * @param \Swift\Model\Query\QueryBuilder $query
+     * @param \Swift\Model\Mapping\Table      $table
      *
-     * @return Fluent
+     * @return QueryBuilder
      */
-    public function apply( Fluent $query, array $properties ): Fluent {
-        return $query->where($properties[$this->fieldName] . ' ' . $this->comparison . ' %s ', $this->value);
+    public function apply( QueryBuilder $query, Table $table ): QueryBuilder {
+        $value = $this->value;
+
+        if ($this->comparison === static::LIKE) {
+            $value = '%' . $value . '%';
+        }
+
+        return $query->where($table->getFieldByPropertyName($this->fieldName)->getDatabaseName() . ' ' . $this->comparison . ' %s ', $value);
     }
 
 }

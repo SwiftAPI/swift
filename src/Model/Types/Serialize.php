@@ -3,7 +3,7 @@
 /*
  * This file is part of the Swift Framework
  *
- * (c) Henri van 't Sant <henri@henrivantsant.dev>
+ * (c) Henri van 't Sant <hello@henrivantsant.dev>
  *
  * For the full copyright and license information, please view the LICENSE file that was distributed with this source code.
  */
@@ -19,8 +19,26 @@ use Swift\Kernel\TypeSystem\Enum;
  */
 class Serialize extends Enum {
 
-    public const DATETIME = 'datetime';
-    public const JSON = 'json';
-    public const BOOL = 'bool';
+    public const VARCHAR = Varchar::VARCHAR;
+    public const TEXT = Varchar::VARCHAR;
+    public const STRING = Varchar::VARCHAR;
+
+    public const LONGTEXT = LongText::LONGTEXT;
+
+    public const INT = Integer::INT;
+
+    public const FLOAT = FloatingPointValue::FLOAT;
+    public const BIG_FLOAT = BigFloat::BIG_FLOAT;
+    public const DOUBLE = DoublePointValue::DOUBLE;
+
+    public const DATETIME = DateTime::DATETIME;
+    public const TIME = Time::TIME;
+    public const TIMESTAMP = TimeStamp::TIMESTAMP;
+
+    public const JSON = Json::JSON;
+
+    public const BOOL = Boolean::BOOL;
+
+
 
 }

@@ -11,6 +11,7 @@
 namespace Swift\Security\Firewall;
 
 use Swift\Configuration\ConfigurationInterface;
+use Swift\Events\EventListenerInterface;
 use Swift\HttpFoundation\RequestInterface;
 use Swift\Events\Attribute\ListenTo;
 use Swift\Kernel\Attributes\Autowire;
@@ -25,7 +26,7 @@ use Swift\Security\Security;
  * @package Swift\Security\Firewall
  */
 #[Autowire]
-class Firewall implements FirewallInterface {
+class Firewall implements FirewallInterface, EventListenerInterface {
 
     /**
      * Firewall constructor.

@@ -12,13 +12,13 @@ namespace Swift\Kernel\Container\CompilerPass;
 
 use Swift\Kernel\Attributes\DI;
 use Swift\Kernel\Container\Container;
-use Swift\Kernel\DiTags;
+use Swift\Kernel\KernelDiTags;
 
 /**
  * Interface CompilerPassInterface
  * @package Swift\Kernel\Container\CompilerPass
  */
-#[DI(tags: [DiTags::POST_COMPILER_PASS])]
+#[DI(tags: [KernelDiTags::POST_COMPILER_PASS])]
 interface PostCompilerPassInterface {
 
     public function process( Container $container );

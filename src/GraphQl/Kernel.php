@@ -10,17 +10,16 @@
 
 namespace Swift\GraphQl;
 
+use GraphQL\Error\DebugFlag;
 use GraphQL\Error\FormattedError;
 use GraphQL\GraphQL;
 use GraphQL\Type\Definition\ResolveInfo;
 use GraphQL\Validator\Rules\DisableIntrospection;
-use Swift\Configuration\Configuration;
 use Swift\Configuration\ConfigurationInterface;
 use Swift\GraphQl\Resolvers\FieldResolver;
 use Swift\HttpFoundation\JsonResponse;
 use Swift\HttpFoundation\RequestInterface;
 use Swift\Kernel\Attributes\Autowire;
-use GraphQL\Error\DebugFlag;
 
 /**
  * Class Kernel
@@ -52,7 +51,7 @@ class Kernel {
     private function execute(): array {
         $fieldResolver = $this->fieldResolver;
 
-        $debug = ($this->configuration->get(identifier: 'app.debug', scope: 'root') || ($this->configuration->get(identifier: 'app.mode', scope: 'root') === 'develop')) ?
+        $debug = ( $this->configuration->get( identifier: 'app.debug', scope: 'root' ) || ( $this->configuration->get( identifier: 'app.mode', scope: 'root' ) === 'develop' ) ) ?
             DebugFlag::INCLUDE_DEBUG_MESSAGE | DebugFlag::INCLUDE_TRACE : DebugFlag::NONE;
 
         try {
@@ -60,25 +59,25 @@ class Kernel {
                 schema: $this->schema->getSchema(),
                 source: $this->request->getContent()->get( key: 'query' ) ?: null,
                 variableValues: $this->request->getContent()->get( key: 'variables' ) ?: null,
-                fieldResolver: function ( $value, $args, $context, ResolveInfo $info) use ($fieldResolver) {
-                return $fieldResolver->resolve($value, $args, $context, $info);
-            },
+                fieldResolver: function ( $value, $args, $context, ResolveInfo $info ) use ( $fieldResolver ) {
+                    return $fieldResolver->resolve( $value, $args, $context, $info );
+                },
                 validationRules: $this->getValidationRules()
             );
 
-            return $result->toArray($debug);
-        } catch(\Exception $exception) {
-            return array('errors' => [FormattedError::createFromException($exception, $debug)]);
+            return $result->toArray( $debug );
+        } catch ( \Exception $exception ) {
+            return array( 'errors' => [ FormattedError::createFromException( $exception, $debug ) ] );
         }
     }
 
     /**
      * @return array
      */
-    private function  getValidationRules(): array {
+    private function getValidationRules(): array {
         $rules = array();
 
-        if (!$this->configuration->get('graphql.enable_introspection', 'app')) {
+        if ( ! $this->configuration->get( 'graphql.enable_introspection', 'app' ) ) {
             $rules[] = new DisableIntrospection();
         }
 

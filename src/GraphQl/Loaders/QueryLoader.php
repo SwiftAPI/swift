@@ -73,10 +73,13 @@ class QueryLoader implements LoaderInterface {
                     $parameterConfig = !empty($reflectionParameter->getAttributes(name: Argument::class)) ? $reflectionParameter->getAttributes(name: Argument::class)[0]->newInstance() : null;
                     $argumentType = $this->helper->getArgumentType($parameterConfig?->type, $reflectionParameter?->getType());
                     $argumentName = $parameterConfig->name ?? $reflectionParameter->getName();
+                    $declaringClass = class_exists($reflectionParameter->getType()?->getName()) ?
+                        $reflectionParameter->getType()?->getName() :
+                        $reflectionMethod->getDeclaringClass()?->getName();
 
                     $arguments[$argumentName] = new ObjectType(
                         name: $argumentName,
-                        declaringClass: $reflectionMethod->getDeclaringClass()->getName(),
+                        declaringClass: $declaringClass,
                         declaringMethod: $methodConfig->name ?? $reflectionMethod->getName(),
                         type: $argumentType,
                         nullable: $reflectionParameter->isOptional(),
@@ -98,6 +101,8 @@ class QueryLoader implements LoaderInterface {
                     generator: $methodConfig->generator ?? null,
                     generatorArguments: $methodConfig->generatorArguments ?? array(),
                     description: $methodConfig->description ?? null,
+                    authTypes: $methodConfig?->getAuthTypes(),
+                    isGranted: $methodConfig?->getIsGranted(),
                 );
 
                 $this->queryRegistry->addType($objectType);
