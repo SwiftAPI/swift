@@ -112,7 +112,7 @@ class UpdateEntitiesCommand extends AbstractCommand {
 
         } catch ( \Exception $exception ) {
             $section->clear( 1 );
-            $section->writeln( '❌ <fg=red;options=bold>Failed:</> Has not updated "' . $classMeta->getTable()->getDatabaseName() . '" for entity "' . $entity::class . '. See: <fg=blue>https://henrivantsant.github.io/swift-docs/docs/database</>"' );
+            $section->writeln( '❌ <fg=red;options=bold>Failed:</> Has not updated "' . $classMeta->getTable()->getDatabaseName() . '" for entity "' . $entity::class . '. See: <fg=blue>https://swiftapi.github.io/swift-docs/docs/database/introduction</>"' );
             $io->error( $exception->getMessage() );
         }
     }
