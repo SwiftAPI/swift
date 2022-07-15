@@ -3,7 +3,7 @@
 /*
  * This file is part of the Swift Framework
  *
- * (c) Henri van 't Sant <henri@henrivantsant.dev>
+ * (c) Henri van 't Sant <hello@henrivantsant.dev>
  *
  * For the full copyright and license information, please view the LICENSE file that was distributed with this source code.
  */
@@ -12,7 +12,7 @@ namespace Swift\Security\Authorization;
 
 
 use Swift\Configuration\ConfigurationInterface;
-use Swift\Kernel\Attributes\Autowire;
+use Swift\DependencyInjection\Attributes\Autowire;
 use Swift\Security\Authentication\Token\TokenInterface;
 use Swift\Security\Authorization\Strategy\AffirmativeDecisionStrategy;
 use Swift\Security\Authorization\Strategy\ConsensusDecisionStrategy;
@@ -72,6 +72,8 @@ final class AccessDecisionManager implements AccessDecisionManagerInterface {
         if (!$voters) {
             return;
         }
+        
+        $voters = iterator_to_array( $voters );
 
         foreach ($voters as $voter) {
             $this->voters[$voter::class] = $voter;
@@ -83,6 +85,8 @@ final class AccessDecisionManager implements AccessDecisionManagerInterface {
         if (!$decisionStrategies) {
             return;
         }
+        
+        $decisionStrategies = iterator_to_array( $decisionStrategies );
 
         foreach ($decisionStrategies as $decisionStrategy) {
             $this->decisionStrategies[$decisionStrategy::class] = $decisionStrategy;

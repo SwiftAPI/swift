@@ -24,10 +24,10 @@ final class RefreshTokenCredentials implements CredentialsInterface {
     /**
      * RefreshTokenCredentials constructor.
      *
-     * @param \stdClass $token
+     * @param \Swift\Security\Authentication\Entity\AccessTokenEntity $token
      */
     public function __construct(
-        private \stdClass $token,
+        private readonly \Swift\Security\Authentication\Entity\AccessTokenEntity $token,
     ) {
     }
 
@@ -35,14 +35,14 @@ final class RefreshTokenCredentials implements CredentialsInterface {
      * @inheritDoc
      */
     public function getCredential(): string {
-        return $this->token->accessToken;
+        return $this->token->getAccessToken();
     }
 
     /**
      * @inheritDoc
      */
     public function validateCredentials( UserInterface $user ): void {
-        if ($this->token->expires->getTimestamp() < time()) {
+        if ($this->token->getExpires()->getTimestamp() < time()) {
             throw new InvalidCredentialsException('Invalid Refresh Token');
         }
     }

@@ -14,13 +14,13 @@ use Swift\Controller\AbstractController;
 use Swift\HttpFoundation\JsonResponse;
 use Swift\Router\Attributes\Route;
 use Swift\Router\RouteParameterBag;
-use Swift\Router\Types\RouteMethodEnum;
+use Swift\Router\Types\RouteMethod;
 
 /**
  * class FooController
  * @package Foo\Controller
  */
-#[Route(method: [RouteMethodEnum::GET, RouteMethodEnum::PATCH], route: '/foo/', name: 'foo')]
+#[Route(method: [RouteMethod::GET, RouteMethod::PATCH], route: '/foo/', name: 'foo')]
 class FooController extends AbstractController {
 
     /**
@@ -42,7 +42,7 @@ class FooController extends AbstractController {
      *
      * @return JSONResponse
      */
-    #[Route(method: [RouteMethodEnum::GET], route: '/bar/[i:article_id]/', name: 'foo.get_bar')]
+    #[Route(method: [RouteMethod::GET], route: '/bar/[i:article_id]/', name: 'foo.get_bar')]
     public function getBar( RouteParameterBag $params): JsonResponse {
         // Let's return the article here
 
@@ -59,7 +59,7 @@ class FooController extends AbstractController {
      *
      * @return JsonResponse
      */
-    #[Route(method: [RouteMethodEnum::PATCH], route: '/bar/[i:article_id]/', name: 'foo.patch_bar')]
+    #[Route(method: [RouteMethod::PATCH], route: '/bar/[i:article_id]/', name: 'foo.patch_bar')]
     public function patchBar( RouteParameterBag $params): JsonResponse {
         // Let's update the article here
         return new JsonResponse(array('foo bar'));
@@ -73,7 +73,7 @@ On the method `getBar()` we expose the route '/bar'/ which will be prefixed with
 
 But what if you want a variable like an id? More on the specifics of building the Route Annotation in the chapter 'Route Attribute'. 
 
-NOTE: Multiple types can be exposed for a given route. Also the same route can lead to different methods on the controller based on the Method used to make the request. The class route must allow for all HTTP Methods used in the definitions within. Type HTTP methods in writing (uppercase) or simple refer using the `Swift\Router\Types\RouteMethodEnum` as in the example above. 
+NOTE: Multiple types can be exposed for a given route. Also the same route can lead to different methods on the controller based on the Method used to make the request. The class route must allow for all HTTP Methods used in the definitions within. Type HTTP methods in writing (uppercase) or simple refer using the `Swift\Router\Types\RouteMethod` as in the example above. 
 
 ### Route annotation
 The Router will 'harvest' all methods in the controllers classes with a `#[Route]` attribute, and map those as routes. If a route annotation is used on the class (highly recommended) this will be used as a prefix for all methods in this specific controller as explained in the example above.
@@ -98,7 +98,7 @@ This means you could have the same route for different HTTP Methods if you would
      *
      * @return JsonResponse
      */
-    #[Route( method: [RouteMethodEnum::POST], route: '/login/', name: 'security.user.login', isGranted: [AuthorizationTypesEnum::IS_AUTHENTICATED_DIRECTLY], tags: [Route::TAG_ENTRYPOINT] )]
+    #[Route( method: [RouteMethod::POST], route: '/login/', name: 'security.user.login', isGranted: [AuthorizationType::IS_AUTHENTICATED_DIRECTLY], tags: [Route::TAG_ENTRYPOINT] )]
     public function login( array $params ): JsonResponse {
         $data = $this->getCurrentUser()?->serialize();
         $data->token = new \stdClass();
@@ -148,7 +148,7 @@ Okay so we can use several variables, convenient! How to read this? Easy! The va
      *
      * @return JSONResponse
      */
-    #[Route(method: [RouteMethodEnum::GET], route: '/bar/[i:article_id]/', name: 'foo.get_bar')]
+    #[Route(method: [RouteMethod::GET], route: '/bar/[i:article_id]/', name: 'foo.get_bar')]
     public function getBar( array $params): JsonResponse {
         // Let's return the article here
 

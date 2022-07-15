@@ -3,7 +3,7 @@
 /*
  * This file is part of the Swift Framework
  *
- * (c) Henri van 't Sant <henri@henrivantsant.dev>
+ * (c) Henri van 't Sant <hello@henrivantsant.dev>
  *
  * For the full copyright and license information, please view the LICENSE file that was distributed with this source code.
  */
@@ -11,29 +11,15 @@
 namespace Swift\Kernel\Attributes;
 
 use Attribute;
+use JetBrains\PhpStorm\Deprecated;
 
 /**
  * Class DI
  * @package Swift\Kernel\Attributes
  */
-#[Attribute(Attribute::TARGET_CLASS)]
-class DI {
+#[Attribute(Attribute::TARGET_CLASS), Deprecated(reason: 'Moved to new dedicated DependencyInjection component', replacement: \Swift\DependencyInjection\Attributes\DI::class)]
+class DI extends \Swift\DependencyInjection\Attributes\DI {
 
-    /**
-     * DI constructor.
-     *
-     * @param array $tags
-     * @param bool $shared
-     * @param bool $exclude
-     * @param bool $autowire
-     * @param array $aliases
-     */
-    public function __construct(
-        public array $tags = array(),
-        public bool $shared = true,
-        public bool $exclude = false,
-        public bool $autowire = true,
-        public array $aliases = array(),
-    ) {
-    }
+
+
 }

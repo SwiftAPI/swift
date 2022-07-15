@@ -1,0 +1,39 @@
+#!/bin/bash
+
+#
+# This file is part of the Swift Framework
+#
+# (c) Henri van 't Sant <hello@henrivantsant.dev>
+#
+# For the full copyright and license information, please view the LICENSE file that was distributed with this source code.
+#
+
+SCRIPT_DIR=$( cd -- "$( dirname -- "${BASH_SOURCE[0]}" )" &> /dev/null && pwd )
+
+nice php -q -f "$SCRIPT_DIR"/server-bootstrap.php -- $@
+ERR=$?
+
+## Possibilities
+# 97    - planned pause/restart `exit 97;`
+# 98    - planned restart (immediate, no sleep)
+# 99    - planned stop, exit.
+# 0     - unplanned restart (as returned by "exit;" or exceptions)
+#        - Anything else is also unplanned exit
+
+if [ $ERR -eq 97 ]
+then
+   exec $0 $@;
+fi
+
+if [ $ERR -eq 98 ]
+then
+   exec $0 $@;
+fi
+
+if [ $ERR -eq 99 ]
+then
+   echo "99: PLANNED_EXIT";
+fi
+
+
+

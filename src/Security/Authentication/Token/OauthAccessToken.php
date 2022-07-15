@@ -37,6 +37,12 @@ class OauthAccessToken extends AbstractToken {
         $this->userId = null;
         $this->clientId = $this->getUser()->getId();
     }
-
+    
+    /**
+     * @return \Swift\Security\Authentication\Token\TokenInterface|null
+     */
+    public function getRefreshToken(): ?TokenInterface {
+        return $this->refreshToken;
+    }
 
 }

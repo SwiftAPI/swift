@@ -22,6 +22,8 @@ interface TokenInterface {
     public const SCOPE_ACCESS_TOKEN = 'SCOPE_ACCESS_TOKEN';
     public const SCOPE_REFRESH_TOKEN = 'SCOPE_REFRESH_TOKEN';
     public const SCOPE_RESET_PASSWORD = 'SCOPE_RESET_PASSWORD';
+    
+    public function getId(): ?int;
 
     /**
      * @return UserInterface

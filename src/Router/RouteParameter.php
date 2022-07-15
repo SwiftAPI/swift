@@ -3,14 +3,14 @@
 /*
  * This file is part of the Swift Framework
  *
- * (c) Henri van 't Sant <henri@henrivantsant.dev>
+ * (c) Henri van 't Sant <hello@henrivantsant.dev>
  *
  * For the full copyright and license information, please view the LICENSE file that was distributed with this source code.
  */
 
 namespace Swift\Router;
 
-use Swift\Kernel\Attributes\DI;
+use Swift\DependencyInjection\Attributes\DI;
 use Swift\Router\MatchTypes\MatchTypeInterface;
 
 /**
@@ -31,12 +31,12 @@ final class RouteParameter {
      * @param mixed|null $value
      */
     public function __construct(
-        private string $block,
-        private string $pre,
-        private MatchTypeInterface|string $type,
-        private string $param,
-        private string $optional,
-        private mixed $value = null,
+        private readonly string                    $block,
+        private readonly string                    $pre,
+        private readonly MatchTypeInterface|string $type,
+        private readonly string                    $param,
+        private readonly string                    $optional,
+        private mixed                              $value = null,
     ) {
     }
 

@@ -3,15 +3,14 @@
 /*
  * This file is part of the Swift Framework
  *
- * (c) Henri van 't Sant <henri@henrivantsant.dev>
+ * (c) Henri van 't Sant <hello@henrivantsant.dev>
  *
  * For the full copyright and license information, please view the LICENSE file that was distributed with this source code.
  */
 
 namespace Swift\Router;
 
-use Swift\HttpFoundation\RequestInterface;
-use Swift\Router\MatchTypes\MatchTypeInterface;
+use Psr\Http\Message\RequestInterface;
 
 /**
  * Interface RouteInterface
@@ -36,11 +35,11 @@ interface RouteInterface {
     /**
      * Checks whether a given HTTPMethod applies for this route
      *
-     * @param string $method
+     * @param \Swift\Router\Types\RouteMethod $method
      *
      * @return bool
      */
-    public function methodApplies( string $method): bool;
+    public function methodApplies( \Swift\Router\Types\RouteMethod $method): bool;
 
     /**
      * Validate whether given route matches the passed request

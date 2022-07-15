@@ -10,6 +10,8 @@
 
 namespace Swift\HttpFoundation\Session\Storage\Handler;
 
+use ReturnTypeWillChange;
+
 /**
  * Session handler using a PDO connection to read and write data.
  *
@@ -420,6 +422,7 @@ class PdoSessionHandler extends AbstractSessionHandler {
     /**
      * @return bool
      */
+    #[ReturnTypeWillChange]
     public function gc( $maxlifetime ): bool {
         // We delay gc() to close() so that it is executed outside the transactional and blocking read-write process.
         // This way, pruning expired sessions does not block them from being started while the current session is used.

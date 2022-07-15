@@ -3,17 +3,15 @@
 /*
  * This file is part of the Swift Framework
  *
- * (c) Henri van 't Sant <henri@henrivantsant.dev>
+ * (c) Henri van 't Sant <hello@henrivantsant.dev>
  *
  * For the full copyright and license information, please view the LICENSE file that was distributed with this source code.
  */
 
 namespace Swift\Configuration;
 
-use Swift\Configuration\DiTags;
 use Swift\Configuration\Exception\InvalidConfigurationValueException;
 use Swift\Configuration\Exception\UnknownConfigurationKeyException;
-use Swift\Kernel\Attributes\DI;
 
 /**
  * Interface ConfigurationInterface
@@ -56,5 +54,10 @@ interface ConfigurationInterface  {
      * @return bool
      */
     public function has( string $identifier, string $scope ): bool;
+    
+    /**
+     * Persist configuration changes
+     */
+    public function persist(): void;
 
 }

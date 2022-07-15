@@ -24,7 +24,7 @@ class PreAuthenticatedStamp implements StampInterface {
      * @param \stdClass|TokenInterface $token
      */
     public function __construct(
-        private \stdClass|TokenInterface $token
+        private readonly \stdClass|TokenInterface $token
     ) {
     }
 

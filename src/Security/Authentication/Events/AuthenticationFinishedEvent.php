@@ -11,9 +11,8 @@
 namespace Swift\Security\Authentication\Events;
 
 
+use Psr\Http\Message\RequestInterface;
 use Swift\Events\AbstractEvent;
-use Swift\HttpFoundation\RequestInterface;
-use Swift\Security\Authentication\Authenticator\AuthenticatorInterface;
 use Swift\Security\Authentication\Passport\PassportInterface;
 use Swift\Security\Authentication\Token\TokenInterface;
 
@@ -35,9 +34,9 @@ class AuthenticationFinishedEvent extends AbstractEvent {
      * @param RequestInterface $request
      */
     public function __construct(
-        private TokenInterface $token,
-        private PassportInterface $passport,
-        private RequestInterface $request,
+        private readonly TokenInterface    $token,
+        private readonly PassportInterface $passport,
+        private readonly RequestInterface  $request,
     ) {
     }
 

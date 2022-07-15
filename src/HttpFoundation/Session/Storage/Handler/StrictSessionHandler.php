@@ -10,6 +10,8 @@
 
 namespace Swift\HttpFoundation\Session\Storage\Handler;
 
+use ReturnTypeWillChange;
+
 /**
  * Adds basic `SessionUpdateTimestampHandlerInterface` behaviors to another `SessionHandlerInterface`.
  *
@@ -73,6 +75,7 @@ class StrictSessionHandler extends AbstractSessionHandler {
     /**
      * @return bool
      */
+    #[ReturnTypeWillChange]
     public function gc( $maxlifetime ): bool {
         return $this->handler->gc( $maxlifetime );
     }

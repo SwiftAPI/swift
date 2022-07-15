@@ -32,7 +32,7 @@ declare(strict_types=1);
 
 namespace Swift\Logging;
 
-use Swift\Kernel\Attributes\Autowire;
+use Swift\DependencyInjection\Attributes\Autowire;
 use Swift\Logging\Formatter\LineFormatter;
 use Monolog\Handler\StreamHandler;
 

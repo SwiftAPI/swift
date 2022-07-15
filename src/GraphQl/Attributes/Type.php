@@ -11,15 +11,18 @@
 namespace Swift\GraphQl\Attributes;
 
 use Attribute;
-use Swift\Kernel\Attributes\DI;
+use JetBrains\PhpStorm\Deprecated;
+use Swift\DependencyInjection\Attributes\DI;
 
 /**
  * Class Type
  * @package Swift\GraphQl\Attributes
  */
-#[Attribute(Attribute::TARGET_CLASS), DI(exclude: true)]
+#[Attribute(Attribute::TARGET_CLASS)]
+#[DI(exclude: true)]
+#[Deprecated]
 class Type {
-
+    
     /**
      * Type constructor.
      *

@@ -3,15 +3,15 @@
 /*
  * This file is part of the Swift Framework
  *
- * (c) Henri van 't Sant <henri@henrivantsant.dev>
+ * (c) Henri van 't Sant <hello@henrivantsant.dev>
  *
  * For the full copyright and license information, please view the LICENSE file that was distributed with this source code.
  */
 
 namespace Swift\HttpFoundation\Session\Storage\Handler;
 
+use Swift\DependencyInjection\Attributes\DI;
 use Swift\HttpFoundation\Session\SessionUtils;
-use Swift\Kernel\Attributes\DI;
 
 /**
  * This abstract session handler provides a generic implementation

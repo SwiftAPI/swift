@@ -1,0 +1,9 @@
+connection:
+  driver: mysql
+  engine: InnoDB
+  host: localhost
+  username: root
+  password: ''
+  database: database_name
+  port: 3306
+  prefix: tableprefix_

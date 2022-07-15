@@ -11,11 +11,12 @@
 namespace Swift\Router;
 
 use JetBrains\PhpStorm\Pure;
-use Swift\HttpFoundation\RequestInterface;
+use Psr\Http\Message\RequestInterface;
+use Swift\DependencyInjection\Attributes\DI;
 use Swift\HttpFoundation\RequestMatcher;
-use Swift\Kernel\Attributes\DI;
 use Swift\Router\MatchTypes\MatchTypeInterface;
-use Swift\Security\Authorization\AuthorizationTypesEnum;
+use Swift\Router\Types\RouteMethod;
+use Swift\Security\Authorization\AuthorizationType;
 
 /**
  * Class Route
@@ -36,14 +37,14 @@ class Route implements RouteInterface {
     private RouteParameterBag $params;
 
     /** @var MatchTypeInterface[] */
-    private array $matchTypes = array();
+    private array $matchTypes = [];
 
     /**
      * Route constructor.
      *
      * @param string|null $name
      * @param string $regex The route regex, custom regex must start with an @. You can use multiple pre-set regex filters, like [i:id]
-     * @param array $methods HTTP methods on which the route applies. Methods must be one or more of 5 HTTP Methods (GET|POST|PATCH|PUT|DELETE)
+     * @param \Swift\Router\Types\RouteMethod[] $methods HTTP methods on which the route applies. Methods must be one or more of 5 HTTP Methods (GET|POST|PATCH|PUT|DELETE)
      * @param string $controller FQCN of the controller class
      * @param string|null $action
      * @param array $authType
@@ -59,7 +60,7 @@ class Route implements RouteInterface {
         private string|null $action,
         private array $authType,
         private array $isGranted,
-        array $tags = array(),
+        array $tags = [],
         private RouteInterface|null $controllerRoute = null,
     ) {
         $this->tags = new RouteTagBag($tags);
@@ -75,7 +76,9 @@ class Route implements RouteInterface {
      */
     public function matchesRequest( RequestInterface $request ): bool {
         // Method did not match, continue to next route.
-        if ( ! $this->methodApplies( $request->getMethod() ) ) {
+        
+        $method = RouteMethod::from( $request->getMethod() );
+        if ( ! $this->methodApplies( $method ) ) {
             return false;
         }
 
@@ -120,12 +123,12 @@ class Route implements RouteInterface {
     /**
      * Checks whether a given HTTPMethod applies for this route
      *
-     * @param string $method
+     * @param \Swift\Router\Types\RouteMethod $method
      *
      * @return bool
      */
     #[Pure]
-    public function methodApplies( string $method ): bool {
+    public function methodApplies( \Swift\Router\Types\RouteMethod $method ): bool {
         return in_array( $method, $this->methods, false );
     }
 
@@ -228,7 +231,7 @@ class Route implements RouteInterface {
     }
 
     /**
-     * @return array
+     * @return \Swift\Router\Types\RouteMethod[]
      */
     public function getMethods(): array {
         return $this->methods;
@@ -301,7 +304,7 @@ class Route implements RouteInterface {
      * @return bool
      */
     public function isAuthRequired(): bool {
-        return !in_array(AuthorizationTypesEnum::PUBLIC_ACCESS, $this->authType, true);
+        return !in_array(AuthorizationType::PUBLIC_ACCESS, $this->authType, true);
     }
 
     /**

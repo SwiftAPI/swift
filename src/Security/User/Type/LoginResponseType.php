@@ -3,18 +3,16 @@
 /*
  * This file is part of the Swift Framework
  *
- * (c) Henri van 't Sant <henri@henrivantsant.dev>
+ * (c) Henri van 't Sant <hello@henrivantsant.dev>
  *
  * For the full copyright and license information, please view the LICENSE file that was distributed with this source code.
  */
 
 namespace Swift\Security\User\Type;
 
-use DateTime;
-use stdClass;
+use Swift\DependencyInjection\Attributes\DI;
 use Swift\GraphQl\Attributes\Field;
 use Swift\GraphQl\Attributes\Type;
-use Swift\Kernel\Attributes\DI;
 use Swift\Security\Authentication\Types\TokenType;
 
 /**

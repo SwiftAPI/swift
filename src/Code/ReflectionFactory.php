@@ -3,7 +3,7 @@
 /*
  * This file is part of the Swift Framework
  *
- * (c) Henri van 't Sant <henri@henrivantsant.dev>
+ * (c) Henri van 't Sant <hello@henrivantsant.dev>
  *
  * For the full copyright and license information, please view the LICENSE file that was distributed with this source code.
  */
@@ -11,7 +11,7 @@
 namespace Swift\Code;
 
 use SplObjectStorage;
-use Swift\Kernel\Attributes\Autowire;
+use Swift\DependencyInjection\Attributes\Autowire;
 
 /**
  * Class ReflectionFactory
@@ -29,8 +29,8 @@ final class ReflectionFactory {
      * ReflectionFactory constructor.
      */
     public function __construct(
-        private AttributeReader $attributeReader,
-        //private DocBlockFactory $docBlockFactory,
+        private readonly AttributeReader $attributeReader,
+        private readonly PropertyReader  $propertyReader,
     ) {
         $this->objectStorage = new SplObjectStorage();
     }
@@ -67,26 +67,22 @@ final class ReflectionFactory {
     public function getAttributeReader(): AttributeReader {
         return $this->attributeReader;
     }
-
-//    /**
-//     * @return DocBlockFactory
-//     */
-//    public function getDocBlockFactory(): DocBlockFactory {
-//        return $this->docBlockFactory;
-//    }
+    
+    /**
+     * @return \Swift\Code\PropertyReader
+     */
+    public function getPropertyReader(): PropertyReader {
+        return $this->propertyReader;
+    }
 
     private function createReflection( string $class ): ReflectionClass {
         $classReflector = new ReflectionClass($class);
 
         $attributeReader = $this->attributeReader;
-        //$docBlockFactory = $this->docBlockFactory;
 
         $classReflector->setAttributeReader(function () use ($attributeReader) {
             return $attributeReader;
         });
-//        $classReflector->setDocBlockFactory(function () use ($docBlockFactory) {
-//            return $docBlockFactory;
-//        });
 
         return $classReflector;
     }

@@ -3,7 +3,7 @@
 /*
  * This file is part of the Swift Framework
  *
- * (c) Henri van 't Sant <henri@henrivantsant.dev>
+ * (c) Henri van 't Sant <hello@henrivantsant.dev>
  *
  * For the full copyright and license information, please view the LICENSE file that was distributed with this source code.
  */
@@ -11,8 +11,8 @@
 namespace Swift\Security\Authentication\Events;
 
 
+use Psr\Http\Message\RequestInterface;
 use Swift\Events\AbstractEvent;
-use Swift\HttpFoundation\RequestInterface;
 use Swift\Security\Authentication\Authenticator\AuthenticatorInterface;
 use Swift\Security\Authentication\Exception\AuthenticationException;
 
@@ -33,9 +33,9 @@ class AuthenticationFailedEvent extends AbstractEvent {
      * @param AuthenticationException $authenticationException
      */
     public function __construct(
-        private RequestInterface $request,
-        private AuthenticatorInterface $authenticator,
-        private AuthenticationException $authenticationException,
+        private readonly RequestInterface        $request,
+        private readonly AuthenticatorInterface  $authenticator,
+        private readonly AuthenticationException $authenticationException,
     ) {
     }
 

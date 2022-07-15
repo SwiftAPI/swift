@@ -3,7 +3,7 @@
 /*
  * This file is part of the Swift Framework
  *
- * (c) Henri van 't Sant <henri@henrivantsant.com>
+ * (c) Henri van 't Sant <hello@henrivantsant.com>
  *
  * For the full copyright and license information, please view the LICENSE file that was distributed with this source code.
  */
@@ -11,14 +11,16 @@
 namespace Swift\GraphQl\Attributes;
 
 use Attribute;
-use Swift\Kernel\Attributes\DI;
-use Swift\Security\Authorization\AuthorizationTypesEnum;
+use JetBrains\PhpStorm\Deprecated;
+use Swift\DependencyInjection\Attributes\DI;
+use Swift\Security\Authorization\AuthorizationType;
 
 /**
  * Class Query
  * @package Swift\GraphQl\Attributes
  */
 #[Attribute(Attribute::TARGET_METHOD), DI(exclude: true)]
+#[Deprecated]
 class Query {
 
     /**
@@ -31,8 +33,8 @@ class Query {
      * @param string|null $generator
      * @param array $generatorArguments
      * @param string|null $description
-     * @param AuthorizationTypesEnum[]|string[] $authTypes
-     * @param string[] $isGranted
+     * @param AuthorizationType[] $authTypes
+     * @param \Swift\Security\Authorization\AuthorizationRole[] $isGranted
      */
     public function __construct(
         public string|null $name = null,
@@ -40,16 +42,11 @@ class Query {
         public bool $nullable = true,
         public bool $isList = false,
         public string|null $generator = null,
-        public array $generatorArguments = array(),
+        public array $generatorArguments = [],
         public string|null $description = null,
         public array $authTypes = [],
         public array $isGranted = [],
     ) {
-        $authorizationToEnums = [];
-        foreach ($authTypes as $authType) {
-            $authorizationToEnums[] = new AuthorizationTypesEnum($authType);
-        }
-        $this->authTypes = $authorizationToEnums;
     }
 
     /**
@@ -102,14 +99,14 @@ class Query {
     }
 
     /**
-     * @return AuthorizationTypesEnum[]
+     * @return AuthorizationType[]
      */
     public function getAuthTypes(): array {
         return $this->authTypes;
     }
 
     /**
-     * @return string[]
+     * @return \Swift\Security\Authorization\AuthorizationRole[]
      */
     public function getIsGranted(): array {
         return $this->isGranted;

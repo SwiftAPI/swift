@@ -3,16 +3,16 @@
 /*
  * This file is part of the Swift Framework
  *
- * (c) Henri van 't Sant <henri@henrivantsant.dev>
+ * (c) Henri van 't Sant <hello@henrivantsant.dev>
  *
  * For the full copyright and license information, please view the LICENSE file that was distributed with this source code.
  */
 
 namespace Swift\Security\User\EventSubscriber;
 
+use Swift\DependencyInjection\Attributes\Autowire;
 use Swift\Events\Attribute\ListenTo;
 use Swift\Events\EventListenerInterface;
-use Swift\Kernel\Attributes\Autowire;
 use Swift\Security\Authentication\Events\AuthenticationTokenCreatedEvent;
 
 /**

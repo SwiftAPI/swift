@@ -10,7 +10,7 @@
 
 namespace Swift\Application\Bootstrap\Autoloading;
 
-require_once INCLUDE_DIR . '/vendor/autoload.php';
+
 
 /**
  * Class Autoloader
@@ -18,7 +18,7 @@ require_once INCLUDE_DIR . '/vendor/autoload.php';
  */
 class Autoloader {
 
-    private array $registered = array();
+    private array $registered = [];
 
     /**
      * Register autoloaders
@@ -63,16 +63,17 @@ class Autoloader {
 
                 return;
             }
-            if ( file_exists( INCLUDE_DIR . '/app/' . str_replace('app\\', '', $classPathLc) ) ) {
-                include_once INCLUDE_DIR . '/app/' . str_replace('app\\', '', $classPathLc);
+            if ( file_exists( INCLUDE_DIR . '/app/' . str_replace('app' . DIRECTORY_SEPARATOR, '', $classPathLc) ) ) {
+                include_once INCLUDE_DIR . '/app/' . str_replace('app' . DIRECTORY_SEPARATOR, '', $classPathLc);
 
                 return;
             }
-            if ( file_exists( INCLUDE_DIR . '/app/' . str_replace('App\\', '', $classPathUc) ) ) {
-                include_once INCLUDE_DIR . '/app/' . str_replace('App\\', '', $classPathUc);
+            if ( file_exists( INCLUDE_DIR . '/app/' . str_replace('App' . DIRECTORY_SEPARATOR, '', $classPathUc) ) ) {
+                include_once INCLUDE_DIR . '/app/' . str_replace('App' . DIRECTORY_SEPARATOR, '', $classPathUc);
 
                 return;
             }
+            
         } );
     }
 

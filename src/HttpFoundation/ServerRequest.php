@@ -3,20 +3,15 @@
 /*
  * This file is part of the Swift Framework
  *
- * (c) Henri van 't Sant <henri@henrivantsant.dev>
+ * (c) Henri van 't Sant <hello@henrivantsant.dev>
  *
  * For the full copyright and license information, please view the LICENSE file that was distributed with this source code.
  */
 
 namespace Swift\HttpFoundation;
 
-use Psr\Http\Message\{RequestInterface as PsrRequestInterface, ServerRequestInterface, StreamInterface, UploadedFileInterface, UriInterface};
-use Swift\HttpFoundation\Exception\ConflictingHeadersException;
-use Swift\HttpFoundation\Exception\JsonException;
-use Swift\HttpFoundation\Exception\SuspiciousOperationException;
-use Swift\HttpFoundation\Session\SessionInterface;
-use Swift\Kernel\Attributes\DI;
-use function in_array;
+use Psr\Http\Message\{RequestInterface as PsrRequestInterface, ServerRequestInterface, UploadedFileInterface};
+use Swift\DependencyInjection\Attributes\DI;
 
 /**
  * ServerRequest represents an HTTP request.
@@ -38,7 +33,7 @@ class ServerRequest extends Request implements ServerRequestInterface {
     private array $cookieParams = [];
 
     /** @var array|object|null */
-    private object|null|array $parsedBody;
+    private object|null|array $parsedBody = null;
 
     /** @var array */
     private array $queryParams = [];

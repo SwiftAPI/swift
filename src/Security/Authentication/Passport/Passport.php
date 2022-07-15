@@ -1,9 +1,9 @@
-<?php declare(strict_types=1);
+<?php declare( strict_types=1 );
 
 /*
  * This file is part of the Swift Framework
  *
- * (c) Henri van 't Sant <henri@henrivantsant.dev>
+ * (c) Henri van 't Sant <hello@henrivantsant.dev>
  *
  * For the full copyright and license information, please view the LICENSE file that was distributed with this source code.
  */
@@ -20,66 +20,67 @@ use Swift\Security\User\UserInterface;
  * @package Swift\Security\Authentication\Passport
  */
 class Passport implements PassportInterface {
-
-    private array $stamps = array();
+    
+    private array $stamps = [];
     public AttributesBag $attributes;
-
+    
     /**
      * Passport constructor.
      *
-     * @param UserInterface $user
+     * @param UserInterface        $user
      * @param CredentialsInterface $credentials
-     * @param array $stamps
-     * @param array $attributes
+     * @param array                $stamps
+     * @param array                $attributes
      */
     public function __construct(
-        private UserInterface $user,
-        private CredentialsInterface $credentials,
-        array $stamps = array(),
-        array $attributes = array(),
+        private readonly UserInterface        $user,
+        private readonly CredentialsInterface $credentials,
+        array                                 $stamps = [],
+        array                                 $attributes = [],
     ) {
-        $this->credentials->validateCredentials($this->user);
-        $this->attributes = new AttributesBag($attributes);
-
-        foreach ($stamps as $stamp) {
-            $this->stamps[get_class($stamp)] = $stamp;
+        $this->credentials->validateCredentials( $this->user );
+        $this->attributes = new AttributesBag( $attributes );
+        
+        foreach ( $stamps as $stamp ) {
+            $this->stamps[ get_class( $stamp ) ] = $stamp;
         }
     }
-
+    
     /**
      * @inheritDoc
      */
     public function getUser(): UserInterface {
         return $this->user;
     }
-
+    
     /**
      * @inheritDoc
      */
     public function getStamps(): array {
         return $this->stamps;
     }
-
+    
     /**
      * @inheritDoc
      */
     public function getStamp( string $stamp ): ?StampInterface {
-        return $this->stamps[$stamp] ?? null;
+        return $this->stamps[ $stamp ] ?? null;
     }
-
+    
     /**
      * @inheritDoc
      */
-    #[Pure] public function hasStamp( string $stamp ): bool {
-        return array_key_exists($stamp, $this->stamps);
+    #[Pure]
+    public function hasStamp( string $stamp ): bool {
+        return array_key_exists( $stamp, $this->stamps );
     }
-
+    
     /**
      * @inheritDoc
      */
     public function getAttributes(): AttributesBag {
         return $this->attributes;
     }
-
-
+    
+    
 }

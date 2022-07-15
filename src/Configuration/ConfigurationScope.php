@@ -3,7 +3,7 @@
 /*
  * This file is part of the Swift Framework
  *
- * (c) Henri van 't Sant <henri@henrivantsant.dev>
+ * (c) Henri van 't Sant <hello@henrivantsant.dev>
  *
  * For the full copyright and license information, please view the LICENSE file that was distributed with this source code.
  */
@@ -11,16 +11,13 @@
 namespace Swift\Configuration;
 
 use Swift\Configuration\Tree\TreeInterface;
-use Swift\Events\Attribute\ListenTo;
-use Swift\Events\EventListenerInterface;
-use Swift\Kernel\Event\KernelOnBeforeShutdown;
 use Symfony\Component\Filesystem\Filesystem;
 
 /**
  * Class ConfigurationScope
  * @package Swift\Configuration
  */
-abstract class ConfigurationScope implements EventListenerInterface {
+abstract class ConfigurationScope {
 
     protected TreeInterface $runtimeConfig;
     protected TreeInterface|null $appConfig;
@@ -52,13 +49,13 @@ abstract class ConfigurationScope implements EventListenerInterface {
     }
 
     /**
-     * Write updated app config on kernel shutdown
+     * Write updated app config
      */
-    #[ListenTo(event: KernelOnBeforeShutdown::class)]
-    public function onKernelShutdown(): void {
+    public function persist(): void {
         $filename = $this->appFilePath . DIRECTORY_SEPARATOR . $this->filename;
-        if ($this->appConfig && $this->appConfigHasModified && (new Filesystem())->exists($filename)) {
-            file_put_contents($filename, $this->yaml->dump($this->appConfig->toArray(), 2));
+    
+        if ($this->runtimeConfig && $this->appConfigHasModified && (new Filesystem())->exists($filename)) {
+            file_put_contents($filename, $this->yaml->dump($this->runtimeConfig->toArray(), 2));
         }
     }
 

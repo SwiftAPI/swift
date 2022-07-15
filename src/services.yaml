@@ -1,6 +1,3 @@
-imports:
-  - { resource: vendor/swift-api/swift/src/Application/services.yaml}
-
 parameters:
 # ...
 
@@ -11,5 +8,6 @@ services:
     public: true
 
   Swift\:
-    resource: 'vendor/swift-api/swift/src/*'
-    exclude: [ 'Monolog/Logger' ]
+    resource: '*'
+    public: true
+    exclude: [ 'Monolog/Logger', 'GraphQl_old', 'GraphQl2/*', 'GraphQl3/*', 'Doctrine/*', 'Application/Bootstrap/*', 'Application/Globals.php', 'Runtime/Server/server-bootstrap.php' ]

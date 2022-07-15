@@ -13,7 +13,7 @@ namespace Swift\Configuration;
 use stdClass;
 use Swift\Configuration\Helper\Parser;
 use RuntimeException;
-use Swift\Kernel\Attributes\Autowire;
+use Swift\DependencyInjection\Attributes\Autowire;
 
 /**
  * Class ConfigurationDeprecated

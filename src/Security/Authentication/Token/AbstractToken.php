@@ -3,7 +3,7 @@
 /*
  * This file is part of the Swift Framework
  *
- * (c) Henri van 't Sant <henri@henrivantsant.dev>
+ * (c) Henri van 't Sant <hello@henrivantsant.dev>
  *
  * For the full copyright and license information, please view the LICENSE file that was distributed with this source code.
  */
@@ -12,7 +12,7 @@ namespace Swift\Security\Authentication\Token;
 
 use DateTime;
 use stdClass;
-use Swift\Kernel\Attributes\DI;
+use Swift\DependencyInjection\Attributes\DI;
 use Swift\Security\User\UserInterface;
 use Swift\Security\Utils;
 use Swift\Security\Authentication\Utils as AuthenticationUtils;
@@ -28,7 +28,7 @@ abstract class AbstractToken implements TokenInterface {
     protected ?int $id = null;
     protected ?int $clientId = null;
     protected ?int $userId = null;
-    protected DateTime $expires;
+    protected \DateTimeInterface $expires;
 
     /**
      * AbstractToken constructor.
@@ -50,7 +50,14 @@ abstract class AbstractToken implements TokenInterface {
         }
         $this->userId = $this->user->getId();
     }
-
+    
+    /**
+     * @return int|null
+     */
+    public function getId(): ?int {
+        return $this->id;
+    }
+    
     /**
      * @inheritDoc
      */
@@ -119,4 +126,5 @@ abstract class AbstractToken implements TokenInterface {
     protected function generateToken(): string {
         return Utils::randomToken();
     }
+    
 }

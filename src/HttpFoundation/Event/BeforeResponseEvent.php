@@ -3,16 +3,16 @@
 /*
  * This file is part of the Swift Framework
  *
- * (c) Henri van 't Sant <henri@henrivantsant.dev>
+ * (c) Henri van 't Sant <hello@henrivantsant.dev>
  *
  * For the full copyright and license information, please view the LICENSE file that was distributed with this source code.
  */
 
 namespace Swift\HttpFoundation\Event;
 
+use Swift\DependencyInjection\Attributes\DI;
 use Swift\Events\AbstractEvent;
 use Swift\HttpFoundation\ResponseInterface;
-use Swift\Kernel\Attributes\DI;
 
 /**
  * Class BeforeResponseEvent

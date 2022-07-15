@@ -26,8 +26,8 @@ declare(strict_types=1);
 namespace Foo\Service;
 
 use Swift\Configuration\ConfigurationInterface;
-use Swift\Kernel\Attributes\Autowire;
-use Swift\Model\EntityInterface;
+use Swift\DependencyInjection\Attributes\Autowire;
+use Swift\Orm\EntityInterface;
 use Swift\Security\Security;
 
 /**
@@ -73,7 +73,7 @@ namespace Foo\Service;
 
 use Swift\Configuration\ConfigurationInterface;
 use Swift\Kernel\Attributes\DI;
-use Swift\Model\EntityInterface;
+use Swift\Orm\EntityInterface;
 use Swift\Security\Security;
 use Foo\Bar\FooBarInterface;
 
@@ -129,9 +129,9 @@ namespace Foo\Service;
 
 use Swift\Configuration\ConfigurationInterface;
 use Swift\HttpFoundation\RequestInterface;
-use Swift\Kernel\Attributes\Autowire;
+use Swift\DependencyInjection\Attributes\Autowire;
 use Swift\Kernel\Attributes\DI;
-use Swift\Model\EntityInterface;
+use Swift\Orm\EntityInterface;
 use Swift\Security\Security;
 
 /**
@@ -235,9 +235,9 @@ declare(strict_types=1);
 namespace Foo\Repository;
 
 use Swift\Kernel\Attributes\DI;
-use Swift\Model\Attributes\DB;
-use Swift\Model\Entity;
-use Swift\Model\EntityInterface;
+use Swift\Orm\Attributes\DB;
+use Swift\Orm\Entity;
+use Swift\Orm\EntityInterface;
 
 /**
  * Class FooRepository
@@ -261,8 +261,8 @@ use Swift\GraphQl\Attributes\InputType;
 use Swift\GraphQl\Attributes\Mutation;
 use Swift\GraphQl\Attributes\Query;
 use Swift\GraphQl\Attributes\Type;
-use Swift\Kernel\Attributes\DI;
-use Swift\Kernel\DiTags;
+use Swift\DependencyInjection\Attributes\DI;
+use Swift\Kernel\KernelDiTags;
 use Symfony\Component\DependencyInjection\ContainerBuilder;
 use Symfony\Component\DependencyInjection\Compiler\CompilerPassInterface;
 

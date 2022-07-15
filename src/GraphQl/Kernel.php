@@ -16,72 +16,61 @@ use GraphQL\GraphQL;
 use GraphQL\Type\Definition\ResolveInfo;
 use GraphQL\Validator\Rules\DisableIntrospection;
 use Swift\Configuration\ConfigurationInterface;
+use Swift\DependencyInjection\Attributes\Autowire;
 use Swift\GraphQl\Resolvers\FieldResolver;
 use Swift\HttpFoundation\JsonResponse;
 use Swift\HttpFoundation\RequestInterface;
-use Swift\Kernel\Attributes\Autowire;
 
 /**
  * Class Kernel
  * @package Swift\GraphQl
  */
 #[Autowire]
-class Kernel {
-
+final class Kernel {
+    
     /**
-     * Kernel constructor.
-     *
-     * @param RequestInterface $request
      * @param ConfigurationInterface $configuration
-     * @param Schema $schema
-     * @param FieldResolver $fieldResolver
+     * @param \Swift\GraphQl\Factory $factory
      */
     public function __construct(
-        private RequestInterface $request,
-        private ConfigurationInterface $configuration,
-        private Schema $schema,
-        private FieldResolver $fieldResolver,
+        private readonly ConfigurationInterface $configuration,
+        private readonly Factory                $factory,
     ) {
     }
-
-    public function run(): JsonResponse {
-        return new JsonResponse( $this->execute() );
+    
+    public function run( RequestInterface $request ): JsonResponse {
+        return new JsonResponse( $this->execute( $request ) );
     }
-
-    private function execute(): array {
-        $fieldResolver = $this->fieldResolver;
-
-        $debug = ( $this->configuration->get( identifier: 'app.debug', scope: 'root' ) || ( $this->configuration->get( identifier: 'app.mode', scope: 'root' ) === 'develop' ) ) ?
+    
+    private function execute( RequestInterface $request ): array {
+        $debug = \Swift\Configuration\Utils::isDevModeOrDebug( $this->configuration ) ?
             DebugFlag::INCLUDE_DEBUG_MESSAGE | DebugFlag::INCLUDE_TRACE : DebugFlag::NONE;
-
+        
         try {
             $result = GraphQL::executeQuery(
-                schema: $this->schema->getSchema(),
-                source: $this->request->getContent()->get( key: 'query' ) ?: null,
-                variableValues: $this->request->getContent()->get( key: 'variables' ) ?: null,
-                fieldResolver: function ( $value, $args, $context, ResolveInfo $info ) use ( $fieldResolver ) {
-                    return $fieldResolver->resolve( $value, $args, $context, $info );
-                },
-                validationRules: $this->getValidationRules()
+                schema:          $this->factory->createSchema(),
+                source:          $request->getContent()->get( key: 'query' ) ?: null,
+                variableValues:  $request->getContent()->get( key: 'variables' ) ?: null,
+                validationRules: $this->getValidationRules(),
             );
-
+            
             return $result->toArray( $debug );
         } catch ( \Exception $exception ) {
-            return array( 'errors' => [ FormattedError::createFromException( $exception, $debug ) ] );
+            return [ 'errors' => [ FormattedError::createFromException( $exception, $debug ) ] ];
         }
     }
-
+    
     /**
      * @return array
      */
     private function getValidationRules(): array {
-        $rules = array();
-
+        $rules = [];
+        
         if ( ! $this->configuration->get( 'graphql.enable_introspection', 'app' ) ) {
             $rules[] = new DisableIntrospection();
         }
-
+        
         return $rules;
     }
-
+    
 }

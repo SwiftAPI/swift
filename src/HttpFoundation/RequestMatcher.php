@@ -3,14 +3,15 @@
 /*
  * This file is part of the Swift Framework
  *
- * (c) Henri van 't Sant <henri@henrivantsant.dev>
+ * (c) Henri van 't Sant <hello@henrivantsant.dev>
  *
  * For the full copyright and license information, please view the LICENSE file that was distributed with this source code.
  */
 
 namespace Swift\HttpFoundation;
 
-use Swift\Kernel\Attributes\DI;
+use Swift\DependencyInjection\Attributes\DI;
+use Psr\Http\Message\RequestInterface;
 
 /**
  * RequestMatcher compares a pre-defined set of checks against a Request instance.
@@ -67,7 +68,15 @@ class RequestMatcher implements RequestMatcherInterface {
      * @param null $schemes
      * @param int|null $port
      */
-    public function __construct( string $path = null, string $host = null, $methods = null, $ips = null, array $attributes = [], $schemes = null, int $port = null ) {
+    public function __construct(
+        string $path = null,
+        string $host = null,
+        $methods = null,
+        $ips = null,
+        array $attributes = [],
+        $schemes = null,
+        int $port = null
+    ) {
         $this->matchPath( $path );
         $this->matchHost( $host );
         $this->matchMethod( $methods );
@@ -85,7 +94,7 @@ class RequestMatcher implements RequestMatcherInterface {
      *
      * @param string|null $regexp
      */
-    public function matchPath( ?string $regexp ) {
+    public function matchPath( ?string $regexp ): void {
         $this->path = $regexp;
     }
 
@@ -94,7 +103,7 @@ class RequestMatcher implements RequestMatcherInterface {
      *
      * @param string|null $regexp
      */
-    public function matchHost( ?string $regexp ) {
+    public function matchHost( ?string $regexp ): void {
         $this->host = $regexp;
     }
 
@@ -104,7 +113,7 @@ class RequestMatcher implements RequestMatcherInterface {
      * @param string|string[]|null $method An HTTP method or an array of HTTP methods
      */
     public function matchMethod( array|string|null $method ): void {
-        $this->methods = null !== $method ? array_map( 'strtoupper', (array) $method ) : [];
+        $this->methods = null !== $method ? array_map( static fn( $method ) => \is_string($method) ? strtoupper($method) : strtoupper($method->value), (array) $method ) : [];
     }
 
     /**

@@ -10,11 +10,14 @@
 
 namespace Swift\GraphQl\Attributes;
 
+use JetBrains\PhpStorm\Deprecated;
+
 /**
  * Class InterfaceType
  * @package Swift\GraphQl\Attributes
  */
 #[\Attribute(\Attribute::TARGET_CLASS)]
+#[Deprecated]
 class InterfaceType {
 
     /**

@@ -3,14 +3,13 @@
 /*
  * This file is part of the Swift Framework
  *
- * (c) Henri van 't Sant <henri@henrivantsant.dev>
+ * (c) Henri van 't Sant <hello@henrivantsant.dev>
  *
  * For the full copyright and license information, please view the LICENSE file that was distributed with this source code.
  */
 
 namespace Swift\Router;
 
-use Swift\HttpFoundation\ParameterBag;
 use Swift\Router\MatchTypes\MatchType;
 use Swift\Router\MatchTypes\MatchTypeInterface;
 
@@ -41,7 +40,7 @@ class Utils {
      *
      * @return RouteParameterBag
      */
-    public static function getRouteParametersFromPath( string $path, array &$matchTypes = array() ): RouteParameterBag {
+    public static function getRouteParametersFromPath( string $path, array &$matchTypes = [] ): RouteParameterBag {
         $parameters = new RouteParameterBag();
         if (preg_match_all('`(/|\.|)\[([^:\]]*+)(?::([^:\]]*+))?\](\?|)`', $path, $matches, PREG_SET_ORDER)) {
             foreach ($matches as [$block, $pre, $type, $param, $optional] ) {
@@ -62,7 +61,7 @@ class Utils {
      *
      * @return string
      */
-    public static function routePathToRegex( string $route, array $matchTypes = array() ): string {
+    public static function routePathToRegex( string $route, array $matchTypes = [] ): string {
         if (preg_match_all('`(/|\.|)\[([^:\]]*+)(?::([^:\]]*+))?\](\?|)`', $route, $matches, PREG_SET_ORDER)) {
             foreach ($matches as [$block, $pre, $type, $param, $optional] ) {
 

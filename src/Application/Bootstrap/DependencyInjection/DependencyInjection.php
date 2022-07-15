@@ -1,4 +1,4 @@
-<?php declare(strict_types=1);
+<?php declare( strict_types=1 );
 
 /*
  * This file is part of the Swift Framework
@@ -11,34 +11,22 @@
 namespace Swift\Application\Bootstrap\DependencyInjection;
 
 use Exception;
-use Symfony\Component\Config\FileLocator;
-use Symfony\Component\DependencyInjection\Loader\YamlFileLoader;
-use Swift\Kernel\Container\Container;
+use Swift\DependencyInjection\ContainerFactory;
+use Swift\DependencyInjection\ContainerInterface;
 
 /**
  * Class DependencyInjection
  * @package Swift\Application\Bootstrap\DependencyInjection
  */
 class DependencyInjection {
-
+    
     /**
      * Initialize DI
-     * 
+     *
      * @throws Exception
      */
-    public function initialize(): Container {
-        $container = new Container();
-
-        if (!file_exists(INCLUDE_DIR . '/services.yaml')) {
-            throw new \RuntimeException('Missing services.yaml declaration in root. Please see https://swiftapi.github.io/swift-docs/docs/dependency-injection');
-        }
-
-        $loader = new YamlFileLoader($container, new FileLocator(INCLUDE_DIR));
-        $loader->load('services.yaml');
-
-        $container->compile();
-
-        return $container;
+    public function initialize(): ContainerInterface {
+        return ContainerFactory::createContainer();
     }
     
 }

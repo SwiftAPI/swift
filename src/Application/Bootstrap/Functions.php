@@ -10,7 +10,8 @@
 
 namespace Swift\Application\Bootstrap;
 
-use Swift\Kernel\Attributes\DI;
+
+use Swift\DependencyInjection\Attributes\DI;
 
 #[DI(exclude: true)]
 class Functions {}

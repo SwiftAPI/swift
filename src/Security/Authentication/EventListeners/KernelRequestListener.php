@@ -3,7 +3,7 @@
 /*
  * This file is part of the Swift Framework
  *
- * (c) Henri van 't Sant <henri@henrivantsant.dev>
+ * (c) Henri van 't Sant <hello@henrivantsant.dev>
  *
  * For the full copyright and license information, please view the LICENSE file that was distributed with this source code.
  */
@@ -14,7 +14,7 @@ namespace Swift\Security\Authentication\EventListeners;
 use Swift\Configuration\ConfigurationInterface;
 use Swift\Events\Attribute\ListenTo;
 use Swift\Events\EventListenerInterface;
-use Swift\Kernel\Attributes\Autowire;
+use Swift\DependencyInjection\Attributes\Autowire;
 use Swift\Kernel\Event\KernelRequestEvent;
 use Swift\Security\Authentication\Utils;
 
@@ -29,7 +29,7 @@ class KernelRequestListener implements EventListenerInterface {
      * KernelRequestListener constructor.
      */
     public function __construct(
-        private ConfigurationInterface $configuration,
+        private readonly ConfigurationInterface $configuration,
     ) {
     }
 

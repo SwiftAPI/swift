@@ -10,7 +10,7 @@
 
 namespace Swift\Security\Authentication;
 
-use Swift\Kernel\Attributes\DI;
+use Swift\DependencyInjection\Attributes\DI;
 
 /**
  * Class Utils

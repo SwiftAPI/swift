@@ -1,9 +1,9 @@
-<?php declare(strict_types=1);
+<?php declare( strict_types=1 );
 
 /*
  * This file is part of the Swift Framework
  *
- * (c) Henri van 't Sant <henri@henrivantsant.dev>
+ * (c) Henri van 't Sant <hello@henrivantsant.dev>
  *
  * For the full copyright and license information, please view the LICENSE file that was distributed with this source code.
  */
@@ -11,10 +11,12 @@
 namespace Swift\Security\User;
 
 
-use Swift\Kernel\Attributes\Autowire;
-use Swift\Model\EntityInterface;
-use Swift\Model\Exceptions\DuplicateEntryException;
+use Swift\Dbal\Exceptions\DuplicateEntryException;
+use Swift\DependencyInjection\Attributes\Autowire;
+use Swift\Orm\EntityManagerInterface;
 use Swift\Security\Authentication\Passport\Credentials\PasswordCredentialsEncoder;
+use Swift\Security\User\Entity\UserCredentials;
+use Swift\Security\User\Entity\UserEntity;
 use Swift\Security\User\Exception\UserAlreadyExistsException;
 
 /**
@@ -23,89 +25,90 @@ use Swift\Security\User\Exception\UserAlreadyExistsException;
  */
 #[Autowire]
 final class UserProvider implements UserProviderInterface {
-
+    
     private UserInterface $user;
-
+    
     /**
      * UserProvider constructor.
      *
-     * @param UserStorageInterface $userDatabaseStorage
+     * @param \Swift\Orm\EntityManagerInterface $entityManager
      */
     public function __construct(
-        private UserStorageInterface $userDatabaseStorage,
+        private readonly EntityManagerInterface $entityManager,
     ) {
     }
-
+    
     /**
      * @inheritDoc
      */
     public function getUserByUsername( string $username ): ?UserInterface {
-        if (!$userInfo = $this->userDatabaseStorage->findOne(array('username' => $username))) {
+        if ( ! $userInfo = $this->entityManager->findOne( UserEntity::class, [ 'username' => $username ] ) ) {
             return null;
         }
-
-        return $this->getUserInstance($userInfo->toArray());
+        
+        return $this->getUserInstance( $userInfo );
     }
-
+    
     /**
      * @inheritDoc
      */
     public function getUserByEmail( string $email ): ?UserInterface {
-        if (!$userInfo = $this->userDatabaseStorage->findOne(array('email' => $email))) {
+        if ( ! $userInfo = $this->entityManager->findOne( UserEntity::class, [ 'email' => $email ] ) ) {
             return null;
         }
-
-        return $this->getUserInstance($userInfo->toArray());
+        
+        return $this->getUserInstance( $userInfo );
     }
-
-
+    
+    
     /**
      * @inheritDoc
      */
     public function getUserById( int $id ): ?UserInterface {
-        if (!$userInfo = $this->userDatabaseStorage->findOne(array('id' => $id))) {
+        if ( ! $userInfo = $this->entityManager->findOne( UserEntity::class, [ 'id' => $id ] ) ) {
             return null;
         }
-
-        return $this->getUserInstance($userInfo->toArray());
+        
+        return $this->getUserInstance( $userInfo );
     }
-
+    
     /**
      * @inheritDoc
      */
     public function storeUser( string $username, string $password, string $email, string $firstname, string $lastname ): UserInterface {
         try {
-            $data = $this->userDatabaseStorage->save([
-                'username' => $username,
-                'password' => (new PasswordCredentialsEncoder($password))->getEncoded(),
-                'email' => $email,
-                'firstname' => $firstname,
-                'lastname' => $lastname,
-                'created' => new \DateTime(),
-                'modified' => new \DateTime(),
-            ]);
-        } catch (DuplicateEntryException $exception) {
-            throw new UserAlreadyExistsException($exception->getMessage());
+            $user = new UserEntity();
+            $user->setUsername( $username );
+            $user->setEmail( $email );
+            $user->setFirstname( $firstname );
+            $user->setLastname( $lastname );
+            $user->getCredentials()->setCredential( ( new PasswordCredentialsEncoder( $password ) )->getEncoded() );
+            
+            $this->entityManager->persist( $user );
+            $this->entityManager->run();
+            
+            return $this->getUserInstance( $user );
+        } catch ( DuplicateEntryException $exception ) {
+            throw new UserAlreadyExistsException( $exception->getMessage() );
         }
-
-        return $this->getUserInstance($data->toArray());
     }
-
+    
     /**
-     * @param array $userInfo
+     * @param \Swift\Security\User\Entity\UserEntity $userInfo
      *
      * @return UserInterface
      */
-    private function getUserInstance(array $userInfo): UserInterface {
-        if (isset($this->user)) {
+    private function getUserInstance( UserEntity $userInfo ): UserInterface {
+        if ( isset( $this->user ) ) {
             return $this->user;
         }
-
-        $this->user = new User(...$userInfo);
-        $this->user->setUserStorage($this->userDatabaseStorage);
-
+        
+        $this->user = User::fromUserEntity( $userInfo );
+        $this->user->setUserStorage( $this->entityManager );
+        $this->user->setUserEntity( $userInfo );
+        
         return $this->user;
     }
-
-
+    
+    
 }

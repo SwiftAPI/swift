@@ -3,7 +3,7 @@
 /*
  * This file is part of the Swift Framework
  *
- * (c) Henri van 't Sant <henri@henrivantsant.dev>
+ * (c) Henri van 't Sant <hello@henrivantsant.dev>
  *
  * For the full copyright and license information, please view the LICENSE file that was distributed with this source code.
  */
@@ -18,6 +18,7 @@ use Swift\Kernel\TypeSystem\Enum;
  */
 class DiTags extends Enum {
 
-    public const CONFIGURATION = 'CONFIGURATION';
+    public const CONFIGURATION = 'configuration.scope';
+    public const CONFIGURATION_SUB_SCOPE = 'CONFIGURATION.SUB.SCOPE';
 
 }

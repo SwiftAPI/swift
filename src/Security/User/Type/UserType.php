@@ -3,7 +3,7 @@
 /*
  * This file is part of the Swift Framework
  *
- * (c) Henri van 't Sant <henri@henrivantsant.dev>
+ * (c) Henri van 't Sant <hello@henrivantsant.dev>
  *
  * For the full copyright and license information, please view the LICENSE file that was distributed with this source code.
  */
@@ -11,20 +11,20 @@
 namespace Swift\Security\User\Type;
 
 use DateTime;
+use Swift\DependencyInjection\Attributes\DI;
 use Swift\GraphQl\Attributes\Field;
 use Swift\GraphQl\Attributes\Type;
 use Swift\GraphQl\ContextInterface;
 use Swift\GraphQl\Types\NodeTypeInterface;
 use Swift\GraphQl\Utils;
-use Swift\Kernel\Attributes\DI;
-use Swift\Security\User\Controller\UserControllerGraphQl;
+use Swift\Security\User\Controller\GraphQl\UserController;
 
 /**
  * Class UserType
  * @package Swift\Security\User\Type
  */
 #[DI(autowire: false), Type(description: 'Represents user data')]
-class UserType implements NodeTypeInterface {
+class UserType { // implements NodeTypeInterface {
 
     /**
      * UserType constructor.
@@ -59,7 +59,7 @@ class UserType implements NodeTypeInterface {
      * @inheritDoc
      */
     public static function getNodeResolverClassnameAndMethod( int|string $id, ContextInterface $context ): array {
-        return [UserControllerGraphQl::class, 'getUserTypeByNode'];
+        return [UserController::class, 'getUserTypeByNode'];
     }
 
 }

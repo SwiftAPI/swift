@@ -11,6 +11,7 @@
 namespace Swift\Security\User\Type;
 
 
+use Swift\DependencyInjection\Attributes\DI;
 use Swift\GraphQl\Attributes\Field;
 use Swift\GraphQl\Attributes\Type;
 use Swift\GraphQl\Types\AbstractEdgeType;
@@ -21,7 +22,8 @@ use Swift\GraphQl\Types\NodeTypeInterface;
  * @package Swift\Security\User\Type
  */
 #[Type]
-class UserEdge extends AbstractEdgeType {
+#[DI(exclude: true)]
+class UserEdge {// extends AbstractEdgeType {
 
     /**
      * @return NodeTypeInterface

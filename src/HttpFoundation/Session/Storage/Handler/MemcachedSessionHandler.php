@@ -10,6 +10,8 @@
 
 namespace Swift\HttpFoundation\Session\Storage\Handler;
 
+use ReturnTypeWillChange;
+
 /**
  * Memcached based session storage handler based on the Memcached class
  * provided by the PHP memcached extension.
@@ -63,6 +65,7 @@ class MemcachedSessionHandler extends AbstractSessionHandler {
     /**
      * @return bool
      */
+    #[ReturnTypeWillChange]
     public function updateTimestamp( $sessionId, $data ) {
         $this->memcached->touch( $this->prefix . $sessionId, time() + $this->ttl );
 
@@ -72,6 +75,7 @@ class MemcachedSessionHandler extends AbstractSessionHandler {
     /**
      * @return bool
      */
+    #[ReturnTypeWillChange]
     public function gc( $maxlifetime ) {
         // not required here because memcached will auto expire the records anyhow.
         return true;

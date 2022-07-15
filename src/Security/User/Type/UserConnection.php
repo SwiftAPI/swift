@@ -3,7 +3,7 @@
 /*
  * This file is part of the Swift Framework
  *
- * (c) Henri van 't Sant <henri@henrivantsant.dev>
+ * (c) Henri van 't Sant <hello@henrivantsant.dev>
  *
  * For the full copyright and license information, please view the LICENSE file that was distributed with this source code.
  */
@@ -11,6 +11,7 @@
 namespace Swift\Security\User\Type;
 
 
+use Swift\DependencyInjection\Attributes\DI;
 use Swift\GraphQl\Attributes\Field;
 use Swift\GraphQl\Attributes\Type;
 use Swift\GraphQl\Types\AbstractConnectionType;
@@ -20,14 +21,15 @@ use Swift\GraphQl\Types\AbstractConnectionType;
  * @package Swift\Security\User\Type
  */
 #[Type(description: 'List of users')]
-class UserConnection extends AbstractConnectionType {
+#[DI(exclude: true)]
+class UserConnection { // extends AbstractConnectionType {
 
     /**
      * @return UserEdge[]
      */
     #[Field(name: 'edges', type: UserEdge::class, isList: true, description: 'Edges')]
     public function getEdges(): array {
-        $edges = array();
+        $edges = [];
         foreach ($this->resultSet as $user) {
             unset($user->password);
             $edges[] = new UserEdge($user->id, new UserType(...$user->toArray()));

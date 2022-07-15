@@ -3,7 +3,7 @@
 /*
  * This file is part of the Swift Framework
  *
- * (c) Henri van 't Sant <henri@henrivantsant.dev>
+ * (c) Henri van 't Sant <hello@henrivantsant.dev>
  *
  * For the full copyright and license information, please view the LICENSE file that was distributed with this source code.
  */
@@ -12,10 +12,7 @@ namespace Swift\Events\Command;
 
 
 use Swift\Console\Command\AbstractCommand;
-use Swift\Events\AbstractEvent;
-use Swift\Events\EventDispatcher;
-use Swift\Kernel\Attributes\Autowire;
-use Swift\Kernel\ServiceLocatorInterface;
+use Swift\DependencyInjection\ServiceLocatorInterface;
 use Symfony\Component\Console\Input\InputInterface;
 use Symfony\Component\Console\Input\InputOption;
 use Symfony\Component\Console\Output\OutputInterface;
@@ -54,16 +51,16 @@ final class ListEventsCommand extends AbstractCommand {
     }
 
     protected function execute( InputInterface $input, OutputInterface $output ): int {
-        $events = array();
+        $events = [];
 
         foreach ($this->events as $event) {
             $eventReflection = $this->serviceLocator->getReflectionClass($event);
-            $events[$event] = array($event, $eventReflection->getStaticPropertyValue('eventDescription'));
+            $events[$event] = [$event, $eventReflection->getStaticPropertyValue('eventDescription')];
         }
 
         ksort($events);
 
-        $this->io->table(array('event', 'description'), $events);
+        $this->io->table(['event', 'description'], $events);
 
         return AbstractCommand::SUCCESS;
     }

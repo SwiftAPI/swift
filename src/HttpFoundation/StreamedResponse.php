@@ -3,16 +3,15 @@
 /*
  * This file is part of the Swift Framework
  *
- * (c) Henri van 't Sant <henri@henrivantsant.dev>
+ * (c) Henri van 't Sant <hello@henrivantsant.dev>
  *
  * For the full copyright and license information, please view the LICENSE file that was distributed with this source code.
  */
 
 namespace Swift\HttpFoundation;
 
-use Swift\Kernel\Attributes\DI;
 
-/**
+use Swift\DependencyInjection\Attributes\DI;/**
  * StreamedResponse represents a streamed HTTP response.
  *
  * A StreamedResponse uses a callback for its content.
@@ -21,9 +20,9 @@ use Swift\Kernel\Attributes\DI;
  * to stream the response back to the client. The flush() function
  * can also be used if needed.
  *
- * @see flush()
- *
  * @author Fabien Potencier <fabien@symfony.com>
+ *@see flush()
+ *
  */
 #[DI( exclude: true, autowire: false )]
 class StreamedResponse extends Response {

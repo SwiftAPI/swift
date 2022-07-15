@@ -3,15 +3,16 @@
 /*
  * This file is part of the Swift Framework
  *
- * (c) Henri van 't Sant <henri@henrivantsant.dev>
+ * (c) Henri van 't Sant <hello@henrivantsant.dev>
  *
  * For the full copyright and license information, please view the LICENSE file that was distributed with this source code.
  */
 
 namespace Swift\Console\Command;
 
-use Swift\Kernel\Attributes\Autowire;
-use Swift\Kernel\Attributes\DI;
+use Swift\Console\Style\ConsoleStyle;
+use Swift\DependencyInjection\Attributes\Autowire;
+use Swift\DependencyInjection\Attributes\DI;
 use Swift\Kernel\KernelDiTags;
 use Symfony\Component\Console\Input\InputInterface;
 use Symfony\Component\Console\Output\ConsoleSectionOutput;
@@ -25,8 +26,8 @@ use Symfony\Component\Console\Style\SymfonyStyle;
 #[DI(tags: [KernelDiTags::COMMAND]), Autowire]
 abstract class AbstractCommand extends \Symfony\Component\Console\Command\Command {
 
-    /** @var SymfonyStyle $io Input/Output helper */
-    protected SymfonyStyle $io;
+    /** @var ConsoleStyle $io Input/Output helper */
+    protected ConsoleStyle $io;
     protected InputInterface $input;
     protected OutputInterface $output;
 
@@ -65,7 +66,7 @@ abstract class AbstractCommand extends \Symfony\Component\Console\Command\Comman
      * @see execute()
      */
     public function run(InputInterface $input, OutputInterface $output): int {
-        $this->io = new SymfonyStyle($input, $output);
+        $this->io = new ConsoleStyle($input, $output);
         $this->input = $input;
         $this->output = $output;
 
@@ -81,13 +82,13 @@ abstract class AbstractCommand extends \Symfony\Component\Console\Command\Comman
     /**
      * Get Symfony Style Command Helper
      *
-     * @return SymfonyStyle
+     * @return ConsoleStyle
      */
-    protected function getInputOutputHelper(): SymfonyStyle {
+    protected function getInputOutputHelper(): ConsoleStyle {
         return $this->io;
     }
 
-    protected function createOutputSection(): ConsoleSectionOutput {
+    public function createOutputSection(): ConsoleSectionOutput {
         return $this->output->section();
     }
 
@@ -95,7 +96,7 @@ abstract class AbstractCommand extends \Symfony\Component\Console\Command\Comman
      * Before executing command
      */
     protected function beforeRun(): void {
-        if ($this->input->getOption('track-timing')) {
+        if ($this->input->getOption('track-time')) {
             $this->startTime = microtime(true);
         }
     }
@@ -104,7 +105,7 @@ abstract class AbstractCommand extends \Symfony\Component\Console\Command\Comman
      * After executing command
      */
     protected function afterRun(): void {
-        if ($this->input->getOption('track-timing')) {
+        if ($this->input->getOption('track-time')) {
             $this->io->note('Executed in ' . round((microtime(true) - $this->startTime), 2) . 's');
         }
     }
@@ -114,7 +115,7 @@ abstract class AbstractCommand extends \Symfony\Component\Console\Command\Comman
     }
 
     protected function execute( InputInterface $input, OutputInterface $output ): int {
-        parent::execute( $input, $output );
+        return parent::execute( $input, $output );
     }
 
 

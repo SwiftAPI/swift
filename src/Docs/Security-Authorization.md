@@ -55,24 +55,21 @@ declare(strict_types=1);
 
 namespace Swift\Security\Authorization;
 
-
-use Swift\Kernel\TypeSystem\Enum;
-
 /**
- * Class AuthorizationRolesEnum
+ * Class AuthorizationRole
  * @package Swift\Security\Authorization
  */
-class AuthorizationRolesEnum extends Enum {
+enum AuthorizationRole {
 
     // Main roles
-    public const ROLE_GUEST = 'ROLE_GUEST';
-    public const ROLE_USER = 'ROLE_USER';
-    public const ROLE_CLIENT = 'ROLE_CLIENT';
-    public const ROLE_ADMIN = 'ROLE_ADMIN';
-    public const ROLE_SUPER_ADMIN = 'ROLE_SUPER_ADMIN';
+    case ROLE_GUEST = 'ROLE_GUEST';
+    case ROLE_USER = 'ROLE_USER';
+    case ROLE_CLIENT = 'ROLE_CLIENT';
+    case ROLE_ADMIN = 'ROLE_ADMIN';
+    case ROLE_SUPER_ADMIN = 'ROLE_SUPER_ADMIN';
 
     // Sub roles
-    public const ROLE_USERS_LIST = 'ROLE_USERS_LIST';
+    case ROLE_USERS_LIST = 'ROLE_USERS_LIST';
 
 }
 ```
@@ -88,10 +85,10 @@ namespace Swift\Security\Authorization;
 use Swift\Kernel\TypeSystem\Enum;
 
 /**
- * Class AuthorizationTypesEnum
+ * Class AuthorizationType
  * @package Swift\Security\Authorization
  */
-class AuthorizationTypesEnum extends Enum {
+class AuthorizationType extends Enum {
 
     public const IS_AUTHENTICATED = 'IS_AUTHENTICATED';
     public const IS_AUTHENTICATED_DIRECTLY = 'IS_AUTHENTICATED_DIRECTLY';
@@ -236,10 +233,10 @@ interface AuthorizationCheckerInterface {
 #### How to use
 ```php
 // Returns a boolean (true on granted, false on not granted)
-$this->authorizationChecker->isGranted([AuthorizationRolesEnum::ROLE_CLIENT]);
+$this->authorizationChecker->isGranted([AuthorizationRole::ROLE_CLIENT]);
 
 // Throws Swift\HttpFoundation\Exception\AccessDeniedException when not granted.
-$this->authorizationChecker->denyUnlessGranted([AuthorizationRolesEnum::ROLE_CLIENT]);
+$this->authorizationChecker->denyUnlessGranted([AuthorizationRole::ROLE_CLIENT]);
 ```
 
 ## Controller shortcuts
@@ -254,7 +251,7 @@ However even more useful for REST endpoints is the isGranted parameter on the Ro
  *
  * @return JsonResponse
  */
-#[Route( method: RouteMethodEnum::GET, route: '/me/', name: 'security.users.me', isGranted: [AuthorizationTypesEnum::IS_AUTHENTICATED] )]
+#[Route( method: RouteMethod::GET, route: '/me/', name: 'security.users.me', isGranted: [AuthorizationType::IS_AUTHENTICATED] )]
 public function me( array $params ): JsonResponse {
     $data = $this->getCurrentUser()->serialize();
     unset($data->password);

@@ -3,14 +3,15 @@
 /*
  * This file is part of the Swift Framework
  *
- * (c) Henri van 't Sant <henri@henrivantsant.dev>
+ * (c) Henri van 't Sant <hello@henrivantsant.dev>
  *
  * For the full copyright and license information, please view the LICENSE file that was distributed with this source code.
  */
 
 namespace Swift\HttpFoundation\Session\Storage\Handler;
 
-use Swift\Kernel\Attributes\DI;
+use ReturnTypeWillChange;
+use Swift\DependencyInjection\Attributes\DI;
 
 /**
  * Migrating session handler for migrating from one handler to another. It reads
@@ -62,6 +63,7 @@ class MigratingSessionHandler implements \SessionHandlerInterface, \SessionUpdat
     /**
      * @return bool
      */
+    #[ReturnTypeWillChange]
     public function gc( $maxlifetime ): bool {
         $result = $this->currentHandler->gc( $maxlifetime );
         $this->writeOnlyHandler->gc( $maxlifetime );

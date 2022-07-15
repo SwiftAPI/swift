@@ -3,14 +3,14 @@
 /*
  * This file is part of the Swift Framework
  *
- * (c) Henri van 't Sant <henri@henrivantsant.dev>
+ * (c) Henri van 't Sant <hello@henrivantsant.dev>
  *
  * For the full copyright and license information, please view the LICENSE file that was distributed with this source code.
  */
 
 namespace Swift\Security\User;
 
-use Swift\Security\Authorization\AuthorizationRolesEnum;
+use Swift\Security\Authorization\AuthorizationRole;
 
 /**
  * Class AnonymousUser
@@ -24,15 +24,14 @@ class AnonymousUser implements UserInterface {
      * AnonymousUser constructor.
      */
     public function __construct() {
-        $this->roles = new UserRolesBag([AuthorizationRolesEnum::ROLE_GUEST => AuthorizationRolesEnum::ROLE_GUEST]);
+        $this->roles = new UserRolesBag([AuthorizationRole::ROLE_GUEST => AuthorizationRole::ROLE_GUEST]);
     }
-
-
+    
     /**
      * @inheritDoc
      */
-    public function getCredential(): string {
-        return '';
+    public function getCredential(): UserCredentialInterface {
+        return new UserCredentials( null, null, null, null, null );
     }
 
     /**
@@ -41,7 +40,11 @@ class AnonymousUser implements UserInterface {
     public function getId(): ?int {
         return null;
     }
-
+    
+    public function getUuid(): ?string {
+        return null;
+    }
+    
     /**
      * @inheritDoc
      */

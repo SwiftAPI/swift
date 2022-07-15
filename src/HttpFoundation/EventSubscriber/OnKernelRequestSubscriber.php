@@ -1,4 +1,4 @@
-<?php declare(strict_types=1);
+<?php declare( strict_types=1 );
 
 /*
  * This file is part of the Swift Framework
@@ -10,54 +10,51 @@
 
 namespace Swift\HttpFoundation\EventSubscriber;
 
-use Swift\Configuration\Configuration;
+
+use Swift\DependencyInjection\Attributes\Autowire;
 use Swift\Events\Attribute\ListenTo;
-use Swift\HttpFoundation\CorsResponse;
-use Swift\Kernel\Attributes\Autowire;
-use Swift\Kernel\Kernel;
-use Swift\Kernel\Event\KernelRequestEvent;
-use Swift\Events\EventSubscriberInterface;
 
 /**
  * Class OnKernelRequestSubscriber
  * @package Swift\Http\EventSubscriber
  */
 #[Autowire]
-final class OnKernelRequestSubscriber implements EventSubscriberInterface {
-
+final class OnKernelRequestSubscriber implements \Swift\Events\EventSubscriberInterface {
+    
     /**
      * OnKernelRequestSubscriber constructor.
      *
-     * @param Configuration $configuration
-     * @param Kernel $application
+     * @param \Swift\Configuration\ConfigurationInterface $configuration
+     * @param \Swift\Kernel\Kernel                        $application
      */
     public function __construct(
-        private Configuration $configuration,
-        private Kernel $application,
+        private readonly \Swift\Configuration\ConfigurationInterface $configuration,
+        private readonly \Swift\Kernel\Kernel                        $application,
     ) {
     }
-
+    
     /**
      * @inheritDoc
      */
     public static function getSubscribedEvents(): array {
-        return array(
-            KernelRequestEvent::class => 'onKernelRequest'
-        );
-
+        return [
+            \Swift\Kernel\Event\KernelRequestEvent::class => 'onKernelRequest',
+        ];
+        
     }
-
+    
     /**
      * Catch preflight requests and return appropriate CORS headers if enabled
      *
-     * @param KernelRequestEvent $event
+     * @param \Swift\Kernel\Event\KernelRequestEvent $event
      */
-    #[ListenTo(event: KernelRequestEvent::class)]
-    public function onKernelRequest( KernelRequestEvent $event ): void {
-        if ($this->configuration->get('app.allow_cors', 'root') && $event->getRequest()->isPreflight()) {
-            $response = new CorsResponse();
+    #[ListenTo( event: \Swift\Kernel\Event\KernelRequestEvent::class )]
+    public function onKernelRequest( \Swift\Kernel\Event\KernelRequestEvent $event ): void {
+        if ( $this->configuration->get( 'app.allow_cors', 'root' ) && $event->getRequest()->isPreflight() ) {
+            $response = new \Swift\HttpFoundation\CorsResponse();
             $response->sendOutput();
-            $this->application->finalize($response);
+            $this->application->finalize( $response );
         }
     }
+    
 }

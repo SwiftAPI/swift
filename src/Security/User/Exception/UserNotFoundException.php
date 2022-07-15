@@ -10,10 +10,12 @@
 
 namespace Swift\Security\User\Exception;
 
+use Swift\HttpFoundation\Exception\NotFoundException;
+
 /**
  * Class UserNotFoundException
  * @package Swift\Security\User\Exception
  */
-class UserNotFoundException extends \InvalidArgumentException {
+class UserNotFoundException extends NotFoundException {
 
 }

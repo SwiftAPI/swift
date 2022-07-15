@@ -12,12 +12,14 @@ namespace Swift\GraphQl\Attributes;
 
 use Attribute;
 use JetBrains\PhpStorm\ArrayShape;
+use JetBrains\PhpStorm\Deprecated;
 
 /**
  * Class Argument
  * @package Swift\GraphQl\Attributes
  */
 #[Attribute(Attribute::TARGET_PARAMETER)]
+#[Deprecated]
 class Argument {
 
     /**

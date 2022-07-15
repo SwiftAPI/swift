@@ -17,7 +17,7 @@
     "graphql-server",
     "cli-app"
   ],
-  "homepage": "https://github.com/HenrivantSant/swift",
+  "homepage": "https://github.com/SwiftAPI/swift",
   "license": "MIT",
   "authors": [
     {
@@ -28,30 +28,39 @@
     }
   ],
   "require": {
-    "webonyx/graphql-php": "^v14.6.2",
+    "webonyx/graphql-php": "^v14.11.6",
     "myclabs/php-enum": "^1.8.0",
     "phpdocumentor/reflection-docblock": "^5.2",
-    "bshaffer/oauth2-server-php": "^1.11",
     "guzzlehttp/guzzle": "^7.2",
-    "symfony/mime": "^5.2",
-    "symfony/rate-limiter": "^5.2",
-    "symfony/cache": "^5.2",
-    "symfony/config": "^5.2",
-    "symfony/dependency-injection": "^5.2",
-    "symfony/http-foundation": "5.2",
-    "symfony/yaml": "^5.2",
-    "symfony/console": "^5.2",
-    "dibi/dibi": "^4.1",
-    "monolog/monolog": "^2.1",
+    "symfony/mime": "^6.0",
+    "symfony/rate-limiter": "^6.0",
+    "symfony/config": "^6.0",
+    "symfony/dependency-injection": "^6.0",
+    "symfony/yaml": "^6.0",
+    "symfony/console": "^6.0",
+    "monolog/monolog": "^2.6.0",
     "mashape/unirest-php": "^3.0",
-    "symfony/event-dispatcher": "^5.2",
+    "symfony/event-dispatcher": "^6.0",
     "symfony/event-dispatcher-contracts": "^2.2",
-    "ramsey/uuid": "^4.1",
+    "ramsey/uuid": "^4.3.1",
     "doctrine/orm": "^2.9.x-dev",
     "psr/simple-cache": "^1.0",
     "mouf/classname-mapper": "^1.0",
     "caseyamcl/guzzle_retry_middleware": "^2.6",
-    "league/flysystem": "^2.1"
+    "league/flysystem": "^2.1",
+    "symfony/cache": "^6.0",
+    "laminas/laminas-code": "^4.4",
+    "dibi/dibi": "^4.2",
+    "runtime/react": "^0.1.0",
+    "cboden/ratchet": "^0.4.4",
+    "cycle/orm": "^2.1",
+    "cycle/annotated": "^3.1",
+    "cycle/schema-migrations-generator": "^2.0",
+    "alecrabbit/php-cli-snake": "^0.6.0",
+    "react/async": "^4@dev",
+    "peppeocchi/php-cron-scheduler": "^4.0",
+    "symfony/process": "^6.0",
+    "cycle/entity-behavior-uuid": "^1.0"
   },
   "require-dev": {
     "symfony/maker-bundle": "^1.14",
@@ -60,6 +69,11 @@
   "autoload": {
     "psr-4": {
       "Swift\\": "src"
+    }
+  },
+  "config": {
+    "allow-plugins": {
+      "symfony/runtime": true
     }
   }
 }

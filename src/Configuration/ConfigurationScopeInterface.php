@@ -3,17 +3,16 @@
 /*
  * This file is part of the Swift Framework
  *
- * (c) Henri van 't Sant <henri@henrivantsant.dev>
+ * (c) Henri van 't Sant <hello@henrivantsant.dev>
  *
  * For the full copyright and license information, please view the LICENSE file that was distributed with this source code.
  */
 
 namespace Swift\Configuration;
 
-use Swift\Configuration\DiTags;
 use Swift\Configuration\Exception\InvalidConfigurationValueException;
 use Swift\Configuration\Exception\UnknownConfigurationKeyException;
-use Swift\Kernel\Attributes\DI;
+use Swift\DependencyInjection\Attributes\DI;
 
 /**
  * Interface ConfigurationScopeInterface

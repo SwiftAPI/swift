@@ -3,7 +3,7 @@
 /*
  * This file is part of the Swift Framework
  *
- * (c) Henri van 't Sant <henri@henrivantsant.dev>
+ * (c) Henri van 't Sant <hello@henrivantsant.dev>
  *
  * For the full copyright and license information, please view the LICENSE file that was distributed with this source code.
  */
@@ -13,7 +13,7 @@ namespace Swift\HttpClient;
 
 use Psr\Http\Message\RequestInterface;
 use Psr\Http\Message\ResponseInterface;
-use Swift\Kernel\Attributes\Autowire;
+use Swift\DependencyInjection\Attributes\Autowire;
 
 /**
  * Class RetryMiddlewareHandler
@@ -58,6 +58,8 @@ class RetryMiddlewareHandler {
      */
     #[Autowire]
     public function setMiddlewares( #[Autowire(tag: 'httpclient.retry_middleware')] iterable $middlewares ): void {
+        $middlewares = iterator_to_array( $middlewares );
+        
         $this->middlewares = $middlewares;
     }
 

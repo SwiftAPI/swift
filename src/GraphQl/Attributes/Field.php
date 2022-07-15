@@ -11,14 +11,16 @@
 namespace Swift\GraphQl\Attributes;
 
 use Attribute;
-use Swift\Kernel\Attributes\DI;
 use GraphQL\Type\Definition\Type;
+use JetBrains\PhpStorm\Deprecated;
+use Swift\DependencyInjection\Attributes\DI;
 
 /**
  * Class Field
  * @package Swift\GraphQl\Attributes
  */
 #[Attribute(Attribute::TARGET_PROPERTY|Attribute::TARGET_METHOD), DI(exclude: true)]
+#[Deprecated]
 class Field {
 
     /**

@@ -15,18 +15,20 @@ namespace Swift\Security\User;
  * @package Swift\Security\User
  */
 interface UserInterface {
-
+    
     /**
      * Get credentials belonging to user
      *
-     * @return string
+     * @return \Swift\Security\User\UserCredentialInterface
      */
-    public function getCredential(): string;
-
+    public function getCredential(): UserCredentialInterface;
+    
     /**
      * @return int|null
      */
     public function getId(): ?int;
+    
+    public function getUuid(): ?string;
 
     /**
      * @return string
@@ -53,9 +55,9 @@ interface UserInterface {
      */
     public function getFullName(): ?string;
 
-    public function getCreated(): \DateTime;
+    public function getCreated(): \DateTimeInterface;
 
-    public function getLastModified(): \DateTime;
+    public function getLastModified(): \DateTimeInterface;
 
     public function getRoles(): UserRolesBag;
 

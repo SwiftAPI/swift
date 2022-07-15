@@ -3,7 +3,7 @@
 /*
  * This file is part of the Swift Framework
  *
- * (c) Henri van 't Sant <henri@henrivantsant.dev>
+ * (c) Henri van 't Sant <hello@henrivantsant.dev>
  *
  * For the full copyright and license information, please view the LICENSE file that was distributed with this source code.
  */
@@ -11,12 +11,12 @@
 namespace Swift\Security\Firewall;
 
 use Swift\Configuration\ConfigurationInterface;
+use Swift\DependencyInjection\Attributes\Autowire;
 use Swift\Events\EventListenerInterface;
 use Swift\HttpFoundation\RequestInterface;
 use Swift\Events\Attribute\ListenTo;
-use Swift\Kernel\Attributes\Autowire;
 use Swift\Kernel\Event\KernelRequestEvent;
-use Swift\Router\RouterInterface;
+use Swift\Router\Router;
 use Swift\Security\Authentication\AuthenticationManager;
 use Swift\Security\Authorization\AccessDecisionManagerInterface;
 use Swift\Security\Security;
@@ -27,26 +27,16 @@ use Swift\Security\Security;
  */
 #[Autowire]
 class Firewall implements FirewallInterface, EventListenerInterface {
-
+    
     /**
      * Firewall constructor.
      *
-     * @param AuthenticationManager $authenticationManager
-     * @param AccessDecisionManagerInterface $accessDecisionManager
-     * @param Security $security
-     * @param RouterInterface $router
-     * @param FirewallConfigInterface $firewallConfig
-     * @param RequestInterface $request
+     * @param AuthenticationManager  $authenticationManager
      * @param ConfigurationInterface $configuration
      */
     public function __construct(
-        private AuthenticationManager $authenticationManager,
-        private AccessDecisionManagerInterface $accessDecisionManager,
-        private Security $security,
-        private RouterInterface $router,
-        private FirewallConfigInterface $firewallConfig,
-        private RequestInterface $request,
-        private ConfigurationInterface $configuration,
+        private readonly AuthenticationManager  $authenticationManager,
+        private readonly ConfigurationInterface $configuration,
     ) {
     }
 

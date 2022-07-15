@@ -3,16 +3,16 @@
 /*
  * This file is part of the Swift Framework
  *
- * (c) Henri van 't Sant <henri@henrivantsant.dev>
+ * (c) Henri van 't Sant <hello@henrivantsant.dev>
  *
  * For the full copyright and license information, please view the LICENSE file that was distributed with this source code.
  */
 
 namespace Swift\Kernel\Event;
 
+use Swift\DependencyInjection\Attributes\DI;
 use Swift\Events\AbstractEvent;
 use Swift\HttpFoundation\RequestInterface;
-use Swift\Kernel\Attributes\DI;
 use Swift\Router\RouteInterface;
 
 /**
@@ -32,8 +32,8 @@ class OnKernelRouteEvent extends AbstractEvent {
      * @param RouteInterface $route
      */
     public function __construct(
-        private RequestInterface $request,
-        private RouteInterface $route,
+        private readonly RequestInterface $request,
+        private RouteInterface            $route,
     ) {
     }
 

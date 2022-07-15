@@ -219,8 +219,8 @@ namespace Foo\Type;
 
 use Swift\GraphQl\Attributes\Field;
 use Swift\GraphQl\Attributes\Type;
-use Swift\Kernel\Attributes\Autowire;
-use Swift\Model\EntityInterface;
+use Swift\DependencyInjection\Attributes\Autowire;
+use Swift\Orm\EntityInterface;
 
 /**
  * Class BarType
@@ -424,7 +424,7 @@ The Argument attribute can be used to add additional meta data or settings to mu
 #[Query(name: 'Users', description: 'List all users' )]
 public function users( #[Argument(type: ArgumentsType::class, generator: EntityArgumentGenerator::class, generatorArguments: ['entity' => UserEntity::class])] array $filter ): UserConnection {
     // Make sure a user is authenticated
-    $this->denyAccessUnlessGranted([AuthorizationRolesEnum::ROLE_USERS_LIST]);
+    $this->denyAccessUnlessGranted([AuthorizationRoleEnum::ROLE_USERS_LIST]);
 
     $filter ??= array();
     $state = $filter['where'] ?? array();
@@ -488,8 +488,8 @@ namespace Foo\Type;
 
 use Swift\GraphQl\Attributes\Field;
 use Swift\GraphQl\Attributes\Type;
-use Swift\Kernel\Attributes\Autowire;
-use Swift\Model\EntityInterface;
+use Swift\DependencyInjection\Attributes\Autowire;
+use Swift\Orm\EntityInterface;
 
 /**
  * Class BarType
@@ -622,7 +622,7 @@ It is recommended to follow the [Relay Server Specs](https://relay.dev/docs/guid
     */
     public function getUserTypeByNode( string|int $id, ContextInterface $context ): UserType {
         // Make sure a user is authenticated
-        $this->denyAccessUnlessGranted([AuthorizationTypesEnum::IS_AUTHENTICATED, AuthorizationRolesEnum::ROLE_USERS_LIST]);
+        $this->denyAccessUnlessGranted([AuthorizationType::IS_AUTHENTICATED, AuthorizationRoleEnum::ROLE_USERS_LIST]);
     
         // Get user data
         if (!$data = $this->userProvider->getUserById((int) $id)?->serialize()) {
@@ -646,7 +646,7 @@ It is recommended to follow the [Relay Server Specs](https://relay.dev/docs/guid
     #[Query(name: 'Users', description: 'List all users' )]
     public function users( #[Argument(type: ArgumentsType::class, generator: EntityArgumentGenerator::class, generatorArguments: ['entity' => UserEntity::class])] array $filter ): UserConnection {
         // Make sure a user is authenticated
-        $this->denyAccessUnlessGranted([AuthorizationRolesEnum::ROLE_USERS_LIST]);
+        $this->denyAccessUnlessGranted([AuthorizationRoleEnum::ROLE_USERS_LIST]);
     
         $filter ??= array();
         $state = $filter['where'] ?? array();

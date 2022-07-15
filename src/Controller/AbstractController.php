@@ -13,8 +13,8 @@ namespace Swift\Controller;
 
 use Swift\HttpFoundation\RequestInterface;
 use Swift\HttpFoundation\ServerRequest;
-use Swift\Kernel\Attributes\Autowire;
-use Swift\Kernel\Attributes\DI;
+use Swift\DependencyInjection\Attributes\Autowire;
+use Swift\DependencyInjection\Attributes\DI;
 use Swift\Kernel\KernelDiTags;
 use Swift\Router\RouteInterface;
 use Swift\Security\Authentication\Token\TokenInterface;

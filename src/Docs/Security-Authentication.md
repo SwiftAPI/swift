@@ -16,8 +16,8 @@ use Swift\HttpFoundation\RequestInterface;
 use Swift\HttpFoundation\HeaderBag;
 use Swift\HttpFoundation\JsonResponse;
 use Swift\HttpFoundation\ResponseInterface;
-use Swift\Kernel\Attributes\Autowire;
-use Swift\Model\EntityInterface;
+use Swift\DependencyInjection\Attributes\Autowire;
+use Swift\Orm\EntityInterface;
 use Swift\Security\Authentication\Authenticator\AuthenticatorEntrypointInterface;
 use Swift\Security\Authentication\Authenticator\AuthenticatorInterface;
 use Swift\Security\Authentication\Exception\AuthenticationException;
@@ -256,7 +256,7 @@ Also note that authentication has already finished when we get to the controller
 *
 * @return JsonResponse
 */
-#[Route( method: [RouteMethodEnum::POST], route: '/login/', name: 'security.user.login', isGranted: [AuthorizationTypesEnum::IS_AUTHENTICATED_DIRECTLY], tags: [Route::TAG_ENTRYPOINT] )]
+#[Route( method: [RouteMethod::POST], route: '/login/', name: 'security.user.login', isGranted: [AuthorizationType::IS_AUTHENTICATED_DIRECTLY], tags: [Route::TAG_ENTRYPOINT] )]
 public function login( RouteParameterBag $params ): JsonResponse {
     $data = $this->getCurrentUser()?->serialize();
     $data->created = $data->created->format('Y-m-d H:i:s');

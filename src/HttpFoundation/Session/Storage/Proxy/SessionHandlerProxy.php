@@ -11,6 +11,7 @@
 namespace Swift\HttpFoundation\Session\Storage\Proxy;
 
 use JetBrains\PhpStorm\Pure;
+use ReturnTypeWillChange;
 
 /**
  * @author Drak <drak@zikula.org>
@@ -70,6 +71,7 @@ class SessionHandlerProxy extends AbstractProxy implements \SessionHandlerInterf
     /**
      * @return bool
      */
+    #[ReturnTypeWillChange]
     public function gc( $maxlifetime ): bool {
         return (bool) $this->handler->gc( $maxlifetime );
     }

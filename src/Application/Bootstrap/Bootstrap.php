@@ -10,41 +10,24 @@
 
 namespace Swift\Application\Bootstrap;
 
-require_once 'Autoloading/Autoloader.php';
-require_once 'DependencyInjection/DependencyInjection.php';
 use Swift\Application\Bootstrap\Autoloading\Autoloader;
 use Swift\Application\Bootstrap\DependencyInjection\DependencyInjection;
 use Swift\Configuration\Configuration;
-use Swift\Kernel\Container\Container;
+use Swift\Kernel\Deprecations\Deprecation;
+use Swift\Kernel\Deprecations\DeprecationLevel;
 use Swift\Kernel\Kernel;
+use Swift\Kernel\KernelInterface;
 
 /**
  * Class Bootstrap
  * @package Swift\Application\Bootstrap
  */
 class Bootstrap {
-
-    private Container $container;
-
+    
     /**
      * Bootstrap Application
      */
-    public function initialize(): Kernel {
-        /**
-         * Define the application's minimum supported PHP version as a constant so it can be referenced within the application.
-         */
-        define('SWIFT_MINIMUM_PHP', '8.0.0');
-        
-        if (version_compare(PHP_VERSION, SWIFT_MINIMUM_PHP, '<')) {
-            die('Your host needs to use PHP ' . SWIFT_MINIMUM_PHP . ' or higher to run this version of Henri!');
-        }
-
-        // Saves the start time and memory usage.
-        global $startTime;
-        global $startMem;
-        $startTime = microtime(true);
-        $startMem  = memory_get_usage();
-
+    public static function createKernel(): KernelInterface {
         include_once __DIR__ . '/Functions.php';
 
 
@@ -53,18 +36,24 @@ class Bootstrap {
         $autoloadBootstrap->initialize();
 
         // set up DI
-        $DiBootstrap = new DependencyInjection();
-        $this->container = $DiBootstrap->initialize();
+        $diBootstrap = new DependencyInjection();
+        $container   = $diBootstrap->initialize();
     
         // Set timezone
         /** @var Configuration|null $configuration */
-        $configuration = $this->container->get(Configuration::class);
+        $configuration = $container->get( Configuration::class);
         date_default_timezone_set( $configuration?->get('app.timezone', 'root') ?? 'Europe/Amsterdam' );
+        
+        // Set Debugging
+        Deprecation::setDeprecationLevel(
+            $configuration?->get( 'app.debug', 'app' ) ?
+                DeprecationLevel::TRIGGER_ERROR : DeprecationLevel::NONE
+        );
 
-        /** @var Kernel $app */
-        $app = $this->container->get(Kernel::class);
+        /** @var KernelInterface $app */
+        $kernel = $container->get( Kernel::class);
 
-        return $app;
+        return $kernel;
     }
     
 }

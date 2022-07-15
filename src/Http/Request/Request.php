@@ -11,9 +11,8 @@
 namespace Swift\Http\Request;
 
 use Swift\Configuration\Configuration;
+use Swift\DependencyInjection\Attributes\Autowire;
 use Swift\Http\Request\Exceptions\RequestFailed;
-use Swift\Http\Request\Method;
-use Swift\Kernel\Attributes\Autowire;
 use Unirest\Request as UnirestRequest;
 
 /**
@@ -38,7 +37,7 @@ class Request {
     public function __construct( Configuration $configuration ) {
         $this->configuration = $configuration;
 
-        if ($this->configuration->get('app.debug')) {
+        if ($this->configuration->get('app.debug', 'root')) {
             UnirestRequest::verifyPeer(false);
             UnirestRequest::verifyHost(false);
         }

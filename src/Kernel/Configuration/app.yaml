@@ -1,0 +1,6 @@
+app:
+  name: Swift
+  mode: production
+  debug: false
+  allow_cors: true
+  timezone: Europe/Amsterdam

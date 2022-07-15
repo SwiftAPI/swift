@@ -3,14 +3,15 @@
 /*
  * This file is part of the Swift Framework
  *
- * (c) Henri van 't Sant <henri@henrivantsant.dev>
+ * (c) Henri van 't Sant <hello@henrivantsant.dev>
  *
  * For the full copyright and license information, please view the LICENSE file that was distributed with this source code.
  */
 
 namespace Swift\HttpFoundation\Session\Storage\Handler;
 
-use Swift\Kernel\Attributes\DI;
+use ReturnTypeWillChange;
+use Swift\DependencyInjection\Attributes\DI;
 use Symfony\Component\Cache\Marshaller\MarshallerInterface;
 
 /**
@@ -57,6 +58,7 @@ class MarshallingSessionHandler implements \SessionHandlerInterface, \SessionUpd
     /**
      * {@inheritdoc}
      */
+    #[ReturnTypeWillChange]
     public function gc( $maxlifetime ): bool {
         return $this->handler->gc( $maxlifetime );
     }
@@ -64,6 +66,7 @@ class MarshallingSessionHandler implements \SessionHandlerInterface, \SessionUpd
     /**
      * {@inheritdoc}
      */
+    #[ReturnTypeWillChange]
     public function read( $sessionId ) {
         return $this->marshaller->unmarshall( $this->handler->read( $sessionId ) );
     }

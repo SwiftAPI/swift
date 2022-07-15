@@ -1,4 +1,4 @@
-<?php declare(strict_types=1);
+<?php declare( strict_types=1 );
 
 /*
  * This file is part of the Swift Framework
@@ -19,30 +19,30 @@ use Swift\Security\User\UserInterface;
  * @package Swift\Security\Authentication\Passport\Credentials
  */
 final class ClientCredentials implements CredentialsInterface {
-
+    
     /**
      * ClientCredentials constructor.
      *
      * @param string $credential
      */
     public function __construct(
-        private string $credential,
+        private readonly string $credential,
     ) {
     }
-
+    
     /**
      * @inheritDoc
      */
     public function getCredential(): string {
         return $this->credential;
     }
-
+    
     /**
      * @inheritDoc
      */
     public function validateCredentials( UserInterface $user ): void {
-        if ($this->getCredential() !== $user->getCredential()) {
-            throw new InvalidCredentialsException('Invalid Client Credentials');
+        if ( $this->getCredential() !== $user->getCredential()->getCredential() ) {
+            throw new InvalidCredentialsException( 'Invalid Client Credentials' );
         }
     }
 }

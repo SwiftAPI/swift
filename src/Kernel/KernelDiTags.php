@@ -17,11 +17,15 @@ namespace Swift\Kernel;
 class KernelDiTags extends TypeSystem\Enum {
 
     public const CONTROLLER = 'kernel.controller';
+    
+    public const CACHE_TYPE = 'kernel.cache.type';
+    public const CACHE_DRIVER = 'kernel.cache.driver';
 
     public const ENTITY = 'kernel.entity';
     public const ENTITY_TYPE = 'kernel.entity.type';
 
     public const EVENT_SUBSCRIBER = 'kernel.event_subscriber';
+    public const EVENT_LISTENER = 'kernel.event_listener';
 
     public const COMPILER_PASS = 'kernel.compiler_pass';
     public const POST_COMPILER_PASS = 'kernel.post_compiler_pass';

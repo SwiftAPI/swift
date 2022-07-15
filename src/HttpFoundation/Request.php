@@ -3,7 +3,7 @@
 /*
  * This file is part of the Swift Framework
  *
- * (c) Henri van 't Sant <henri@henrivantsant.dev>
+ * (c) Henri van 't Sant <hello@henrivantsant.dev>
  *
  * For the full copyright and license information, please view the LICENSE file that was distributed with this source code.
  */
@@ -12,14 +12,12 @@ namespace Swift\HttpFoundation;
 
 use GraphQL\Language\Parser;
 use GraphQL\Language\Source;
-use GraphQL\Server\Helper;
-use GraphQL\Utils\Utils;
 use Swift\Configuration\Configuration;
 use Swift\HttpFoundation\Exception\ConflictingHeadersException;
 use Swift\HttpFoundation\Exception\JsonException;
 use Swift\HttpFoundation\Exception\SuspiciousOperationException;
 use Swift\HttpFoundation\Session\SessionInterface;
-use Swift\Kernel\ServiceLocator;
+use Swift\DependencyInjection\ServiceLocator;
 use function in_array;
 
 
@@ -176,7 +174,14 @@ class Request implements RequestInterface {
      * @param array $server The SERVER parameters
      * @param string|resource|null $content The raw body data
      */
-    public function __construct( array $query = [], array $request = [], array $attributes = [], array $cookies = [], array $files = [], array $server = [] ) {
+    public function __construct(
+        array $query = [],
+        array $request = [],
+        array $attributes = [],
+        array $cookies = [],
+        array $files = [],
+        array $server = []
+    ) {
         if ( empty( $query ) && empty( $request ) && empty( $attributes ) && empty( $cookies ) && empty( $files ) && empty( $server ) ) {
             if (empty($_POST)) {
                 $_POST = $this->decodeInput();
