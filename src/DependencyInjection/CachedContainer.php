@@ -72,7 +72,7 @@ class CachedContainer extends \CachedContainer implements ContainerInterface {
             return $result;
         }
         
-        return $this->aliasMapping[ $tag ] ? [ $this->aliasMapping[ $tag ] ] : [];
+        return isset( $this->aliasMapping[ $tag ] ) ? [ $this->aliasMapping[ $tag ] ] : [];
     }
     
     /**

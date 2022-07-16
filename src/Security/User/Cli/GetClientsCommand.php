@@ -8,7 +8,7 @@
  * For the full copyright and license information, please view the LICENSE file that was distributed with this source code.
  */
 
-namespace Swift\Security\User\Command;
+namespace Swift\Security\User\Cli;
 
 
 use Swift\Console\Command\AbstractCommand;
@@ -22,7 +22,7 @@ use Symfony\Component\Console\Output\OutputInterface;
 
 /**
  * Class GetClientsCommand
- * @package Swift\Security\User\Command
+ * @package Swift\Security\User\Cli
  */
 class GetClientsCommand extends AbstractCommand {
     
@@ -76,12 +76,35 @@ class GetClientsCommand extends AbstractCommand {
             
             if ( ! empty( $clients ) ) {
                 $this->io->writeln( '<fg=green>Clients</>' );
+                $keys = $clients[ 0 ]->toArray();
                 $this->io->table(
-                    array_keys( (array) $clients[ 0 ] ), array_map( static function ( $client ) {
-                    $client->created = $client->created->format( 'Y-m-d H:i:s' );
-                    
-                    return array_map( static fn( $value ) => $value ?? '', (array) $client );
-                }, $clients )
+                    array_keys( $keys ),
+                    array_map( static function ( $client ) use ( $keys ) {
+                        $val = [];
+                        
+                        foreach ( $keys as $key => $value ) {
+                            if ( $key === 'created' ) {
+                                $val[ $key ] = $client->getCreated()->format( 'Y-m-d H:i:s' );
+                                continue;
+                            }
+                            if ( $key === 'modified' ) {
+                                $val[ $key ] = $client->getCreated()->format( 'Y-m-d H:i:s' );
+                                continue;
+                            }
+                            if ( $key === 'uuid' ) {
+                                $val[ $key ] = $client->getUuid()->toString();
+                                continue;
+                            }
+                            if ( $key === 'accessTokens' ) {
+                                $val[ $key ] = $client->accessTokens->count();
+                                continue;
+                            }
+                            
+                            $val[ $key ] = $client->{$key};
+                        }
+                        
+                        return $val;
+                    }, $clients->getIterator()->getArrayCopy() )
                 );
             } else {
                 

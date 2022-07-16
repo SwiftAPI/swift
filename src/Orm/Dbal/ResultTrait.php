@@ -63,7 +63,7 @@ trait ResultTrait {
         }
         
         foreach ( get_object_vars( $this ) as $key => $value ) {
-            if ( in_array( $key, [ '__classMetaDataReference', '__serializeAsObject', '__cycle_orm_relation_props' ], true ) ) {
+            if ( in_array( $key, [ '__classMetaDataReference', '__serializeAsObject', '__cycle_orm_relation_props', '__cycle_orm_rel_map', '__cycle_orm_rel_data'  ], true ) ) {
                 continue;
             }
             $values[ $key ] = $value;

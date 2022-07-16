@@ -8,7 +8,7 @@
  * For the full copyright and license information, please view the LICENSE file that was distributed with this source code.
  */
 
-namespace Swift\Security\User\Command;
+namespace Swift\Security\User\Cli;
 
 
 use Swift\Console\Command\AbstractCommand;
@@ -21,7 +21,7 @@ use Symfony\Component\Console\Output\OutputInterface;
 
 /**
  * Class CreateClientCommand
- * @package Swift\Security\User\Command
+ * @package Swift\Security\User\Cli
  */
 class CreateClientCommand extends AbstractCommand {
     
