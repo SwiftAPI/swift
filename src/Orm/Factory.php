@@ -25,7 +25,7 @@ class Factory {
     protected \Swift\DependencyInjection\ContainerInterface $container;
     
     public function __construct(
-        protected \Swift\Dbal\Dbal     $dbal,
+        protected \Swift\Dbal\DbalProvider          $dbalProvider,
         protected \Swift\Orm\Schema\Factory $schemaFactory,
     ) {
     }
@@ -38,7 +38,7 @@ class Factory {
             $schema    = $this->getSchema();
             $this->orm = new \Swift\Orm\ORM(
                 ( new \Swift\Orm\CoreFactory(
-                                              $this->dbal,
+                                              $this->dbalProvider,
                     defaultCollectionFactory: new CollectionFactory(),
                 ) )->withDefaultSchemaClasses(
                     [

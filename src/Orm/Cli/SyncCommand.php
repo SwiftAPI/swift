@@ -26,7 +26,7 @@ use Cycle\Schema;
 class SyncCommand extends \Swift\Console\Command\AbstractCommand {
     
     public function __construct(
-        private readonly \Swift\Dbal\Dbal                           $dbal,
+        private readonly \Swift\Dbal\DbalProvider                   $dbalProvider,
         private readonly \Swift\Orm\Mapping\ClassLocator            $classLocator,
         private readonly \Swift\Orm\Mapping\ClassMetaDataFactory    $classMetaDataFactory,
         private readonly \Swift\Orm\Mapping\NamingStrategyInterface $namingStrategy,
@@ -53,7 +53,7 @@ class SyncCommand extends \Swift\Console\Command\AbstractCommand {
     public function execute( InputInterface $input, OutputInterface $output ): int {
         $show = new ShowChanges( $this->io );
         
-        $schema = ( new Compiler() )->compile( new Schema\Registry( $this->dbal ), [
+        $schema = ( new Compiler() )->compile( new Schema\Registry( $this->dbalProvider ), [
             new Embeddings( $this->classLocator ),
             new Entities( $this->classLocator ),
             new \Swift\Orm\Schema\Generator\Embeddings( $this->classLocator, $this->classMetaDataFactory, $this->namingStrategy, $this->reader ),
@@ -75,7 +75,6 @@ class SyncCommand extends \Swift\Console\Command\AbstractCommand {
         if ( $show->hasChanges() ) {
             $this->io->writeln( "\n<info>ORM Schema has been synchronized</info>" );
         }
-        $this->io->info( 'Maybe do some caching?' );
         
         return AbstractCommand::SUCCESS;
     }

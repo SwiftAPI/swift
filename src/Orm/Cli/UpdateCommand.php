@@ -16,10 +16,9 @@ use Cycle\Annotated\Entities;
 use Cycle\Annotated\MergeIndexes;
 use Cycle\Schema\Compiler;
 use Doctrine\ORM\Tools\Console\Command\SchemaTool\AbstractCommand;
-use Swift\Dbal\Dbal;
+use Swift\Dbal\DbalProvider;
 use Swift\DependencyInjection\Attributes\Autowire;
 use Swift\Orm\Cli\Generator\ShowChanges;
-use Swift\Orm\Factory;
 use Swift\Orm\Mapping\ClassLocator;
 use Symfony\Component\Console\Input\InputInterface;
 use Symfony\Component\Console\Output\OutputInterface;
@@ -29,7 +28,7 @@ use Cycle\Schema;
 class UpdateCommand extends \Swift\Console\Command\AbstractCommand {
     
     public function __construct(
-        private readonly Dbal                                       $dbal,
+        private readonly DbalProvider                               $dbalProvider,
         private readonly ClassLocator                               $classLocator,
         private readonly \Swift\Orm\Mapping\ClassMetaDataFactory    $classMetaDataFactory,
         private readonly \Swift\Orm\Mapping\NamingStrategyInterface $namingStrategy,
@@ -56,7 +55,7 @@ class UpdateCommand extends \Swift\Console\Command\AbstractCommand {
     public function execute( InputInterface $input, OutputInterface $output ): int {
         $show = new ShowChanges( $this->io );
         
-        $schemaCycle = ( new Compiler() )->compile( new Schema\Registry( $this->dbal ), [
+        $schemaCycle = ( new Compiler() )->compile( new Schema\Registry( $this->dbalProvider ), [
             new Embeddings( $this->classLocator ),
             new Entities( $this->classLocator ),
             new \Swift\Orm\Schema\Generator\Embeddings( $this->classLocator, $this->classMetaDataFactory, $this->namingStrategy, $this->reader ),

@@ -18,7 +18,7 @@ use Cycle\Schema;
 use Cycle\Schema\Compiler;
 use Swift\Configuration\ConfigurationInterface;
 use Swift\Configuration\Utils;
-use Swift\Dbal\Dbal;
+use Swift\Dbal\DbalProvider;
 use Swift\DependencyInjection\Attributes\Autowire;
 use Swift\Orm\Mapping\ClassMetaDataFactory;
 use Swift\Orm\Mapping\ClassLocator;
@@ -30,7 +30,7 @@ class Factory {
     private ?Schema\Registry $registry = null;
     
     public function __construct(
-        private readonly Dbal                                       $dbal,
+        private readonly DbalProvider                               $dbalProvider,
         private readonly ClassLocator                               $classLocator,
         private readonly ConfigurationInterface                     $configuration,
         private readonly ClassMetaDataFactory                       $classMetaDataFactory,
@@ -40,7 +40,7 @@ class Factory {
     }
     
     protected function compileSchema(): array {
-        return ( new Compiler() )->compile( new Schema\Registry( $this->dbal ), [
+        return ( new Compiler() )->compile( new Schema\Registry( $this->dbalProvider ), [
             new Embeddings( $this->classLocator ),
             new Entities( $this->classLocator ),
             new \Swift\Orm\Schema\Generator\Embeddings( $this->classLocator, $this->classMetaDataFactory, $this->namingStrategy, $this->reader ),
@@ -78,7 +78,7 @@ class Factory {
             ]
         );
         
-        $this->migrator = new Migrations\Migrator( $config, $this->dbal, new Migrations\FileRepository( $config ) );
+        $this->migrator = new Migrations\Migrator( $config, $this->dbalProvider, new Migrations\FileRepository( $config ) );
         
         // Init migration table
         $this->migrator->configure();
@@ -88,7 +88,7 @@ class Factory {
     
     public function getRegistry(): Schema\Registry {
         if ( is_null( $this->registry ) ) {
-            $this->registry = new Schema\Registry( $this->dbal );
+            $this->registry = new Schema\Registry( $this->dbalProvider );
         }
         
         return $this->registry;

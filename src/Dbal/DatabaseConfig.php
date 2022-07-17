@@ -1,4 +1,4 @@
-<?php declare(strict_types=1);
+<?php declare( strict_types=1 );
 
 /*
  * This file is part of the Swift Framework
@@ -31,7 +31,7 @@ class DatabaseConfig extends ConfigurationScope implements ConfigurationScopeInt
     
     public string $appFilePath = INCLUDE_DIR . '/etc/config';
     public string $filename = 'database.yaml';
-
+    
     /**
      * ConnectionConfig constructor.
      *
@@ -40,54 +40,54 @@ class DatabaseConfig extends ConfigurationScope implements ConfigurationScopeInt
     public function __construct(
         protected Yaml $yaml,
     ) {
-        $coreFileLocator = new FileLocator([__DIR__]);
-        $appFileLocator = new FileLocator([INCLUDE_DIR . '/etc/config']);
-
+        $coreFileLocator = new FileLocator( [ __DIR__ ] );
+        $appFileLocator  = new FileLocator( [ INCLUDE_DIR . '/etc/config' ] );
+        
         try {
-            $appConfig = $this->yaml->parseFile($appFileLocator->locate('database.yaml'));
-        } catch (FileLocatorFileNotFoundException) {
-            file_put_contents(INCLUDE_DIR . '/etc/config/database.yaml', $this->yaml->dump($this->yaml->parseFile($coreFileLocator->locate('database.yaml'))));
-
-            throw new MissingConfigurationException('Missing database configuration. An example configuration has been placed in the etc/config folder. Please configure a valid connection');
+            $appConfig = $this->yaml->parseFile( $appFileLocator->locate( 'database.yaml' ) );
+        } catch ( FileLocatorFileNotFoundException ) {
+            file_put_contents( INCLUDE_DIR . '/etc/config/database.yaml', $this->yaml->dump( $this->yaml->parseFile( $coreFileLocator->locate( 'database.yaml' ) ) ) );
+            
+            throw new MissingConfigurationException( 'Missing database configuration. An example configuration has been placed in the etc/config folder. Please configure a valid connection' );
         }
-
-        $this->runtimeConfig = new Tree((new Processor())->processConfiguration($this, [$appConfig]));
-        $this->appConfig = new Tree($appConfig);
+        
+        $this->runtimeConfig = new Tree( ( new Processor() )->processConfiguration( $this, [ $appConfig ] ) );
+        $this->appConfig     = new Tree( $appConfig );
     }
-
+    
     /**
      * @inheritDoc
      */
     public function getConfigTreeBuilder() {
-        $config = new TreeBuilder('database');
-
+        $config = new TreeBuilder( 'database' );
+        
         $rootNode = $config->getRootNode();
-
+        
         $rootNode
             ->children()
-                ->arrayNode('connection')
+                ->arrayNode( 'connection' )
                     ->children()
-                        ->scalarNode('driver')->defaultValue('mysql')->isRequired()->cannotBeEmpty()->end()
-                        ->enumNode( 'engine' )->values(array_map(static fn (DatabaseEngine $engine) => $engine->value, DatabaseEngine::cases()))->defaultValue( 'InnoDB' )->end()
-                        ->scalarNode('host')->defaultValue('localhost')->end()
-                        ->scalarNode('username')->isRequired()->cannotBeEmpty()->end()
-                        ->scalarNode('password')->isRequired()->end()
-                        ->scalarNode('database')->isRequired()->cannotBeEmpty()->end()
-                        ->integerNode('port')->defaultValue(3306)->end()
-                        ->scalarNode('prefix')->defaultValue('')->end()
+                        ->scalarNode( 'driver' )->defaultValue( 'mysql' )->isRequired()->cannotBeEmpty()->end()
+                        ->enumNode( 'engine' )->values( array_map( static fn( DatabaseEngine $engine ) => $engine->value, DatabaseEngine::cases() ) )->defaultValue( 'InnoDB' )->end()
+                        ->scalarNode( 'host' )->defaultValue( 'localhost' )->end()
+                        ->scalarNode( 'username' )->isRequired()->cannotBeEmpty()->end()
+                        ->scalarNode( 'password' )->isRequired()->end()
+                        ->scalarNode( 'database' )->isRequired()->cannotBeEmpty()->end()
+                        ->integerNode( 'port' )->defaultValue( 3306 )->end()
+                        ->scalarNode( 'prefix' )->defaultValue( '' )->end()
                     ->end()
                 ->end()
             ->end();
-
+        
         return $config;
     }
-
+    
     /**
      * @inheritDoc
      */
     public function getScope(): string {
         return 'database';
     }
-
-
+    
+    
 }
