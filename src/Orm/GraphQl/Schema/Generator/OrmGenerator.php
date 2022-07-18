@@ -15,7 +15,7 @@ use Cycle\ORM\SchemaInterface;
 use Doctrine\Inflector\InflectorFactory;
 use GraphQL\Type\Definition\ResolveInfo;
 use GraphQL\Type\Definition\Type;
-use Swift\Dbal\Arguments\ArgumentComparisonTypes;
+use Swift\Dbal\Arguments\ArgumentComparison;
 use Swift\DependencyInjection\Attributes\Autowire;
 use Swift\GraphQl\Executor\Utils;
 use Swift\GraphQl\Relay\Relay;
@@ -329,7 +329,7 @@ class OrmGenerator implements GeneratorInterface, ManualGeneratorInterface {
                                 ->addField(
                                     'compare',
                                     static function () {
-                                        return Registry::$typeMap[ PhpEnumType::baseName( ArgumentComparisonTypes::class ) ];
+                                        return Registry::$typeMap[ PhpEnumType::baseName( ArgumentComparison::class ) ];
                                     },
                                 )
                                 ->addField(

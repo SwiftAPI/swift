@@ -13,7 +13,7 @@ namespace Swift\GraphQl\Executor;
 
 use Cycle\ORM\SchemaInterface;
 use GraphQL\Exception\InvalidArgument;
-use Swift\Dbal\Arguments\ArgumentComparisonTypes;
+use Swift\Dbal\Arguments\ArgumentComparison;
 use Swift\Dbal\Arguments\ArgumentDirection;
 use Swift\Dbal\Arguments\Arguments;
 use Swift\Dbal\Arguments\Where;
@@ -70,7 +70,7 @@ class Utils {
                 $arguments->setOrderBy( 'id', ArgumentDirection::DESC );
             }
             if ( isset( $args[ 'before' ] ) ) {
-                $arguments->addArgument( new Where( 'id', ArgumentComparisonTypes::LESS_THAN, $args[ 'before' ] ) );
+                $arguments->addArgument( new Where( 'id', ArgumentComparison::LESS_THAN, $args[ 'before' ] ) );
             }
         }
         if ( isset( $args[ 'where' ] ) ) {

@@ -11,7 +11,6 @@
 namespace Swift\Dbal\Arguments;
 
 use Cycle\Database\Injection\Parameter;
-use Swift\Dbal\QueryBuilder;
 use Swift\DependencyInjection\Attributes\DI;
 use Swift\Orm\Mapping\Definition\Entity;
 
@@ -29,25 +28,25 @@ class Where implements ArgumentInterface {
     public const CONTAINS     = 'CONTAINS';
     public const IN           = 'IN';
     
-    private readonly ArgumentComparisonTypes $comparison;
+    private readonly ArgumentComparison $comparison;
     
     /**
      * Where constructor.
      *
      * @param string                                               $fieldName
-     * @param \Swift\Dbal\Arguments\ArgumentComparisonTypes|string $comparison
+     * @param \Swift\Dbal\Arguments\ArgumentComparison|string $comparison
      * @param mixed                                                $value
      */
     public function __construct(
         private readonly string        $fieldName,
-        ArgumentComparisonTypes|string $comparison,
+        ArgumentComparison|string $comparison,
         private readonly mixed         $value,
     ) {
-        $this->comparison = is_string( $comparison ) ? ArgumentComparisonTypes::from( $comparison ) : $comparison;
+        $this->comparison = is_string( $comparison ) ? ArgumentComparison::from( $comparison ) : $comparison;
     }
     
-    public static function compareAs( string $comparison ): ArgumentComparisonTypes {
-        return ArgumentComparisonTypes::from( $comparison );
+    public static function compareAs( string $comparison ): ArgumentComparison {
+        return ArgumentComparison::from( $comparison );
     }
     
     /**

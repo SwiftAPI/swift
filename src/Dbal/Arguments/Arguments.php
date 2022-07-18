@@ -85,7 +85,7 @@ class Arguments {
     /**
      * @param int|null $offset
      */
-    public function setOffset( ?int $offset ): void {
+    public function setOffset( ?int $offset ): self {
         $this->offset = $offset;
         
         $didMatch = false;
@@ -98,15 +98,21 @@ class Arguments {
         if ( ! $didMatch ) {
             $this->addArgument( new Offset( $offset ?? 0 ) );
         }
+        
+        return $this;
     }
     
     /**
      * Add argument
      *
      * @param ArgumentInterface $argument
+     *
+     * @return \Swift\Dbal\Arguments\Arguments
      */
-    public function addArgument( ArgumentInterface $argument ): void {
+    public function addArgument( ArgumentInterface $argument ): self {
         $this->arguments[] = $argument;
+        
+        return $this;
     }
     
     /**
@@ -119,7 +125,7 @@ class Arguments {
     /**
      * @param int|null $limit
      */
-    public function setLimit( ?int $limit ): void {
+    public function setLimit( ?int $limit ): self {
         $this->limit = $limit;
         
         $didMatch = false;
@@ -132,6 +138,8 @@ class Arguments {
         if ( ! $didMatch ) {
             $this->addArgument( new Limit( $limit ?? 0 ) );
         }
+        
+        return $this;
     }
     
     /**
@@ -145,7 +153,7 @@ class Arguments {
      * @param string|null                                 $orderBy
      * @param \Swift\Dbal\Arguments\ArgumentDirection $direction
      */
-    public function setOrderBy( ?string $orderBy, ArgumentDirection $direction = ArgumentDirection::ASC ): void {
+    public function setOrderBy( ?string $orderBy, ArgumentDirection $direction = ArgumentDirection::ASC ): self {
         $this->orderBy = $orderBy;
         $this->direction = $direction;
         
@@ -159,13 +167,17 @@ class Arguments {
         if ( ! $didMatch ) {
             $this->addArgument( new OrderBy( $orderBy ?? '', $direction ) );
         }
+        
+        return $this;
     }
     
     /**
      * @param \Swift\Dbal\Arguments\ArgumentDirection $direction
      */
-    public function setDirection( ArgumentDirection $direction ): void {
+    public function setDirection( ArgumentDirection $direction ): self {
         $this->setOrderBy( $this->orderBy, $direction );
+        
+        return $this;
     }
     
     /**
@@ -178,7 +190,7 @@ class Arguments {
     /**
      * @param string|null $groupBy
      */
-    public function setGroupBy( ?string $groupBy ): void {
+    public function setGroupBy( ?string $groupBy ): self {
         $this->groupBy = $groupBy;
         
         $didMatch = false;
@@ -191,6 +203,8 @@ class Arguments {
         if ( ! $didMatch ) {
             $this->addArgument( new GroupBy( $groupBy ?? '' ) );
         }
+        
+        return $this;
     }
     
     /**
@@ -203,8 +217,10 @@ class Arguments {
     /**
      * @param \Swift\Dbal\Arguments\ArgumentInterface[] $arguments
      */
-    public function setArguments( array $arguments ): void {
+    public function setArguments( array $arguments ): self {
         $this->arguments = $arguments;
+        
+        return $this;
     }
     
     /**
