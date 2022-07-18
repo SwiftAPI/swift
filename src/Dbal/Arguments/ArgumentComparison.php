@@ -12,12 +12,9 @@ namespace Swift\Dbal\Arguments;
 
 use Swift\DependencyInjection\Attributes\DI;
 
-/**
- * Class ArgumentComparisonTypesEnum
- * @package Swift\Orm\Types
- */
+
 #[DI(autowire: false)]
-enum ArgumentComparisonTypes: string {
+enum ArgumentComparison: string {
 
     case GREATER_THAN = '>';
     case LESS_THAN = '<';
