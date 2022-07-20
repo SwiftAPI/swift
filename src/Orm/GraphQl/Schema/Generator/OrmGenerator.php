@@ -111,7 +111,7 @@ class OrmGenerator implements GeneratorInterface, ManualGeneratorInterface {
     }
     
     protected function initCoreTypes( Registry $registry ): void {
-        $this->resolveEnum( $registry, ArgumentComparisonTypes::class );
+        $this->resolveEnum( $registry, ArgumentComparison::class );
     }
     
     protected function createType( string $table, array $schema, Registry $registry ): ObjectBuilder {
@@ -242,7 +242,7 @@ class OrmGenerator implements GeneratorInterface, ManualGeneratorInterface {
     
     protected function resolveType( string $type ): \GraphQL\Type\Definition\ScalarType|\GraphQL\Type\Definition\ListOfType {
         return match ( $type ) {
-            'string', 'text', 'longtext', 'enum' => Type::string(),
+            'string', 'text', 'longtext', 'enum', 'ENUM' => Type::string(),
             'int', 'time' => Type::int(),
             'float', 'big_float' => Type::float(),
             'bool' => Type::boolean(),

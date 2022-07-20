@@ -16,8 +16,6 @@ use Swift\DependencyInjection\Attributes\Autowire;
 use Swift\GraphQl\Executor\Middleware\ResolverMiddlewareExecutor;
 use Swift\GraphQl\Executor\Resolver\ResolverCollector;
 use Swift\GraphQl\Schema\Registry;
-use Swift\GraphQl\Type\DateTimeWithPreFormat;
-use Swift\Orm\Entity\EntityInterface;
 
 #[Autowire]
 class Resolver {
@@ -32,22 +30,20 @@ class Resolver {
     }
     
     public function resolve( $objectValue, $args, $context, ResolveInfo $info, ?callable $callback = null ): mixed {
-        $ref = $this;
-        
-        $resolve = static function ( $objectValue, $args, $context, $info ) use ( $callback, $ref ) {
+        $resolve = function ( $objectValue, $args, $context, $info ) use ( $callback ) {
             if ( $callback ) {
                 $objectValue = $callback( $objectValue, $args, $context, $info );
             } else {
                 $objectValue = self::getDefaultResolver()( $objectValue, $args, $context, $info );
             }
             
-            if ( $resolvers = $ref->resolverCollector->get( $info->fieldDefinition->getName() ) ) {
+            if ( $resolvers = $this->resolverCollector->get( $info->fieldDefinition->getName() ) ) {
                 foreach ( $resolvers as $resolver ) {
                     $objectValue = $resolver[ 0 ]->{$resolver[ 1 ]}( $objectValue, $args, $context, $info );
                 }
             }
     
-            return $ref->resolveDirectives( $objectValue, $args, $context, $info );
+            return $this->resolveDirectives( $objectValue, $args, $context, $info );
         };
         
         return $this->middlewareExecutor->process( $objectValue, $args, $context, $info, $resolve );

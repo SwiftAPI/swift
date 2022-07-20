@@ -14,7 +14,7 @@ namespace Swift\Kernel;
  * Class KernelDiTags
  * @package Swift\Kernel
  */
-class KernelDiTags extends TypeSystem\Enum {
+class KernelDiTags {
 
     public const CONTROLLER = 'kernel.controller';
     

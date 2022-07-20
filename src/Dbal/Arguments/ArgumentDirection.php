@@ -11,7 +11,6 @@
 namespace Swift\Dbal\Arguments;
 
 use Swift\DependencyInjection\Attributes\DI;
-use Swift\Kernel\TypeSystem\Enum;
 
 /**
  * Class ArgumentDirectionEnum

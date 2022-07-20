@@ -12,7 +12,6 @@ namespace Swift\Orm\Attributes;
 
 use Attribute;
 use Swift\DependencyInjection\Attributes\DI;
-use Swift\Kernel\TypeSystem\Enum;
 use Swift\Orm\Types\FieldTypes;
 use InvalidArgumentException;
 
@@ -20,7 +19,8 @@ use InvalidArgumentException;
  * Class Field
  * @package Swift\Orm\Attributes
  */
-#[Attribute( Attribute::TARGET_PROPERTY ), DI( autowire: false )]
+#[Attribute( Attribute::TARGET_PROPERTY )]
+#[DI( autowire: false )]
 final class Field {
     
     public string|object $type;
@@ -94,7 +94,7 @@ final class Field {
      * @return string
      */
     public function getType(): string {
-        return $this->type;
+        return strtolower($this->type);
     }
     
     /**

@@ -11,7 +11,6 @@
 namespace Swift\GraphQl\Schema\Builder;
 
 
-use GraphQL\Type\Definition\InputObjectType;
 use GraphQL\Type\Definition\ListOfType;
 use GraphQL\Type\Definition\Type;
 

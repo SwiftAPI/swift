@@ -10,8 +10,6 @@
 
 namespace Swift\Router\Types;
 
-use Swift\DependencyInjection\Attributes\DI;
-use Swift\Kernel\TypeSystem\Enum;
 
 /**
  * Class RouteMethod

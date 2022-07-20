@@ -10,13 +10,11 @@
 
 namespace Swift\Configuration;
 
-use Swift\Kernel\TypeSystem\Enum;
-
 /**
  * Class DiTags
  * @package Swift\Configuration
  */
-class DiTags extends Enum {
+class DiTags {
 
     public const CONFIGURATION = 'configuration.scope';
     public const CONFIGURATION_SUB_SCOPE = 'CONFIGURATION.SUB.SCOPE';
