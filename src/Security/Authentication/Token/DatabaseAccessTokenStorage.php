@@ -42,6 +42,10 @@ final class DatabaseAccessTokenStorage implements TokenStorageInterface {
      * @inheritDoc
      */
     public function supports( TokenInterface $token ): bool {
+        if ( $token->getScope() === TokenInterface::SCOPE_IGNORE ) {
+            return false;
+        }
+        
         return true;
     }
     

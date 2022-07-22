@@ -28,6 +28,7 @@ use Swift\Security\Authentication\Passport\Stamp\PreAuthenticatedStamp;
 use Swift\Security\Authentication\Token\AuthenticatedToken;
 use Swift\Security\Authentication\Token\TokenInterface;
 use Swift\Security\Authorization\AuthorizationRole;
+use Swift\Security\User\Authentication\Passport\Stamp\ResetPasswordStamp;
 use Swift\Security\User\UserProviderInterface;
 
 /**
@@ -36,7 +37,7 @@ use Swift\Security\User\UserProviderInterface;
  */
 #[Autowire]
 final class ResetPasswordAuthenticator implements AuthenticatorInterface {
-
+    
     public const TAG_RESET_PASSWORD = 'TAG_RESET_PASSWORD';
     
     /**
@@ -50,7 +51,7 @@ final class ResetPasswordAuthenticator implements AuthenticatorInterface {
         private readonly UserProviderInterface $userProvider,
     ) {
     }
-
+    
     /**
      * Support if Route is tagged with TAG_RESET_PASSWORD
      *
@@ -60,60 +61,79 @@ final class ResetPasswordAuthenticator implements AuthenticatorInterface {
         if ( $request->getUri()->getPath() !== '/graphql' ) {
             return false;
         }
-
-        return $request->getContent()->has( 'ResetPassword' );
+        
+        return $request->getContent()->has( 'UserResetPassword' );
     }
-
+    
     /**
      * @inheritDoc
      */
     public function authenticate( \Psr\Http\Message\RequestInterface $request ): PassportInterface {
-        if ( empty( $request->getContent()->get( 'ResetPassword' )['resetPasswordToken'] ) || empty( $request->getContent()->get( 'ResetPassword' )['newPassword'] ) ) {
+        if ( empty( $request->getContent()->get( 'UserResetPassword' )[ 'token' ] ) || empty( $request->getContent()->get( 'UserResetPassword' )[ 'password' ] ) ) {
             throw new InvalidCredentialsException( 'Invalid credentials provided' );
         }
-
+        
         if ( ! $token = $this->entityManager->findOne(
             AccessTokenEntity::class,
             [
-                'accessToken' => $request->getContent()->get( 'ResetPassword' )['resetPasswordToken'],
+                'accessToken' => $request->getContent()->get( 'UserResetPassword' )[ 'token' ],
                 'scope'       => TokenInterface::SCOPE_RESET_PASSWORD,
             ]
         ) ) {
             throw new InvalidCredentialsException( 'No valid token found', Response::HTTP_UNAUTHORIZED );
         }
-
-        if ( ! $token->userId ) {
+        
+        if ( ! $token->getUser() ) {
             throw new AuthenticationException( 'No user related to token' );
         }
-
-        if ( $token->userId ) {
-            $user = $this->userProvider->getUserById( $token->userId );
+        
+        if ( $token->getUser()->getId() ) {
+            $user = $this->userProvider->getUserById( $token->getUser()->getId() );
         }
-
+        
         $user?->getRoles()->set( AuthorizationRole::ROLE_CHANGE_PASSWORD );
-
-        return new Passport( $user, new AccessTokenCredentials( $token ), array( new PreAuthenticatedStamp( $token ) ) );
+        
+        return new Passport(
+            $user,
+            new AccessTokenCredentials( $token ),
+            [
+                new PreAuthenticatedStamp( $token ),
+                new ResetPasswordStamp(
+                    $request->getContent()->get( 'UserResetPassword' )[ 'token' ],
+                    $request->getContent()->get( 'UserResetPassword' )[ 'password' ],
+                ),
+            ],
+        );
     }
-
+    
     /**
      * @inheritDoc
      */
     public function createAuthenticatedToken( PassportInterface $passport ): TokenInterface {
+        // Remove token so it can't be used again
+        $this->entityManager->delete( $passport->getStamp( PreAuthenticatedStamp::class )->getToken() );
+        $passport->getUser()->set(
+            [
+                'password' => $passport->getStamp( ResetPasswordStamp::class )->getPassword(),
+            ]
+        );
+        $this->entityManager->run();
+        
         return new AuthenticatedToken(
-            user: $passport->getUser(),
-            scope: TokenInterface::SCOPE_RESET_PASSWORD,
-            token: null,
+            user:            $passport->getUser(),
+            scope:           TokenInterface::SCOPE_IGNORE,
+            token:           null,
             isAuthenticated: false,
         );
     }
-
+    
     /**
      * @inheritDoc
      */
     public function onAuthenticationSuccess( \Psr\Http\Message\RequestInterface $request, TokenInterface $token ): ?ResponseInterface {
         return null;
     }
-
+    
     /**
      * @inheritDoc
      */
@@ -121,7 +141,7 @@ final class ResetPasswordAuthenticator implements AuthenticatorInterface {
         $response          = new \stdClass();
         $response->message = $authenticationException->getMessage();
         $response->code    = $authenticationException->getCode();
-
+        
         return new JsonResponse( $response, $authenticationException->getCode() );
     }
 }

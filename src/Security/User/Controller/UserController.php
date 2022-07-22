@@ -196,16 +196,6 @@ class UserController extends AbstractController {
      */
     #[Route( method: [ RouteMethod::POST ], route: '/password/reset/', name: 'security.user.password.reset', isGranted: [ AuthorizationRole::ROLE_CHANGE_PASSWORD ], tags: [ Route::TAG_ENTRYPOINT, ResetPasswordAuthenticator::TAG_RESET_PASSWORD ] )]
     public function resetPassword( RouteParameterBag $params ): JsonResponse {
-        try {
-            $this->getCurrentUser()->set(
-                [
-                    'password' => $this->getRequest()->getContent()->get( 'newPassword' ),
-                ]
-            );
-        } catch ( DatabaseException ) {
-            throw new InternalErrorException();
-        }
-        
         return new JsonResponse(
             [
                 'message' => 'Successfully reset password',

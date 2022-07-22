@@ -30,6 +30,7 @@ use Swift\Security\Authentication\Passport\Stamp\PreAuthenticatedStamp;
 use Swift\Security\Authentication\Token\AuthenticatedToken;
 use Swift\Security\Authentication\Token\TokenInterface;
 use Swift\Security\Authorization\AuthorizationRole;
+use Swift\Security\User\Authentication\Passport\Stamp\ResetPasswordStamp;
 use Swift\Security\User\User;
 use Swift\Security\User\UserProviderInterface;
 
@@ -69,14 +70,14 @@ final class ResetPasswordAuthenticator implements AuthenticatorInterface, Authen
      * @inheritDoc
      */
     public function authenticate( \Psr\Http\Message\RequestInterface $request ): PassportInterface {
-        if ( ! $request->getContent()->has( 'resetPasswordToken' ) || ! $request->getContent()->has( 'newPassword' ) ) {
+        if ( ! $request->getContent()->has( 'token' ) || ! $request->getContent()->has( 'password' ) ) {
             throw new InvalidCredentialsException( 'Invalid credentials provided' );
         }
         
         if ( ! $token = $this->entityManager->findOne(
             AccessTokenEntity::class,
             [
-                'accessToken' => $request->getContent()->get( 'resetPasswordToken' ),
+                'accessToken' => $request->getContent()->get( 'token' ),
                 'scope'       => TokenInterface::SCOPE_RESET_PASSWORD,
             ]
         ) ) {
@@ -90,16 +91,35 @@ final class ResetPasswordAuthenticator implements AuthenticatorInterface, Authen
         $user = $this->userProvider->getUserById( $token->getUser()->getId() );
         $user?->getRoles()->set( AuthorizationRole::ROLE_CHANGE_PASSWORD );
         
-        return new Passport( $user, new AccessTokenCredentials( $token ), [ new PreAuthenticatedStamp( $token ) ] );
+        return new Passport(
+            $user,
+            new AccessTokenCredentials( $token ),
+            [
+                new PreAuthenticatedStamp( $token ),
+                new ResetPasswordStamp(
+                    $request->getContent()->get( 'token' ),
+                    $request->getContent()->get( 'password' ),
+                ),
+            ],
+        );
     }
     
     /**
      * @inheritDoc
      */
     public function createAuthenticatedToken( PassportInterface $passport ): TokenInterface {
+        // Remove token so it can't be used again
+        $this->entityManager->delete( $passport->getStamp( PreAuthenticatedStamp::class )->getToken() );
+        $passport->getUser()->set(
+            [
+                'password' => $passport->getStamp( ResetPasswordStamp::class )->getPassword(),
+            ]
+        );
+        $this->entityManager->run();
+        
         return new AuthenticatedToken(
             user:            $passport->getUser(),
-            scope:           TokenInterface::SCOPE_RESET_PASSWORD,
+            scope:           TokenInterface::SCOPE_IGNORE,
             token:           null,
             isAuthenticated: false,
         );

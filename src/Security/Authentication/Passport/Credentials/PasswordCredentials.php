@@ -44,7 +44,7 @@ class PasswordCredentials implements CredentialsInterface {
         $providedCredentials = $this->password instanceof CredentialEncoderInterface ? $this->password->getEncoded() : $this->password;
         
         if ( ! password_verify( $providedCredentials, $user->getCredential()->getCredential() ) ) {
-            throw new InvalidCredentialsException( 'Invalid user password' );
+            throw new InvalidCredentialsException( 'Invalid credentials' );
         }
     }
 }

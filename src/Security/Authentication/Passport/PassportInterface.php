@@ -16,6 +16,8 @@ use Swift\Security\User\UserInterface;
 /**
  * Interface PassportInterface
  * @package Swift\Security\Authentication\Passport
+ *
+ * @template T
  */
 interface PassportInterface {
 
@@ -34,9 +36,11 @@ interface PassportInterface {
     public function getStamps(): array;
 
     /**
-     * @param string $stamp
+     * @template T
      *
-     * @return StampInterface|null
+     * @param class-string<T> $stamp
+     *
+     * @return T|null
      */
     public function getStamp( string $stamp ): ?StampInterface;
 
