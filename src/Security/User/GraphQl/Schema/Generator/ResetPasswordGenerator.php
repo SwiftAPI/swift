@@ -24,7 +24,7 @@ class ResetPasswordGenerator implements \Swift\GraphQl\Schema\Generator\Generato
     ) {
     }
     
-    public function run( \Swift\GraphQl\Schema\Registry $registry ): \Swift\GraphQl\Schema\Registry {
+    public function generate( \Swift\GraphQl\Schema\Registry $registry ): \Swift\GraphQl\Schema\Registry {
         $registry->extendType( 'Mutation', function( ObjectBuilder $objectBuilder ) use ( $registry ) {
             $response = $this->generateUserResetPasswordResult( $registry );
          

@@ -13,9 +13,15 @@ namespace Swift\GraphQl\Schema;
 
 class Compiler {
     
+    /**
+     * @param \Swift\GraphQl\Schema\Registry                       $registry
+     * @param \Swift\GraphQl\Schema\Generator\GeneratorInterface[] $generators
+     *
+     * @return \Swift\GraphQl\Schema\Registry
+     */
     public function compile( Registry $registry, array $generators ): Registry {
         foreach ( $generators as $generator ) {
-            $registry = $generator->run( $registry );
+            $registry = $generator->generate( $registry );
         }
         
         $registry->build();

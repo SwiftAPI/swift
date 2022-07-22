@@ -16,6 +16,6 @@ use Swift\GraphQl\DependencyInjection\DiTags;
 #[DI( tags: [ DiTags::GRAPHQL_SCHEMA_GENERATOR ] )]
 interface GeneratorInterface {
     
-    public function run( \Swift\GraphQl\Schema\Registry $registry ): \Swift\GraphQl\Schema\Registry;
+    public function generate( \Swift\GraphQl\Schema\Registry $registry ): \Swift\GraphQl\Schema\Registry;
     
 }

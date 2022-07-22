@@ -24,7 +24,7 @@ use Swift\GraphQl\Schema\Registry;
  */
 class RelayBaseGenerator implements GeneratorInterface, ManualGeneratorInterface {
     
-    public function run( \Swift\GraphQl\Schema\Registry $registry ): \Swift\GraphQl\Schema\Registry {
+    public function generate( \Swift\GraphQl\Schema\Registry $registry ): \Swift\GraphQl\Schema\Registry {
         $this->addNodeInterface( $registry );
         $this->addEdgeInterface( $registry );
         $this->addConnectionInterface( $registry );

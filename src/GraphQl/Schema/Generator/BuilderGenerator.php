@@ -22,7 +22,7 @@ class BuilderGenerator implements GeneratorInterface, ManualGeneratorInterface {
     /** @var \Swift\GraphQl\Schema\Definition\SchemaBuilderInterface[] $builders */
     protected array $builders = [];
     
-    public function run( \Swift\GraphQl\Schema\Registry $registry ): \Swift\GraphQl\Schema\Registry {
+    public function generate( \Swift\GraphQl\Schema\Registry $registry ): \Swift\GraphQl\Schema\Registry {
         
         foreach ($this->builders as $builder) {
             $builder->define( $registry );

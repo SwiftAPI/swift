@@ -25,7 +25,7 @@ class AccessTokenGenerator implements \Swift\GraphQl\Schema\Generator\GeneratorI
     ) {
     }
     
-    public function run( \Swift\GraphQl\Schema\Registry $registry ): \Swift\GraphQl\Schema\Registry {
+    public function generate( \Swift\GraphQl\Schema\Registry $registry ): \Swift\GraphQl\Schema\Registry {
         $registry->extendType( 'Mutation', function ( ObjectBuilder $objectBuilder ) use ( $registry ) {
             $accessTokenResponse = $this->generateAccessTokenResult( $registry );
             $refreshTokenResponse = $this->generateRefreshTokenResult( $registry );

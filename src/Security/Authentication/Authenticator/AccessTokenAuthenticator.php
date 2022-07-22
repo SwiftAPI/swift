@@ -82,7 +82,7 @@ final class AccessTokenAuthenticator implements AuthenticatorInterface {
         if ( $token->getUser() ) {
             $user = $this->userProvider->getUserById( $token->getUser()->getId() );
         } else {
-            $user = new ClientUser( ...$token->getClient()->toArray() );
+            $user = ClientUser::fromClientEntity( $token->getClient(), $this->entityManager );
         }
         
         return new Passport( $user, new AccessTokenCredentials( $token ), [ new PreAuthenticatedStamp( $token ) ] );

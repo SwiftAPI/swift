@@ -45,7 +45,7 @@ class OrmGenerator implements GeneratorInterface, ManualGeneratorInterface {
     ) {
     }
     
-    public function run( \Swift\GraphQl\Schema\Registry $registry ): \Swift\GraphQl\Schema\Registry {
+    public function generate( \Swift\GraphQl\Schema\Registry $registry ): \Swift\GraphQl\Schema\Registry {
         $this->initCoreTypes( $registry );
         
         foreach ( $this->ormFactory->getSchema()->toArray() as $table => $schema ) {
@@ -119,13 +119,12 @@ class OrmGenerator implements GeneratorInterface, ManualGeneratorInterface {
         $class     = $schema[ SchemaInterface::ENTITY ];
         $role      = $schema[ SchemaInterface::ROLE ] ?? $table;
         $meta      = $this->classMetaDataFactory->getClassMetaData( $class );
-        $ref       = $this;
         
         $type = Builder::objectType( ucfirst( $inflector->camelize( $inflector->singularize( $table ) ) ) )
                        ->addInterface( Relay::NODE, static fn() => Registry::$typeMap[ Relay::NODE ] )
-                       ->setFieldResolver( static function ( $objectValue, array $args, $context, ResolveInfo $info ) use ( $ref, $registry, $role ) {
+                       ->setFieldResolver( function ( $objectValue, array $args, $context, ResolveInfo $info ) {
                            if ( ! $objectValue && ! empty( $args[ 'id' ] ) ) {
-                               return $ref->ormResolver->resolveSingle( $objectValue, $args, $context, $info );
+                               return $this->ormResolver->resolveSingle( $objectValue, $args, $context, $info );
                            }
             
                            return $objectValue;
@@ -133,15 +132,15 @@ class OrmGenerator implements GeneratorInterface, ManualGeneratorInterface {
         
         foreach ( $meta?->getEntity()->getFields() ?? [] as $field ) {
             if ( $field->getEnum() ) {
-                $ref->resolveEnum( $registry, $field->getEnum() );
+                $this->resolveEnum( $registry, $field->getEnum() );
             }
             
             $type->addField(
                 $field->getPropertyName(),
                 Builder::fieldType(
                     $field->getPropertyName(),
-                    static function () use ( $registry, $field, $ref, $meta ) {
-                        $type = $ref->resolveType( $field->getType()->getName() );
+                    function () use ( $field, $meta ) {
+                        $type = $this->resolveType( $field->getType()->getName() );
                         if ( $field === $meta->getEntity()->getPrimaryKey() ) {
                             $type = Type::id();
                         }

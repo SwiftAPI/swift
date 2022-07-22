@@ -37,7 +37,7 @@ class NodeMiddleware implements \Swift\GraphQl\Schema\Middleware\SchemaMiddlewar
         if ( is_callable( $fields ) ) {
             throw new \InvalidArgumentException( 'Fields must be an array for usage with Relay' );
         }
-        
+    
         $fields[ 'id' ][ 'resolve' ] = static function ( $object, array $args, $context, ResolveInfo $info ) use ( $builder, $fields ) {
             $val = is_callable( $fields[ 'id' ][ 'resolve' ] ) ? $fields[ 'id' ][ 'resolve' ]( $object, $args, $context, $info ) : $object->id;
             

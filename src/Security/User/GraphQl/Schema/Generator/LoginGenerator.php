@@ -25,7 +25,7 @@ class LoginGenerator implements \Swift\GraphQl\Schema\Generator\GeneratorInterfa
     ) {
     }
     
-    public function run( \Swift\GraphQl\Schema\Registry $registry ): \Swift\GraphQl\Schema\Registry {
+    public function generate( \Swift\GraphQl\Schema\Registry $registry ): \Swift\GraphQl\Schema\Registry {
         $registry->extendType( 'Mutation', function ( ObjectBuilder $objectBuilder ) use ( $registry ) {
             $response = $this->createResponseType( $registry );
             

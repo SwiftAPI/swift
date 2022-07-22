@@ -24,7 +24,7 @@ class UserMeGenerator implements \Swift\GraphQl\Schema\Generator\GeneratorInterf
     ) {
     }
     
-    public function run( \Swift\GraphQl\Schema\Registry $registry ): \Swift\GraphQl\Schema\Registry {
+    public function generate( \Swift\GraphQl\Schema\Registry $registry ): \Swift\GraphQl\Schema\Registry {
         $registry->extendType( 'Query', function ( ObjectBuilder $objectBuilder ) use ( $registry ) {
             
             $objectBuilder->addField( 'UserMe', [

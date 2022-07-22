@@ -21,7 +21,7 @@ use Swift\GraphQl\Type\DateTimeWithPreFormat;
  */
 class BaseGenerator implements GeneratorInterface, ManualGeneratorInterface {
     
-    public function run( \Swift\GraphQl\Schema\Registry $registry ): \Swift\GraphQl\Schema\Registry {
+    public function generate( \Swift\GraphQl\Schema\Registry $registry ): \Swift\GraphQl\Schema\Registry {
         $query = Builder::objectType( 'Query' )
                         ->setDescription( 'The root query type.' );
         $registry->objectType( $query );
