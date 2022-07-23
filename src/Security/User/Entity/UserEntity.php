@@ -12,7 +12,6 @@ namespace Swift\Security\User\Entity;
 
 use JetBrains\PhpStorm\ArrayShape;
 use Ramsey\Uuid\UuidInterface;
-use Swift\GraphQl\Attributes\Type;
 use Swift\DependencyInjection\Attributes\DI;
 use Swift\Orm\Attributes\Behavior\CreatedAt;
 use Swift\Orm\Attributes\Behavior\UpdatedAt;
@@ -33,21 +32,20 @@ use Swift\Orm\Entity\AbstractEntity;
  * @package Swift\Security\User\Entity
  */
 #[DI( aliases: [ EntityInterface::class . ' $userEntity', UserStorageInterface::class . ' $userDatabaseStorage' ] )]
-#[Type]
 #[Entity( table: 'security_users' )]
 #[CreatedAt( field: 'created' )]
 #[UpdatedAt( field: 'modified' )]
 #[Uuid1( field: 'uuid' )]
-#[Index( fields: [ 'uuid', 'created' ], unique: true )]
+#[Index( fields: [ 'uuid', 'created' ])]
 class UserEntity extends AbstractEntity implements UserStorageInterface {
     
     #[Field( name: 'id', primary: true, type: FieldTypes::INT, length: 11 )]
     protected int $id;
     
-    #[Field( name: 'uuid', type: FieldTypes::UUID, unique: true )]
+    #[Field( name: 'uuid', type: FieldTypes::UUID, index: true )]
     protected UuidInterface $uuid;
     
-    #[Field( name: 'username', type: FieldTypes::TEXT, length: 128, unique: true )]
+    #[Field( name: 'username', type: FieldTypes::TEXT, length: 128 )]
     protected string $username;
     
     #[Field( name: 'first_name', type: FieldTypes::TEXT, length: 255, empty: true )]
@@ -56,7 +54,7 @@ class UserEntity extends AbstractEntity implements UserStorageInterface {
     #[Field( name: 'last_name', type: FieldTypes::TEXT, length: 255, empty: true )]
     protected string $lastname;
     
-    #[Field( name: 'email', type: FieldTypes::TEXT, length: 255, unique: true )]
+    #[Field( name: 'email', type: FieldTypes::TEXT, length: 255 )]
     protected string $email;
     
     #[Field( name: 'created', type: FieldTypes::DATETIME )]

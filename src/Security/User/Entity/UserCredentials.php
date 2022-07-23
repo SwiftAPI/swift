@@ -24,13 +24,13 @@ use Swift\Orm\Types\FieldTypes;
 #[Uuid1( field: 'uuid' )]
 #[CreatedAt( field: 'created' )]
 #[UpdatedAt( field: 'modified' )]
-#[Index( fields: [ 'credential', 'security_users_incrementId' ], unique: true )]
+//#[Index( fields: [ 'credential', 'security_users_incrementId' ], unique: true )]
 class UserCredentials extends AbstractEntity {
     
     #[Field( name: 'id', primary: true, type: FieldTypes::INT, length: 11 )]
     protected int $id;
     
-    #[Field( name: 'uuid', type: FieldTypes::UUID, unique: true )]
+    #[Field( name: 'uuid', type: FieldTypes::UUID )]
     protected UuidInterface $uuid;
     
     #[Field( name: 'credential', type: FieldTypes::TEXT, length: 255 )]

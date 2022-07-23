@@ -35,10 +35,10 @@ class OauthClientsEntity extends AbstractEntity {
     #[Field( name: 'id', primary: true, type: FieldTypes::INT, length: 11 )]
     public int $id;
     
-    #[Field( name: 'uuid', type: FieldTypes::UUID, unique: true )]
+    #[Field( name: 'uuid', type: FieldTypes::UUID )]
     protected UuidInterface $uuid;
     
-    #[Field( name: 'client_id', type: FieldTypes::TEXT, length: 80, empty: false, unique: true )]
+    #[Field( name: 'client_id', type: FieldTypes::TEXT, empty: false )]
     public string $clientId;
     
     #[Field( name: 'client_secret', type: FieldTypes::TEXT, length: 80, empty: true )]
