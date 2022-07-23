@@ -29,7 +29,6 @@
   ],
   "require": {
     "webonyx/graphql-php": "^v14.11.6",
-    "myclabs/php-enum": "^1.8.0",
     "phpdocumentor/reflection-docblock": "^5.2",
     "guzzlehttp/guzzle": "^7.2",
     "symfony/mime": "^6.0",
