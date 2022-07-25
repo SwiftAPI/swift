@@ -10,12 +10,14 @@
 
 namespace Swift\Orm\Mapping\Definition;
 
+use Swift\Orm\Types\FieldTypes;
+
 /**
  * Class IndexTypes
  * @package Swift\Orm\Mapping
  */
 enum IndexType {
-
+    
     case PRIMARY;
     case INDEX;
     case UNIQUE;
@@ -33,7 +35,11 @@ enum IndexType {
             return self::INDEX;
         }
         
+        if ( $fieldAttribute->getType() === FieldTypes::UUID->value ) {
+            return self::UNIQUE;
+        }
+        
         return null;
     }
-
+    
 }
