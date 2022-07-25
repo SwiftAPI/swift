@@ -36,7 +36,7 @@ class Factory {
     public function getOrm(): ORMInterface {
         if ( ! isset( $this->orm ) ) {
             $schema    = $this->getSchema();
-            $this->orm = new \Swift\Orm\ORM(
+            $this->orm = new \Swift\Orm\Orm(
                 ( new \Swift\Orm\CoreFactory(
                                               $this->dbalProvider,
                     defaultCollectionFactory: new CollectionFactory(),
