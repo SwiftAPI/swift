@@ -52,7 +52,7 @@
     "dibi/dibi": "^4.2",
     "runtime/react": "^0.1.0",
     "cboden/ratchet": "^0.4.4",
-    "cycle/orm": "^2.1",
+    "cycle/orm": "^v2.2.0",
     "cycle/annotated": "^3.1",
     "cycle/schema-migrations-generator": "^2.0",
     "alecrabbit/php-cli-snake": "^0.6.0",
