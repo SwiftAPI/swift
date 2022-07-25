@@ -15,7 +15,6 @@ use Swift\Dbal\Arguments\Arguments;
 use Swift\Dbal\Driver\DatabaseDriver;
 use Swift\Dbal\QueryBuilder;
 use Swift\DependencyInjection\Attributes\Autowire;
-use Swift\Orm\Dbal\Helper\QueryHelper;
 use Swift\Orm\Factory;
 use Swift\Orm\Mapping\ClassMetaData;
 use Swift\Orm\Mapping\ClassMetaDataFactory;
