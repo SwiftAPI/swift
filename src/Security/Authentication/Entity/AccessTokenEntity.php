@@ -37,7 +37,7 @@ class AccessTokenEntity extends AbstractEntity {
     #[Field( name: 'uuid', type: FieldTypes::UUID )]
     protected UuidInterface $uuid;
     
-    #[Field( name: 'access_token', type: FieldTypes::TEXT, length: 40, empty: false )]
+    #[Field( name: 'access_token', type: FieldTypes::STRING, length: 40, empty: false, unique: true )]
     public string $accessToken;
     
     #[Field( name: 'expires', type: FieldTypes::DATETIME, empty: false )]

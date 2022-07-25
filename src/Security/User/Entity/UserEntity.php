@@ -36,7 +36,7 @@ use Swift\Orm\Entity\AbstractEntity;
 #[CreatedAt( field: 'created' )]
 #[UpdatedAt( field: 'modified' )]
 #[Uuid1( field: 'uuid' )]
-#[Index( fields: [ 'uuid', 'created' ])]
+#[Index( fields: [ 'uuid', 'created' ], unique: true )]
 class UserEntity extends AbstractEntity implements UserStorageInterface {
     
     #[Field( name: 'id', primary: true, type: FieldTypes::INT, length: 11 )]
@@ -45,16 +45,16 @@ class UserEntity extends AbstractEntity implements UserStorageInterface {
     #[Field( name: 'uuid', type: FieldTypes::UUID, index: true )]
     protected UuidInterface $uuid;
     
-    #[Field( name: 'username', type: FieldTypes::TEXT, length: 128 )]
+    #[Field( name: 'username', type: FieldTypes::STRING, length: 128, unique: true)]
     protected string $username;
     
-    #[Field( name: 'first_name', type: FieldTypes::TEXT, length: 255, empty: true )]
+    #[Field( name: 'first_name', type: FieldTypes::STRING, length: 255, empty: true )]
     protected string $firstname;
     
-    #[Field( name: 'last_name', type: FieldTypes::TEXT, length: 255, empty: true )]
+    #[Field( name: 'last_name', type: FieldTypes::STRING, length: 255, empty: true )]
     protected string $lastname;
     
-    #[Field( name: 'email', type: FieldTypes::TEXT, length: 255 )]
+    #[Field( name: 'email', type: FieldTypes::STRING, length: 255, unique: true )]
     protected string $email;
     
     #[Field( name: 'created', type: FieldTypes::DATETIME )]
