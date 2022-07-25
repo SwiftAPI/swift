@@ -37,7 +37,7 @@ final class FloatingPointValue implements TypeInterface {
         return self::FLOAT;
     }
     
-    public function getDatabaseType(): string {
+    public function getDatabaseType( \Swift\Orm\Mapping\Definition\Field $field ): string {
         return 'float';
     }
     

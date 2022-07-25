@@ -40,7 +40,7 @@ final class Boolean implements TypeInterface {
         return self::BOOL;
     }
     
-    public function getDatabaseType(): string {
+    public function getDatabaseType( \Swift\Orm\Mapping\Definition\Field $field ): string {
         return 'boolean';
     }
 

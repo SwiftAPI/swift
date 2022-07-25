@@ -40,7 +40,7 @@ final class UnknownType implements TypeInterface {
         return $this->name;
     }
     
-    public function getDatabaseType(): string {
+    public function getDatabaseType( \Swift\Orm\Mapping\Definition\Field $field ): string {
         return 'text';
     }
     

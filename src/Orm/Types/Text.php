@@ -37,7 +37,7 @@ final class Text implements TypeInterface {
         return self::TEXT;
     }
     
-    public function getDatabaseType(): string {
+    public function getDatabaseType( \Swift\Orm\Mapping\Definition\Field $field ): string {
         return 'text';
     }
 

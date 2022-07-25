@@ -76,7 +76,7 @@ class Configurator {
             
             $fieldDefinition->setColumn( $field->getDatabaseName() );
             
-            $fieldDefinition->setType( $field->getType()->getDatabaseType() );
+            $fieldDefinition->setType( $field->getType()->getDatabaseType( $field ) );
             $fieldDefinition->setTypecast( $field->getType()->getName() );
             
             if ( $entityDefinition->getPrimaryKey() === $field ) {
@@ -141,7 +141,6 @@ class Configurator {
             try {
                 $metaData = new \AppendIterator();
                 $metaData->append( new \NoRewindIterator( $reader->getPropertyMetadata( $property, RelationFieldInterface::class ) ) );
-                //$metaData->append( new \NoRewindIterator( $reader->getPropertyMetadata( $property, RelationInterface::class ) ) );
             } catch ( \Exception $e ) {
                 throw new AnnotationException( $e->getMessage(), $e->getCode(), $e );
             }

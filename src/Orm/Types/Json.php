@@ -41,7 +41,7 @@ final class Json implements TypeInterface {
         return self::JSON;
     }
     
-    public function getDatabaseType(): string {
+    public function getDatabaseType( \Swift\Orm\Mapping\Definition\Field $field ): string {
         return 'json';
     }
     

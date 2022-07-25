@@ -37,7 +37,7 @@ final class LongText implements TypeInterface {
         return self::LONGTEXT;
     }
     
-    public function getDatabaseType(): string {
+    public function getDatabaseType( \Swift\Orm\Mapping\Definition\Field $field ): string {
         return 'longText';
     }
 

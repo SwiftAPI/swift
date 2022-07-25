@@ -40,8 +40,8 @@ final class BigFloat implements TypeInterface {
         return self::BIG_FLOAT;
     }
     
-    public function getDatabaseType(): string {
-        return 'string(128)';
+    public function getDatabaseType( \Swift\Orm\Mapping\Definition\Field $field ): string {
+        return sprintf('string(%s)', $field->getLength() ?? 128);
     }
     
     

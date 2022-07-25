@@ -52,7 +52,7 @@ final class TimeStamp implements TypeInterface {
         return self::TIMESTAMP;
     }
     
-    public function getDatabaseType(): string {
+    public function getDatabaseType( \Swift\Orm\Mapping\Definition\Field $field ): string {
         return 'timestamp';
     }
     

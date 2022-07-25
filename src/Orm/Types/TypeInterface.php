@@ -12,8 +12,6 @@ namespace Swift\Orm\Types;
 
 use Swift\DependencyInjection\Attributes\DI;
 use Swift\Kernel\KernelDiTags;
-use Swift\Orm\Mapping\Definition\Field;
-use Swift\Orm\Dbal\TableQuery;
 
 /**
  * Interface TypeInterface
@@ -31,8 +29,10 @@ interface TypeInterface {
     /**
      * Type the value will hold in the database
      *
+     * @param \Swift\Orm\Mapping\Definition\Field $field
+     *
      * @return string
      */
-    public function getDatabaseType(): string;
+    public function getDatabaseType( \Swift\Orm\Mapping\Definition\Field $field ): string;
     
 }

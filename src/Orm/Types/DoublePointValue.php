@@ -37,7 +37,7 @@ final class DoublePointValue implements TypeInterface {
         return self::DOUBLE;
     }
     
-    public function getDatabaseType(): string {
+    public function getDatabaseType( \Swift\Orm\Mapping\Definition\Field $field ): string {
         return 'double';
     }
     

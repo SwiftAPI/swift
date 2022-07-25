@@ -41,10 +41,10 @@ class Factory {
     
     protected function compileSchema(): array {
         return ( new Compiler() )->compile( new Schema\Registry( $this->dbalProvider ), [
-            new Embeddings( $this->classLocator ),
-            new Entities( $this->classLocator ),
             new \Swift\Orm\Schema\Generator\Embeddings( $this->classLocator, $this->classMetaDataFactory, $this->namingStrategy, $this->reader ),
             new \Swift\Orm\Schema\Generator\Entities( $this->classMetaDataFactory, $this->namingStrategy, $this->reader ),
+            new Embeddings( $this->classLocator ),
+            new Entities( $this->classLocator ),
             new Schema\Generator\ResetTables(),
             new Schema\Generator\GenerateRelations(),
             new Schema\Generator\GenerateModifiers(),

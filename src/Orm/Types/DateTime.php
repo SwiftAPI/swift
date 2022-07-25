@@ -52,7 +52,7 @@ final class DateTime implements TypeInterface {
         return self::DATETIME;
     }
     
-    public function getDatabaseType(): string {
+    public function getDatabaseType( \Swift\Orm\Mapping\Definition\Field $field ): string {
         return 'datetime';
     }
     

@@ -18,6 +18,7 @@ enum FieldTypes: string {
 
     case UNKNOWN = 'unknown';
     
+    case STRING = 'string';
     case TEXT = 'text';
     case LONGTEXT = 'longtext';
 
