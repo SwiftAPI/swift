@@ -13,6 +13,7 @@ namespace Swift\Logging;
 
 use DateTimeZone;
 use Swift\DependencyInjection\Attributes\Autowire;
+use Swift\DependencyInjection\ServiceLocator;
 use Swift\Events\EventDispatcher;
 use Swift\Logging\Event\OnBeforeLoggerHandlersEvent;
 use Monolog\Handler\HandlerInterface;

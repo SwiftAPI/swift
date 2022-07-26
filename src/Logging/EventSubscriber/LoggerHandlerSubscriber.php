@@ -18,25 +18,16 @@ use Swift\Logging\Event\OnBeforeLoggerHandlersEvent;
 use Monolog\Handler\NativeMailerHandler;
 use Symfony\Component\EventDispatcher\EventSubscriberInterface;
 
-/**
- * Class LoggerHandlerSubscriber
- * @package Swift\Logging\EventSubscriber
- */
+
 #[Autowire]
 class LoggerHandlerSubscriber implements EventSubscriberInterface {
     
     /**
-     * @var ConfigurationInterface $configuration
-     */
-    private ConfigurationInterface $configuration;
-    
-    /**
-     * LoggerHandlerSubscriber constructor.
-     *
      * @param ConfigurationInterface $configuration
      */
-    public function __construct( ConfigurationInterface $configuration ) {
-        $this->configuration = $configuration;
+    public function __construct(
+        protected ConfigurationInterface $configuration
+    ) {
     }
     
     
@@ -56,7 +47,7 @@ class LoggerHandlerSubscriber implements EventSubscriberInterface {
      * @param string                      $eventClassName
      * @param EventDispatcher             $eventDispatcher
      */
-    public function OnBeforeLoggerHandlers( OnBeforeLoggerHandlersEvent $event, string $eventClassName, EventDispatcher $eventDispatcher ) {
+    public function OnBeforeLoggerHandlers( OnBeforeLoggerHandlersEvent $event, string $eventClassName, EventDispatcher $eventDispatcher ): void {
         if ( $this->configuration->get( 'logging.enable_mail', 'root' ) ) {
             if ( is_null( $this->configuration->get( 'logging.logging_mail_from', 'root' ) || is_null( $this->configuration->get( 'logging.logging_mail_to', 'root' ) ) ) ) {
                 return;

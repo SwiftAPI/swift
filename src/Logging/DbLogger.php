@@ -1,4 +1,4 @@
-<?php declare(strict_types=1);
+<?php declare( strict_types=1 );
 
 /*
  * This file is part of the Swift Framework
@@ -21,17 +21,17 @@ use Swift\Logging\Handler\DbHandler;
  */
 #[Autowire]
 class DbLogger extends AbstractLogger {
-
+    
     /**
      * AppLogger constructor.
      *
      * @param DbHandler $dbHandler
      */
     public function __construct( DbHandler $dbHandler ) {
-        $dbHandler->setFormatter(new LineFormatter());
-
-        parent::__construct( 'app', [$dbHandler]);
+        $dbHandler->setFormatter( new LineFormatter() );
+        
+        parent::__construct( 'app', [ $dbHandler ] );
     }
-
-
+    
+    
 }

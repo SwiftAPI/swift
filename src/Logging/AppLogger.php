@@ -1,4 +1,4 @@
-<?php declare(strict_types=1);
+<?php declare( strict_types=1 );
 
 /*
  * This file is part of the Swift Framework
@@ -20,16 +20,16 @@ use Monolog\Handler\StreamHandler;
  */
 #[Autowire]
 class AppLogger extends AbstractLogger {
-
+    
     /**
      * AppLogger constructor.
      */
     public function __construct() {
-        $stream = new StreamHandler(INCLUDE_DIR . '/var/app.log', AbstractLogger::DEBUG);
-        $stream->setFormatter(new LineFormatter());
-
-        parent::__construct('app', array($stream));
+        $stream = new StreamHandler( INCLUDE_DIR . '/var/app.log', AbstractLogger::DEBUG );
+        $stream->setFormatter( new LineFormatter() );
+        
+        parent::__construct( 'app', [ $stream ] );
     }
-
-
+    
+    
 }
