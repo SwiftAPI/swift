@@ -27,11 +27,6 @@
       "role": "Developer"
     }
   ],
-  "config": {
-    "platform": {
-      "php": ">=8.1.0"
-    }
-  },
   "require": {
     "webonyx/graphql-php": "^v14.11.6",
     "phpdocumentor/reflection-docblock": "^5.2",
@@ -76,6 +71,9 @@
     }
   },
   "config": {
+    "platform": {
+      "php": ">=8.1.0"
+    },
     "allow-plugins": {
       "symfony/runtime": true
     }
