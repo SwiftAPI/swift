@@ -38,15 +38,12 @@ abstract class AbstractLogger extends \Monolog\Logger {
      * @param DateTimeZone|null  $timezone   Optional timezone, if not provided date_default_timezone_get() will be used
      */
     public function __construct( string $name = '', array $handlers = [], array $processors = [], ?DateTimeZone $timezone = null ) {
+        $this->dispatcher = ( new ServiceLocator() )->get( EventDispatcher::class );
+        
         /** @var OnBeforeLoggerHandlersEvent $event */
         $event = $this->dispatcher->dispatch( new OnBeforeLoggerHandlersEvent( AppLogger::class, $handlers ) );
         
         parent::__construct( $name, $event->getHandlers(), $processors, $timezone );
-    }
-    
-    #[Autowire]
-    public function setEventDispatcher( EventDispatcher $dispatcher ): void {
-        $this->dispatcher = $dispatcher;
     }
     
 }
