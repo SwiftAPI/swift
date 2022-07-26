@@ -2,6 +2,7 @@
 
 [![CodeFactor](https://www.codefactor.io/repository/github/swiftapi/swift/badge)](https://www.codefactor.io/repository/github/swiftapi/swift)
 [![Version](http://poser.pugx.org/swift-api/swift/version)](https://packagist.org/packages/swift-api/swift)
+[![Latest Unstable Version](http://poser.pugx.org/swift-api/swift/v/unstable)](https://packagist.org/packages/swift-api/swift)
 [![PHP Version Require](http://poser.pugx.org/swift-api/swift/require/php)](https://packagist.org/packages/swift-api/swift)
 
 This is a small and fast PHP framework meant to write APIs or microservices in a fast and easy manner. This is a not meant as a replacement for other frameworks,
