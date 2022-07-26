@@ -28,6 +28,7 @@
     }
   ],
   "require": {
+    "php": ">=8.1.0",
     "webonyx/graphql-php": "^v14.11.6",
     "phpdocumentor/reflection-docblock": "^5.2",
     "guzzlehttp/guzzle": "^7.2",
@@ -71,9 +72,7 @@
     }
   },
   "config": {
-    "platform": {
-      "php": ">=8.1.0"
-    },
+
     "allow-plugins": {
       "symfony/runtime": true
     }
