@@ -41,11 +41,11 @@ class AttributeHelper {
     }
     
     /**
-     * @param \ReflectionClass|\ReflectionMethod|\ReflectionParameter $reflection
+     * @param \ReflectionClass|\ReflectionMethod|\ReflectionParameter|\ReflectionProperty $reflection
      *
      * @return  \Swift\DependencyInjection\Attributes\Autowire[]|\Swift\Kernel\Attributes\Autowire[]|null
      */
-    public static function getAutowireAttributes( ReflectionClass|ReflectionMethod|ReflectionParameter $reflection ): ?array {
+    public static function getAutowireAttributes( ReflectionClass|ReflectionMethod|ReflectionParameter|\ReflectionProperty $reflection ): ?array {
         $attributes = $reflection->getAttributes( Autowire::class );
         
         if ( ! empty( $attributes ) ) {

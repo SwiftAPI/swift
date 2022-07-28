@@ -72,7 +72,6 @@
     }
   },
   "config": {
-
     "allow-plugins": {
       "symfony/runtime": true
     }

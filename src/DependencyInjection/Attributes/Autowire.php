@@ -1,4 +1,4 @@
-<?php declare(strict_types=1);
+<?php declare( strict_types=1 );
 
 /*
  * This file is part of the Swift Framework
@@ -11,14 +11,13 @@
 namespace Swift\DependencyInjection\Attributes;
 
 
-
 /**
  * Class Autowire
  * @package Swift\DependencyInjection\Attributes
  */
-#[\Attribute( \Attribute::TARGET_CLASS | \Attribute::TARGET_METHOD | \Attribute::TARGET_PARAMETER)]
+#[\Attribute( \Attribute::TARGET_CLASS | \Attribute::TARGET_METHOD | \Attribute::TARGET_PARAMETER | \Attribute::TARGET_PROPERTY )]
 class Autowire {
-
+    
     /**
      * Autowire constructor.
      *
@@ -30,4 +29,21 @@ class Autowire {
         public ?string $serviceId = null,
     ) {
     }
+    
+    /**
+     * @return string|null
+     */
+    public function getTag(): ?string {
+        return $this->tag;
+    }
+    
+    /**
+     * @return string|null
+     */
+    public function getServiceId(): ?string {
+        return $this->serviceId;
+    }
+    
+    
+    
 }

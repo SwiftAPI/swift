@@ -30,5 +30,6 @@ class ExtensionsCompilerPass implements \Symfony\Component\DependencyInjection\C
             $compilerPass = $container->get($pass);
             $compilerPass?->process($container);
         }
+        
     }
 }

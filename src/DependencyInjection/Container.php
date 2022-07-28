@@ -10,6 +10,8 @@
 
 namespace Swift\DependencyInjection;
 
+use Symfony\Component\DependencyInjection\Compiler\PassConfig;
+
 /**
  * Class Container
  * @package Swift\DependencyInjection
@@ -47,6 +49,7 @@ class Container extends \Symfony\Component\DependencyInjection\ContainerBuilder 
         
         $this->addCompilerPass( new \Swift\DependencyInjection\CompilerPass\DependencyInjectionCompilerPass() );
         $this->addCompilerPass( new \Swift\DependencyInjection\CompilerPass\ExtensionsCompilerPass() );
+        $this->addCompilerPass( new \Swift\DependencyInjection\CompilerPass\AutowireTaggedConstructorPass(), PassConfig::TYPE_OPTIMIZE, 10 );
         
         parent::compile();
         
