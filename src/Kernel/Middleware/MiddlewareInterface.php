@@ -8,11 +8,16 @@
  * For the full copyright and license information, please view the LICENSE file that was distributed with this source code.
  */
 
-namespace Swift\Application;
+namespace Swift\Kernel\Middleware;
 
 
-interface ApplicationInterface {
+interface MiddlewareInterface extends \Psr\Http\Server\MiddlewareInterface {
     
-    public function run( ?\Psr\Http\Message\ServerRequestInterface $request = null ): void;
+    /**
+     * Priority of the middleware. The middleware will be sorted by this value.
+     *
+     * @return int
+     */
+    public function getPriority(): int;
     
 }

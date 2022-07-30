@@ -12,10 +12,11 @@ namespace Swift\Kernel;
 
 use Exception;
 use JetBrains\PhpStorm\NoReturn;
-use Swift\Configuration\Configuration;
+use Psr\Http\Message\ResponseInterface;
+use Psr\Http\Message\ServerRequestInterface;
 use Swift\Configuration\ConfigurationInterface;
-use Swift\Controller\ControllerInterface;
-use Swift\Events\EventDispatcher;
+use Swift\DependencyInjection\Attributes\Autowire;
+use Swift\Events\EventDispatcherInterface;
 use Swift\HttpFoundation\Event\BeforeResponseEvent;
 use Swift\HttpFoundation\Exception\AccessDeniedException;
 use Swift\HttpFoundation\Exception\BadRequestException;
@@ -24,41 +25,22 @@ use Swift\HttpFoundation\Exception\NotAuthorizedException;
 use Swift\HttpFoundation\Exception\NotFoundException;
 use Swift\HttpFoundation\JsonResponse;
 use Swift\HttpFoundation\Response;
-use Swift\HttpFoundation\ResponseInterface;
-use Swift\HttpFoundation\ServerRequest;
-use Swift\DependencyInjection\Attributes\Autowire;
-use Swift\DependencyInjection\ContainerInterface;
 use Swift\Kernel\Event\KernelOnBeforeShutdown;
 use Swift\Kernel\Event\KernelRequestEvent;
-use Swift\Kernel\Event\OnKernelRouteEvent;
-use Swift\Router\Event\OnBeforeRouteEnterEvent;
-use Swift\Router\Route;
-use Swift\Router\RouteInterface;
-use Swift\Router\Router;
+use Swift\Kernel\Middleware\MiddlewareRunner;
 
-/**
- * Class Application
- * @package Swift\Kernel
- */
 #[Autowire]
 final class Kernel implements KernelInterface {
     
-    private ContainerInterface $container;
     private bool $isRunning = false;
     
     /**
-     * Application constructor.
-     *
-     * @param Router          $router
-     * @param Configuration   $configuration
-     * @param ServerRequest   $request
-     * @param EventDispatcher $dispatcher
+     * @param ConfigurationInterface                 $configuration
+     * @param \Swift\Events\EventDispatcherInterface $eventDispatcher
      */
     public function __construct(
-        private readonly Router                 $router,
-        private readonly ConfigurationInterface $configuration,
-        private readonly ServerRequest          $request,
-        private readonly EventDispatcher        $dispatcher,
+        private readonly ConfigurationInterface   $configuration,
+        private readonly EventDispatcherInterface $eventDispatcher,
     ) {
     }
     
@@ -67,30 +49,29 @@ final class Kernel implements KernelInterface {
      *
      * @throws Exception
      */
-    public function run(): void {
+    public function run( ServerRequestInterface $request, MiddlewareRunner $middlewareRunner ): void {
         if ( $this->isRunning ) {
             throw new \RuntimeException( 'Application is already running' );
         }
         
         if ( $this->isDebug() ) {
-            $this->finalize( $this->doRun() );
+            $this->finalize( $request, $this->doRun( $request, $middlewareRunner ) );
         }
-    
+        
         try {
-            $response = $this->doRun();
+            $response = $this->doRun( $request, $middlewareRunner );
         } catch ( Exception $exception ) {
             $response = new JsonResponse( [ 'message' => $this->isDebug() ? $exception->getMessage() : Response::$reasonPhrases[ Response::HTTP_INTERNAL_SERVER_ERROR ], 'code' => $exception->getCode() ], status: Response::HTTP_INTERNAL_SERVER_ERROR );
         }
         
-        $this->finalize( $response );
+        $this->finalize( $request, $response );
     }
     
-    protected function doRun(): Response {
+    protected function doRun( ServerRequestInterface $request, MiddlewareRunner $middlewareRunner ): \Psr\Http\Message\ResponseInterface {
         try {
-            $this->dispatcher->dispatch( new KernelRequestEvent( $this->request ) );
-            $route = ( $this->dispatcher->dispatch( new OnKernelRouteEvent( $this->request, $this->router->getCurrentRoute() ) ) )->getRoute();
+            $this->eventDispatcher->dispatch( new KernelRequestEvent( $request ) );
             
-            $response = $this->dispatch( $route );
+            $response = $middlewareRunner->run( $request );
         } catch ( NotFoundException $exception ) {
             $response = new JsonResponse( [ 'message' => $exception->getMessage() ?: Response::$reasonPhrases[ Response::HTTP_NOT_FOUND ], 'code' => $exception->getCode() ], status: Response::HTTP_NOT_FOUND );
         } catch ( BadRequestException $exception ) {
@@ -107,41 +88,6 @@ final class Kernel implements KernelInterface {
     }
     
     /**
-     * Method to dispatch requested route
-     *
-     * @param RouteInterface $route
-     *
-     * @return ResponseInterface
-     * @throws Exception
-     */
-    private function dispatch( RouteInterface $route ): ResponseInterface {
-        /** @var Route $route */
-        $route = ( $this->dispatcher->dispatch( new OnBeforeRouteEnterEvent( $route ) ) )->getRoute();
-        
-        if ( ! $this->container->has( $route->getController() ) ) {
-            throw new NotFoundException( 'Not found' );
-        }
-        
-        /** @var ControllerInterface $controller */
-        $controller = $this->container->get( $route->getController() );
-        
-        if ( $controller instanceof ControllerInterface ) {
-            $controller->setRoute( $route );
-        }
-        
-        if ( empty( $route->getAction() ) || ! method_exists( $controller, $route->getAction() ) ) {
-            throw new NotFoundException(
-                $this->isDebug() ? sprintf( 'Action %s not found on controller %s', $route->getAction(), $controller::class ) : 'Action not found'
-            );
-        }
-        
-        /** @var ResponseInterface $response */
-        $response = $controller->{$route->getAction()}( $route->getParams() );
-        
-        return ( $this->dispatcher->dispatch( new BeforeResponseEvent( $response ), BeforeResponseEvent::class ) )->getResponse();
-    }
-    
-    /**
      * @return bool
      */
     public function isDebug(): bool {
@@ -151,33 +97,29 @@ final class Kernel implements KernelInterface {
     /**
      * Shortcut method for gracefully quitting the application with the given response
      *
-     * @param ResponseInterface $response
+     * @param \Psr\Http\Message\ServerRequestInterface $request
+     * @param ResponseInterface                        $response
+     *
+     * @return never
      */
     #[NoReturn]
-    public function finalize( ResponseInterface $response ): never {
+    public function finalize( ServerRequestInterface $request, ResponseInterface $response ): never {
+        $response = ( $this->eventDispatcher->dispatch( new BeforeResponseEvent( $response ), BeforeResponseEvent::class ) )->getResponse();
         $response->send();
-        $this->shutdown( $response );
+        $this->shutdown( $request, $response );
     }
     
     /**
      * Shut down application after outputting response
      *
-     * @param ResponseInterface $response
+     * @param \Psr\Http\Message\ServerRequestInterface $request
+     * @param ResponseInterface                        $response
      */
     #[NoReturn]
-    private function shutdown( ResponseInterface $response ): void {
-        $this->dispatcher->dispatch( event: new KernelOnBeforeShutdown( request: $this->request, response: $response ) );
+    private function shutdown( ServerRequestInterface $request, ResponseInterface $response ): void {
+        $this->eventDispatcher->dispatch( event: new KernelOnBeforeShutdown( request: $request, response: $response ) );
         
         exit();
-    }
-    
-    #[Autowire]
-    public function setContainer( #[Autowire( serviceId: 'service_container' )] ContainerInterface $container ): void {
-        $this->container = $container;
-    }
-    
-    public function getContainer(): ContainerInterface {
-        return $this->container;
     }
     
 }
