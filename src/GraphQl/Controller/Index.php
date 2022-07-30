@@ -11,6 +11,9 @@
 namespace Swift\GraphQl\Controller;
 
 
+use Swift\Configuration\ConfigurationInterface;
+use Swift\GraphQl\Kernel\Middleware\RequestMiddleware;
+use Swift\HttpFoundation\Exception\AccessDeniedException;
 use Swift\HttpFoundation\JsonResponse;
 use Swift\Router\Attributes\Route;
 use Swift\Router\Types\RouteMethod;
@@ -18,13 +21,18 @@ use Swift\Router\Types\RouteMethod;
 class Index extends \Swift\Controller\AbstractController {
     
     public function __construct(
-        protected \Swift\GraphQl\Kernel $kernel,
+        protected \Swift\GraphQl\Kernel  $kernel,
+        protected ConfigurationInterface $configuration,
     ) {
     }
     
     #[Route( method: [ RouteMethod::POST ], route: '/graphql/', name: 'graphql' )]
     public function index(): JsonResponse {
-        return $this->kernel->run( $this->getRequest() );
+        if ( ! $this->configuration->get( 'graphql.enabled', 'app' ) ) {
+            throw new AccessDeniedException( 'GraphQl is disabled' );
+        }
+        
+        throw new \RuntimeException( 'GraphQl should not be called directly, but only functions as a backup so no 404 is generated. ' . RequestMiddleware::class .  ' is responsible for handling GraphQl requests.' );
     }
     
 }
