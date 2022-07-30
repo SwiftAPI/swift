@@ -10,10 +10,10 @@
 
 namespace Swift\Kernel\Event;
 
+use Psr\Http\Message\ResponseInterface;
 use Psr\Http\Message\ServerRequestInterface;
 use Swift\DependencyInjection\Attributes\DI;
 use Swift\Events\AbstractEvent;
-use Swift\HttpFoundation\ResponseInterface;
 
 /**
  * Class KernelOnBeforeShutdown

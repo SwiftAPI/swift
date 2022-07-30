@@ -10,9 +10,9 @@
 
 namespace Swift\HttpFoundation\Event;
 
+use Psr\Http\Message\ResponseInterface;
 use Swift\DependencyInjection\Attributes\DI;
 use Swift\Events\AbstractEvent;
-use Swift\HttpFoundation\ResponseInterface;
 
 /**
  * Class BeforeResponseEvent
