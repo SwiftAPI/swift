@@ -10,16 +10,10 @@
 
 namespace Swift\Security\Firewall;
 
-use Swift\Configuration\ConfigurationInterface;
 use Swift\DependencyInjection\Attributes\Autowire;
 use Swift\Events\EventListenerInterface;
-use Swift\HttpFoundation\RequestInterface;
 use Swift\Events\Attribute\ListenTo;
 use Swift\Kernel\Event\KernelRequestEvent;
-use Swift\Router\Router;
-use Swift\Security\Authentication\AuthenticationManager;
-use Swift\Security\Authorization\AccessDecisionManagerInterface;
-use Swift\Security\Security;
 
 /**
  * Class Firewall
@@ -28,17 +22,7 @@ use Swift\Security\Security;
 #[Autowire]
 class Firewall implements FirewallInterface, EventListenerInterface {
     
-    /**
-     * Firewall constructor.
-     *
-     * @param AuthenticationManager  $authenticationManager
-     * @param ConfigurationInterface $configuration
-     */
-    public function __construct(
-        private readonly AuthenticationManager  $authenticationManager,
-        private readonly ConfigurationInterface $configuration,
-    ) {
-    }
+
 
 
     #[ListenTo(event: KernelRequestEvent::class, priority: -20)]
@@ -48,11 +32,7 @@ class Firewall implements FirewallInterface, EventListenerInterface {
         // - Login throttling
         //
 
-        if (!$this->configuration->get('app.allow_cors', 'root') ||
-            ($this->configuration->get('app.allow_cors', 'root') && !$kernelRequestEvent->getRequest()->isPreflight())
-        ) {
-            $passport = $this->authenticationManager->authenticate($kernelRequestEvent->getRequest());
-        }
+        
     }
 
 }

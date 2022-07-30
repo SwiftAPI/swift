@@ -103,11 +103,11 @@ class ListRoutesCommand extends AbstractCommand {
             [
                 [
                     $route->getName(),
-                    implode( ', ', $route->getMethods() ),
+                    implode( ', ', array_map( static fn( $method ) => is_object( $method ) && enum_exists( $method::class ) ? $method->value : $method, $route->getMethods() ) ),
                     $route->getController() . '::' . $route->getAction() . '()',
                     $route->getFullPath(),
                     implode( ', ', $route->getTags()->getIterator()->getArrayCopy() ),
-                    implode( ', ', $route->getIsGranted() ),
+                    implode( ', ', array_map( static fn( $method ) => is_object( $method ) && enum_exists( $method::class ) ? $method->value : $method, $route->getIsGranted() ) ),
                     implode( ', ', $route->getParams()->getIterator()->getArrayCopy() ),
                     $route->getFullRegex(),
                 ],

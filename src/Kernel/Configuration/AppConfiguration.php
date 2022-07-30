@@ -100,6 +100,7 @@ class AppConfiguration extends ConfigurationScope implements ConfigurationScopeI
                     ->booleanNode('debug')->defaultTrue()->end()
                     ->booleanNode('allow_cors')->defaultTrue()->end()
                     ->scalarNode('timezone')->defaultValue('Europe/Amsterdam')->end()
+                    ->booleanNode('log_requests')->defaultTrue()->end()
                 ->end()
             ->end();
             

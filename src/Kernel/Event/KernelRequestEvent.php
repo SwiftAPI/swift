@@ -10,14 +10,10 @@
 
 namespace Swift\Kernel\Event;
 
+use Psr\Http\Message\RequestInterface;
 use Swift\DependencyInjection\Attributes\DI;
 use Swift\Events\AbstractEvent;
-use Swift\HttpFoundation\RequestInterface;
 
-/**
- * Class KernelRequestEvent
- * @package Swift\Kernel\Event
- */
 #[DI(autowire: false)]
 class KernelRequestEvent extends AbstractEvent {
 
@@ -30,7 +26,7 @@ class KernelRequestEvent extends AbstractEvent {
      * @param RequestInterface $request
      */
     public function __construct(
-        private RequestInterface $request,
+        protected readonly RequestInterface $request,
     ) {
     }
 

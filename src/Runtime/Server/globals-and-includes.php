@@ -29,5 +29,5 @@ if (version_compare(PHP_VERSION, SWIFT_MINIMUM_PHP, '<')) {
 
 require_once INCLUDE_DIR . '/vendor/autoload.php';
 require_once 'ApplicationInterface.php';
-require_once INCLUDE_DIR . '/vendor/swift-api/swift/src/Application/Bootstrap/Autoloading/Autoloader.php';
+require_once SWIFT_ROOT . 'Kernel/Autoloader.php';
 require_once 'Bootstrap.php';

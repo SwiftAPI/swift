@@ -8,17 +8,16 @@
  * For the full copyright and license information, please view the LICENSE file that was distributed with this source code.
  */
 
-namespace Swift\Configuration\Cache;
+namespace Swift\Kernel\Middleware;
 
 
-class ConfigurationCache extends \Swift\Cache\AbstractCache {
+interface MiddlewareInterface extends \Psr\Http\Server\MiddlewareInterface {
     
-    public function getNameSpace(): string {
-        return 'configuration';
-    }
-    
-    public function getName(): string {
-        return 'compiled';
-    }
+    /**
+     * Priority of the middleware. The middleware will be sorted by this value.
+     *
+     * @return int
+     */
+    public function getPriority(): int;
     
 }

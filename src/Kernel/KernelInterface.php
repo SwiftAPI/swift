@@ -11,19 +11,17 @@
 namespace Swift\Kernel;
 
 
-use Swift\DependencyInjection\ContainerInterface;
+use Psr\Http\Message\ServerRequestInterface;
 use Swift\HttpFoundation\ResponseInterface;
+use Swift\Kernel\Middleware\MiddlewareRunner;
 
 interface KernelInterface {
     
-    public function run(): void;
+    public function run( ServerRequestInterface $request, MiddlewareRunner $middlewareRunner ): void;
     
     public function isDebug(): bool;
     
-    public function finalize( ResponseInterface $response ): void;
+    public function finalize( ServerRequestInterface $request, ResponseInterface $response ): void;
     
-    public function setContainer( ContainerInterface $container ): void;
-    
-    public function getContainer(): ContainerInterface;
     
 }

@@ -60,11 +60,11 @@ class AuthenticationManager {
     }
     
     /**
-     * @param \Psr\Http\Message\RequestInterface $request
+     * @param \Psr\Http\Message\ServerRequestInterface $request
      *
      * @return PassportInterface
      */
-    public function authenticate( \Psr\Http\Message\RequestInterface $request ): PassportInterface {
+    public function authenticate( \Psr\Http\Message\ServerRequestInterface $request ): PassportInterface {
         $authenticator = $this->getAuthenticator( $request );
         if ( ! $authenticator ) {
             return $this->createNullPassport( $request );
@@ -86,7 +86,7 @@ class AuthenticationManager {
             
             // Finalize request with provided response
             if ( $response = $authenticator->onAuthenticationSuccess( $request, $token ) ) {
-                $this->kernel->finalize( $response );
+                $this->kernel->finalize( $request, $response );
             }
             
             $this->security->setPassport( $passport );
@@ -101,7 +101,7 @@ class AuthenticationManager {
         } catch ( AuthenticationException $authenticationException ) {
             if ( $response = $authenticator->onAuthenticationFailure( $request, $authenticationException ) ) {
                 $this->eventDispatcher->dispatch( new AuthenticationFailedEvent( $request, $authenticator, $authenticationException ) );
-                $this->kernel->finalize( $response );
+                $this->kernel->finalize( $request, $response );
             }
             $this->eventDispatcher->dispatch( new AuthenticationFailedEvent( $request, $authenticator, $authenticationException ) );
         }

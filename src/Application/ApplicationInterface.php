@@ -11,21 +11,8 @@
 namespace Swift\Application;
 
 
-use Swift\Kernel\KernelInterface;
-
 interface ApplicationInterface {
     
-    /**
-     * Run the application
-     */
-    public function run(): void;
-    
-    public function setKernel( KernelInterface $kernel ): void;
-    
-    public function getKernel(): KernelInterface;
-    
-    public function getStartTime(): float;
-    
-    public function getStartMemory(): int;
+    public function run( ?\Psr\Http\Message\ServerRequestInterface $request = null ): void;
     
 }

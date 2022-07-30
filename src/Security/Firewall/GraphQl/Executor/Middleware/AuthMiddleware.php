@@ -24,8 +24,6 @@ use Swift\Security\Authorization\AuthorizationCheckerInterface;
  * If not, throw an exception.
  *
  * First check field definition grant, after that check based on security configuration.
- *
- * @author Henry van 't Sant
  */
 #[Autowire]
 class AuthMiddleware implements \Swift\GraphQl\Executor\Middleware\ResolverMiddlewareInterface {

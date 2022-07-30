@@ -13,10 +13,6 @@ namespace Swift\Console;
 require_once 'globals-and-includes.php';
 
 
-/**
- * Class CliApplication
- * @package Swift\Console
- */
 final class CliApplication implements ApplicationInterface {
     
     private float $startTime;

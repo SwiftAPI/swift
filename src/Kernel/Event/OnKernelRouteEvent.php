@@ -10,9 +10,9 @@
 
 namespace Swift\Kernel\Event;
 
+use Psr\Http\Message\RequestInterface;
 use Swift\DependencyInjection\Attributes\DI;
 use Swift\Events\AbstractEvent;
-use Swift\HttpFoundation\RequestInterface;
 use Swift\Router\RouteInterface;
 
 /**

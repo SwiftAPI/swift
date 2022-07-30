@@ -4,3 +4,4 @@ app:
   debug: false
   allow_cors: true
   timezone: Europe/Amsterdam
+  log_requests: false

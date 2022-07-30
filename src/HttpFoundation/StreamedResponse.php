@@ -11,7 +11,9 @@
 namespace Swift\HttpFoundation;
 
 
-use Swift\DependencyInjection\Attributes\DI;/**
+use Swift\DependencyInjection\Attributes\DI;
+
+/**
  * StreamedResponse represents a streamed HTTP response.
  *
  * A StreamedResponse uses a callback for its content.

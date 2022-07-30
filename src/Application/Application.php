@@ -12,57 +12,38 @@ namespace Swift\Application;
 
 require_once 'globals-and-includes.php';
 
-use Exception;
-use Swift\Application\Bootstrap\Bootstrap;
-use Swift\Kernel\KernelInterface;
 
-/**
- * Class Application
- * @package Swift\Application
- */
+use Psr\Http\Message\ServerRequestInterface;
+use Swift\DependencyInjection\ContainerFactory;
+use Swift\DependencyInjection\ContainerInterface;
+use Swift\HttpFoundation\ServerRequest;
+use Swift\Kernel\Autoloader;
+use Swift\Kernel\Kernel;
+use Swift\Kernel\KernelInterface;
+use Swift\Kernel\Middleware\MiddlewareRunner;
+
 class Application implements ApplicationInterface {
     
-    private float $startTime;
-    private int $startMemory;
-    private ?\Swift\Kernel\KernelInterface $kernel;
-    
-    /**
-     * @param \Swift\Kernel\KernelInterface|null $kernel
-     */
     public function __construct(
-        ?\Swift\Kernel\KernelInterface $kernel = null
+        protected KernelInterface  $kernel,
+        protected MiddlewareRunner $middlewareRunner,
     ) {
-        $this->kernel = $kernel ?: Bootstrap::createKernel();
-    
-        // Saves the start time and memory usage.
-        $this->startTime   = microtime( true );
-        $this->startMemory = memory_get_usage();
     }
     
-    /**
-     * Method to run application
-     *
-     * @throws Exception
-     */
-    public function run(): void {
-        $this->kernel->run();
+    public function run( ServerRequestInterface $request = null ): void {
+        $request ??= new ServerRequest();
+        
+        $this->kernel?->run( $request, $this->middlewareRunner );
     }
     
-    public function getKernel(): KernelInterface {
-        return $this->kernel;
+    public static function create( ContainerInterface $container = null, MiddlewareRunner $middlewareRunner = null, KernelInterface $kernel = null ): self {
+        Autoloader::initialize();
+        $container        ??= ContainerFactory::createContainer();
+        $middlewareRunner ??= new MiddlewareRunner( $container->getServiceInstancesByTag( 'kernel.request.middleware' ) );
+        /** @var Kernel $kernel */
+        $kernel ??= $container->get( Kernel::class );
+        
+        return new static( $kernel, $middlewareRunner );
     }
-    
-    public function setKernel( KernelInterface $kernel ): void {
-        $this->kernel = $kernel;
-    }
-    
-    public function getStartTime(): float {
-        return $this->startTime;
-    }
-    
-    public function getStartMemory(): int {
-        return $this->startMemory;
-    }
-    
     
 }

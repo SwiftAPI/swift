@@ -34,21 +34,20 @@ class FlushCachesCommand extends AbstractCommand {
     
     public function configure(): void {
         $this
-            ->setDescription( 'Clear all caches' )
-        ;
+            ->setDescription( 'Clear all caches' );
     }
     
     protected function execute( InputInterface $input, OutputInterface $output ): int {
         $this->io->newLine();
-        $this->io->title('Clearing caches');
+        $this->io->title( 'Clearing caches' );
         $this->io->writeln( 'Clearing all caches could take a minute.' );
-    
+        
         if ( Utils::isProductionMode( $this->configuration ) ) {
-            $this->io->writeln('Not that rebuilding caches in a production environment could take a while and result in a slow load the first (few) times as the cache rebuilds.');
+            $this->io->writeln( 'Not that rebuilding caches in a production environment could take a while and result in a slow load the first (few) times as the cache rebuilds.' );
         }
         
         if ( Utils::isDevModeOrDebug( $this->configuration ) ) {
-            $this->io->note('Caching is currently not enabled');
+            $this->io->note( 'Caching is currently not enabled' );
         }
         
         $countFlushed = 0;
@@ -56,14 +55,14 @@ class FlushCachesCommand extends AbstractCommand {
             $section = $this->createOutputSection();
             $section->writeln( '⏳ <fg=blue;options=bold>Clearing:</> "' . $cache->getFullName() );
             
-            if (!$cache->clear()) {
-                $section->clear(1);
-                $section->writeln( '❌ <fg=red;options=bold>Failed:</> Has not cleared successfully');
+            if ( ! $cache->clear() ) {
+                $section->clear( 1 );
+                $section->writeln( '❌ <fg=red;options=bold>Failed:</> Has not cleared successfully' );
             }
             
-            $section->clear(1);
+            $section->clear( 1 );
             $section->writeln( '✅ <fg=green;options=bold>Cleared:</> ' . $cache->getFullName() );
-            $countFlushed++;
+            $countFlushed ++;
         }
         
         $this->io->newLine();

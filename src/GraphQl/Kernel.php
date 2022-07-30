@@ -13,20 +13,18 @@ namespace Swift\GraphQl;
 use GraphQL\Error\DebugFlag;
 use GraphQL\Error\FormattedError;
 use GraphQL\GraphQL;
-use GraphQL\Type\Definition\ResolveInfo;
 use GraphQL\Validator\Rules\DisableIntrospection;
+use Psr\Http\Server\RequestHandlerInterface;
 use Swift\Configuration\ConfigurationInterface;
 use Swift\DependencyInjection\Attributes\Autowire;
-use Swift\GraphQl\Resolvers\FieldResolver;
 use Swift\HttpFoundation\JsonResponse;
-use Swift\HttpFoundation\RequestInterface;
 
 /**
  * Class Kernel
  * @package Swift\GraphQl
  */
 #[Autowire]
-final class Kernel {
+final class Kernel implements RequestHandlerInterface {
     
     /**
      * @param ConfigurationInterface $configuration
@@ -38,11 +36,11 @@ final class Kernel {
     ) {
     }
     
-    public function run( RequestInterface $request ): JsonResponse {
+    public function handle( \Psr\Http\Message\ServerRequestInterface $request ): JsonResponse {
         return new JsonResponse( $this->execute( $request ) );
     }
     
-    private function execute( RequestInterface $request ): array {
+    private function execute( \Psr\Http\Message\ServerRequestInterface $request ): array {
         $debug = \Swift\Configuration\Utils::isDevModeOrDebug( $this->configuration ) ?
             DebugFlag::INCLUDE_DEBUG_MESSAGE | DebugFlag::INCLUDE_TRACE : DebugFlag::NONE;
         
