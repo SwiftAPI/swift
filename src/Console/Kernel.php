@@ -18,7 +18,6 @@ use Swift\HttpFoundation\Response;
 use Swift\HttpFoundation\ServerRequest;
 use Swift\DependencyInjection\Attributes\Autowire;
 use Swift\Kernel\Event\KernelOnBeforeShutdown;
-use Swift\DependencyInjection\ServiceLocatorInterface;
 use Swift\Kernel\KernelDiTags;
 use Symfony\Component\Console\Input\InputDefinition;
 use Symfony\Component\Console\Input\InputInterface;

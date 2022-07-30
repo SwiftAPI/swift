@@ -20,37 +20,47 @@ use Symfony\Component\DependencyInjection\Loader\YamlFileLoader;
 
 class ContainerFactory {
     
-    public static function createContainer(): ContainerInterface {
-        $fileSystem = new FileSystem();
+    protected static ?ContainerInterface $container = null;
     
+    public static function createContainer(): ContainerInterface {
+        if ( self::$container !== null ) {
+            return self::$container;
+        }
+        
+        $fileSystem = new FileSystem();
+        
         if ( $fileSystem->fileExists( '/var/cache/di/container.php' ) ) {
             require_once INCLUDE_DIR . '/var/cache/di/container.php';
-        
+            
             $container     = new \Swift\DependencyInjection\CachedContainer();
             $configuration = $container->get( Configuration::class );
-        
+            
             if ( Utils::isCacheEnabled( $configuration ) ) {
+                self::$container = $container;
+                
                 return $container;
             }
         }
         
         $container = new Container();
-    
+        
         if ( ! file_exists( SWIFT_ROOT . '/services.yaml' ) ) {
-            throw new MissingConfigurationException( 'Missing services.yaml declaration in SWIFT. This is important. This shouldn\'t occur. Could you try importing it in the root services declaration?');
+            throw new MissingConfigurationException( 'Missing services.yaml declaration in SWIFT. This is important. This shouldn\'t occur. Could you try importing it in the root services declaration?' );
         }
         
         $swiftLoader = new YamlFileLoader( $container, new FileLocator( SWIFT_ROOT ) );
         $swiftLoader->load( 'services.yaml' );
-    
+        
         if ( ! file_exists( INCLUDE_DIR . '/services.yaml' ) ) {
             throw new MissingConfigurationException( 'Missing services.yaml declaration in root. Please see https://swiftapi.github.io/swift-docs/docs/dependency-injection' );
         }
-    
+        
         $loader = new YamlFileLoader( $container, new FileLocator( INCLUDE_DIR ) );
         $loader->load( 'services.yaml' );
-    
+        
         $container->compile();
+        
+        self::$container = $container;
         
         return $container;
     }

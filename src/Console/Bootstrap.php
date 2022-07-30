@@ -12,10 +12,9 @@ namespace Swift\Console;
 
 
 use Exception;
-use Swift\Application\Bootstrap\Autoloading\Autoloader;
-use Swift\Application\Bootstrap\DependencyInjection\DependencyInjection;
 use Swift\Configuration\Configuration;
-use Swift\DependencyInjection\ServiceLocator;
+use Swift\DependencyInjection\ContainerFactory;
+use Swift\Kernel\Autoloader;
 use Swift\Kernel\Deprecations\Deprecation;
 use Swift\Kernel\Deprecations\DeprecationLevel;
 
@@ -23,24 +22,18 @@ class Bootstrap {
     
     public static function createKernel(): KernelInterface {
         try {
-            // set up autoloading
-            $autoloaderBootstrap = new Autoloader();
-            $autoloaderBootstrap->initialize();
+            Autoloader::initialize();
         
-            // set up DI
-            $diBootstrap = new DependencyInjection();
-            $diBootstrap->initialize();
+            $container = ContainerFactory::createContainer();
         } catch (Exception $e) {
             echo 'Autoload error: ' . $e->getMessage();
             exit(1);
         }
     
         try {
-            $serviceLocator = new ServiceLocator();
-        
             // Set timezone
             /** @var Configuration|null $configuration */
-            $configuration = $serviceLocator->get(Configuration::class);
+            $configuration = $container->get(Configuration::class);
             date_default_timezone_set( $configuration?->get('app.timezone', 'root') ?? 'Europe/Amsterdam' );
     
     
@@ -51,7 +44,7 @@ class Bootstrap {
             );
         
             // Build to application
-            return $serviceLocator->get( Kernel::class );
+            return $container->get( Kernel::class );
         } catch (Exception $e) {
             (new ErrorLogger())->print( $e );
             exit(0);
