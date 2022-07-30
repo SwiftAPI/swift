@@ -1,4 +1,4 @@
-<?php declare(strict_types=1);
+<?php declare( strict_types=1 );
 
 /*
  * This file is part of the Swift Framework
@@ -21,43 +21,43 @@ use Symfony\Component\EventDispatcher\EventSubscriberInterface;
 class EventDispatcher extends SymfonyEventDispatcher implements EventDispatcherInterface {
     
     public function __construct(
-        private ReflectionFactory $reflectionFactory,
+        protected ReflectionFactory $reflectionFactory,
     ) {
         parent::__construct();
     }
     
     #[Autowire]
     public function autowireEventSubscribers( #[Autowire( tag: KernelDiTags::EVENT_SUBSCRIBER )] ?iterable $eventSubscribers ): void {
-        if (empty($eventSubscribers)) {
+        if ( empty( $eventSubscribers ) ) {
             return;
         }
-    
-        /** @var EventSubscriberInterface[] $eventSubscribers */
-        $eventSubscribers = iterator_to_array($eventSubscribers);
         
-        foreach ($eventSubscribers as $eventSubscriber) {
+        /** @var EventSubscriberInterface[] $eventSubscribers */
+        $eventSubscribers = iterator_to_array( $eventSubscribers );
+        
+        foreach ( $eventSubscribers as $eventSubscriber ) {
             $this->addSubscriber( $eventSubscriber );
         }
     }
     
     #[Autowire]
     public function autowireEventListeners( #[Autowire( tag: KernelDiTags::EVENT_LISTENER )] ?iterable $eventListeners ): void {
-        if (empty($eventListeners)) {
+        if ( empty( $eventListeners ) ) {
             return;
         }
         
         /** @var \Swift\Events\EventListenerInterface[] $eventListeners */
         $eventListeners = iterator_to_array( $eventListeners );
         
-        foreach ($eventListeners as $eventListener) {
+        foreach ( $eventListeners as $eventListener ) {
             $reflection = $this->reflectionFactory->getReflectionClass( $eventListener::class );
-            foreach ($reflection->getMethods() as $reflectionMethod) {
-                if (!empty($reflectionMethod->getAttributes(ListenTo::class))) {
-                    $attribute = $reflectionMethod->getAttributes(ListenTo::class)[0]->getArguments();
-                    $this->addListener($attribute['event'], [$eventListener, $reflectionMethod->getName()]);
+            foreach ( $reflection->getMethods() as $reflectionMethod ) {
+                if ( ! empty( $reflectionMethod->getAttributes( ListenTo::class ) ) ) {
+                    $attribute = $reflectionMethod->getAttributes( ListenTo::class )[ 0 ]->getArguments();
+                    $this->addListener( $attribute[ 'event' ], [ $eventListener, $reflectionMethod->getName() ] );
                 }
             }
         }
     }
-
+    
 }

@@ -11,7 +11,6 @@
 namespace Swift\DependencyInjection\CompilerPass;
 
 
-use Foo\Listener\OnAfterAuthentication;
 use Symfony\Component\Config\Resource\ClassExistenceResource;
 use Symfony\Component\DependencyInjection\Argument\ServiceLocatorArgument;
 use Symfony\Component\DependencyInjection\Argument\TaggedIteratorArgument;

@@ -11,17 +11,7 @@
 namespace Swift\Router\Types;
 
 
-/**
- * Class RouteMethod
- * @package Swift\Router\Types
- *
- * @method static RouteMethod GET()
- * @method static RouteMethod POST()
- * @method static RouteMethod PUT()
- * @method static RouteMethod PATCH()
- * @method static RouteMethod DELETE()
- * @method static RouteMethod HEAD()
- */
+
 enum RouteMethod: string {
 
     case GET = 'GET';

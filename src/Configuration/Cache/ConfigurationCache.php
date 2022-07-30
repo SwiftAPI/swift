@@ -20,4 +20,5 @@ class ConfigurationCache extends \Swift\Cache\AbstractCache {
     public function getName(): string {
         return 'compiled';
     }
+    
 }
