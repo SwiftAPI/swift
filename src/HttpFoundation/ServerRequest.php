@@ -26,98 +26,120 @@ use Swift\DependencyInjection\Attributes\DI;
  *
  * @author Fabien Potencier <fabien@symfony.com>
  */
-#[DI(aliases: [RequestInterface::class . ' $request', PsrRequestInterface::class . ' $request', ServerRequestInterface::class . ' $request'])]
+#[DI( aliases: [ RequestInterface::class . ' $request', PsrRequestInterface::class . ' $request', ServerRequestInterface::class . ' $request' ] )]
 class ServerRequest extends Request implements ServerRequestInterface {
-
+    
     /** @var array */
-    private array $cookieParams = [];
-
+    protected array $cookieParams = [];
+    
     /** @var array|object|null */
-    private object|null|array $parsedBody = null;
-
+    protected object|null|array $parsedBody = null;
+    
     /** @var array */
-    private array $queryParams = [];
-
-    /** @var array */
-    private array $serverParams;
-
+    protected array $queryParams = [];
+    
     /** @var UploadedFileInterface[] */
-    private array $uploadedFiles = [];
-
-    public function getServerParams(): array {
-        return $this->serverParams;
+    protected array $uploadedFiles = [];
+    
+    /**
+     * @param array                $query      The GET parameters
+     * @param array                $request    The POST parameters
+     * @param array                $attributes The request attributes (parameters parsed from the PATH_INFO, ...)
+     * @param array                $cookies    The COOKIE parameters
+     * @param array                $files      The FILES parameters
+     * @param array                $server     The SERVER parameters
+     * @param string|resource|null $content    The raw body data
+     */
+    public function __construct(
+        array $query = [],
+        array $request = [],
+        array $attributes = [],
+        array $cookies = [],
+        array $files = [],
+        array $server = []
+    ) {
+        
+        parent::__construct( $query, $request, $attributes, $cookies, $files, $server );
     }
-
+    
+    public function getServerParams(): array {
+        return $this->server->getIterator()->getArrayCopy();
+    }
+    
     public function getUploadedFiles(): array {
         return $this->uploadedFiles;
     }
-
+    
     public function withUploadedFiles( array $uploadedFiles ): static {
         $new                = clone $this;
         $new->uploadedFiles = $uploadedFiles;
-
+        
         return $new;
     }
-
+    
     public function getCookieParams(): array {
         return $this->cookieParams;
     }
-
+    
     public function withCookieParams( array $cookies ): static {
         $new               = clone $this;
         $new->cookieParams = $cookies;
-
+        
         return $new;
     }
-
+    
     public function getQueryParams(): array {
         return $this->queryParams;
     }
-
+    
     public function withQueryParams( array $query ): static {
         $new              = clone $this;
         $new->queryParams = $query;
-
+        
         return $new;
     }
-
+    
     public function getParsedBody(): object|array|null {
+        if ( ! $this->parsedBody ) {
+            $this->parsedBody = $this->getContent()->getIterator()->getArrayCopy();
+        }
+        
         return $this->parsedBody;
     }
-
+    
     public function withParsedBody( $data ): static {
         if ( ! \is_array( $data ) && ! \is_object( $data ) && null !== $data ) {
             throw new \InvalidArgumentException( 'First parameter to withParsedBody MUST be object, array or null' );
         }
-
+        
         $new             = clone $this;
         $new->parsedBody = $data;
-
+        
         return $new;
     }
-
+    
     public function getAttribute( $attribute, $default = null ): mixed {
         return $this->attributes->get( $attribute, $default );
     }
-
+    
     public function withAttribute( $name, $value ): self {
-        $new                           = clone $this;
-        $new->attributes->set($name, $value);
-
+        $new = clone $this;
+        $new->attributes->set( $name, $value );
+        
         return $new;
     }
-
+    
     public function withoutAttribute( $name ): self {
-        if ( !$this->attributes->has($name)) {
+        if ( ! $this->attributes->has( $name ) ) {
             return $this;
         }
-
+        
         $new = clone $this;
-        $new->attributes->remove($name);
-
+        $new->attributes->remove( $name );
+        
         return $new;
     }
-
+    
     /**
      * Retrieve attributes derived from the request.
      *
