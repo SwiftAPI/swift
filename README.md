@@ -34,3 +34,4 @@ composer require swift-api/swift
 
 ## Documentation
 Find full documentation at https://swiftapi.github.io/swift-docs/docs/
+
