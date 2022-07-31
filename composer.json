@@ -64,7 +64,7 @@
     "psr/http-server-middleware": "^1.0"
   },
   "require-dev": {
-    "symfony/maker-bundle": "^1.14",
+    "symfony/maker-bundle": "^1.45",
     "roave/security-advisories": "dev-latest"
   },
   "autoload": {
