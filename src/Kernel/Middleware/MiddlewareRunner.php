@@ -18,17 +18,17 @@ use Swift\Kernel\RequestHandler\DecoratingRequestHandler;
 class MiddlewareRunner {
     
     /**
-     * @param \Psr\Http\Server\MiddlewareInterface[] $middlewares
+     * @param \Psr\Http\Server\MiddlewareInterface[] $queue
      */
     public function __construct(
-        protected array $middlewares,
+        protected MiddlewareQueue $queue,
     ) {
     }
     
     public function run(
         ServerRequestInterface $request,
     ): ResponseInterface {
-        $this->prepare();
+        $this->queue->compile();
         
         return $this->call( $request, null, 0 );
     }
@@ -38,13 +38,13 @@ class MiddlewareRunner {
         ?ResponseInterface     $response,
         int                    $key,
     ): ResponseInterface {
-        $middlewares = $this->middlewares;
+        $middlewares = $this->queue;
         
-        if ( ! array_key_exists( $key, $middlewares ) ) {
+        if ( ! $middlewares->has( $key ) ) {
             return $response;
         }
         
-        return $middlewares[ $key ]->process(
+        return $middlewares->get( $key )->process(
             $request,
             new DecoratingRequestHandler( function ( ServerRequestInterface $request ) use ( $response, $key ) {
                 $response = $this->call( $request, $response, $key + 1 );
@@ -52,33 +52,6 @@ class MiddlewareRunner {
                 return $response;
             } ),
         );
-    }
-    
-    protected function prepare(): void {
-        $indexed    = [];
-        $nonIndexed = [];
-        foreach ( $this->middlewares as $middleware ) {
-            if ( $middleware instanceof MiddlewareInterface ) {
-                if ( ! isset( $indexed[ $middleware->getPriority() ] ) ) {
-                    $indexed[ $middleware->getPriority() ] = [];
-                }
-                $indexed[ $middleware->getPriority() ][] = $middleware;
-                continue;
-            }
-            if ( $middleware instanceof \Psr\Http\Server\MiddlewareInterface ) {
-                $nonIndexed[] = $middleware;
-            }
-        }
-        ksort( $indexed );
-        $flatIndexed = [];
-        foreach ( $indexed as $middlewares ) {
-            foreach ( $middlewares as $middleware ) {
-                $flatIndexed[] = $middleware;
-            }
-        }
-        $middlewares = [ ...$flatIndexed, ...$nonIndexed ];
-        
-        $this->middlewares = $middlewares;
     }
     
 }

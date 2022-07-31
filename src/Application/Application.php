@@ -20,6 +20,7 @@ use Swift\HttpFoundation\ServerRequest;
 use Swift\Kernel\Autoloader;
 use Swift\Kernel\Kernel;
 use Swift\Kernel\KernelInterface;
+use Swift\Kernel\Middleware\MiddlewareQueue;
 use Swift\Kernel\Middleware\MiddlewareRunner;
 
 class Application implements ApplicationInterface {
@@ -39,7 +40,7 @@ class Application implements ApplicationInterface {
     public static function create( ContainerInterface $container = null, MiddlewareRunner $middlewareRunner = null, KernelInterface $kernel = null ): self {
         Autoloader::initialize();
         $container        ??= ContainerFactory::createContainer();
-        $middlewareRunner ??= new MiddlewareRunner( $container->getServiceInstancesByTag( 'kernel.request.middleware' ) );
+        $middlewareRunner ??= new MiddlewareRunner( new MiddlewareQueue( $container->getServiceInstancesByTag( 'kernel.request.middleware' ) ) );
         /** @var Kernel $kernel */
         $kernel ??= $container->get( Kernel::class );
         
