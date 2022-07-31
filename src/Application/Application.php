@@ -37,7 +37,7 @@ class Application implements ApplicationInterface {
         $this->kernel?->run( $request, $this->middlewareRunner );
     }
     
-    public static function create( ContainerInterface $container = null, MiddlewareRunner $middlewareRunner = null, KernelInterface $kernel = null ): self {
+    public static function create( ?ContainerInterface $container = null, ?MiddlewareRunner $middlewareRunner = null, ?KernelInterface $kernel = null ): self {
         Autoloader::initialize();
         $container        ??= ContainerFactory::createContainer();
         $middlewareRunner ??= new MiddlewareRunner( new MiddlewareQueue( $container->getServiceInstancesByTag( 'kernel.request.middleware' ) ) );
