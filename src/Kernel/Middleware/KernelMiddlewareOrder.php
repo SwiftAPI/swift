@@ -18,7 +18,7 @@ class KernelMiddlewareOrder {
     public const CORS            = - 45;
     public const AUTHENTICATION  = - 10;
     public const RATE_LIMIT      = - 5;
-    public const REQUEST_LOGGING = - 0;
+    public const REQUEST_LOGGING = 0;
     public const GRAPHQL         = 30;
     public const REST            = 40;
     

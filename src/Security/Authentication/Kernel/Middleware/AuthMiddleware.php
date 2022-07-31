@@ -12,7 +12,7 @@ namespace Swift\Security\Authentication\Kernel\Middleware;
 
 
 use Swift\DependencyInjection\Attributes\Autowire;
-use Swift\Kernel\Middleware\KernelMiddlewarePriorities;
+use Swift\Kernel\Middleware\KernelMiddlewareOrder;
 use Swift\Kernel\Middleware\MiddlewareInterface;
 use Swift\Security\Authentication\AuthenticationManager;
 
@@ -24,8 +24,8 @@ class AuthMiddleware implements MiddlewareInterface {
     ) {
     }
     
-    public function getPriority(): int {
-        return KernelMiddlewarePriorities::AUTHENTICATION;
+    public function getOrder(): int {
+        return KernelMiddlewareOrder::AUTHENTICATION;
     }
     
     public function process(

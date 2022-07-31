@@ -10,13 +10,13 @@
 
 namespace Swift\Security\Firewall\Kernel\Middleware;
 
-use Swift\Kernel\Middleware\KernelMiddlewarePriorities;
+use Swift\Kernel\Middleware\KernelMiddlewareOrder;
 use Swift\Kernel\Middleware\MiddlewareInterface;
 
 class RateLimitingMiddleware implements MiddlewareInterface {
     
-    public function getPriority(): int {
-        return KernelMiddlewarePriorities::RATE_LIMIT;
+    public function getOrder(): int {
+        return KernelMiddlewareOrder::RATE_LIMIT;
     }
     
     public function process(
