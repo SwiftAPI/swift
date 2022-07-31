@@ -1,3 +1,14 @@
+## 0.2.13
+
+- Bump cycle/orm minimum version to v2.2.0 [See commit](https://github.com/SwiftAPI/swift/commit/60bd721d4e4d3461323e7df033138e48441a2929)
+- Fix `\Swift\Logging\AbstractLogger` accessing dispatcher before it was initialized [See commit](https://github.com/SwiftAPI/swift/commit/1f6e54987b04f85e0a308bc5449676ed15fc54b3)
+- Support tagged iterator injection through constructor [See commit](https://github.com/SwiftAPI/swift/commit/995ef28ccc9fe56c5d4e876fd3a8b4a53a98750b)
+- Simplified Application Bootstrap [See commit](https://github.com/SwiftAPI/swift/commit/1775329b8888ac619eb991703da6a3f3ea4a1d56)
+- Improved PSR Compliance [See commit](https://github.com/SwiftAPI/swift/commit/9bb62add9c373e580d005b8781764f4b84cee2b8)
+- Implement Middleware pattern in Application [See commit](https://github.com/SwiftAPI/swift/commit/5269c42819ecd006cb2b66d0346cdcddc015e2e9)
+- Add CORS, default timezone setting, deprecation setting, request logging, REST routing, GraphQl, and authentication to Middleware [See commit](https://github.com/SwiftAPI/swift/commit/b04dd60337aa925a7e8d018ee70a204580ddf41e)
+- Improved support for asynchronous flows [See commit](https://github.com/SwiftAPI/swift/commit/b04dd60337aa925a7e8d018ee70a204580ddf41e)
+
 ## 0.2.12  
 
 - [#51](https://github.com/SwiftAPI/swift/issues/51) Add new StringValue `\Swift\Orm\Types\FieldTypes::STRING` as field type which renders to varchar in MySQL. This field supports indexes, where TEXT does not. It also supports a length up to 255 characters. [See commit](https://github.com/SwiftAPI/swift/commit/2833be1ca49bb073df4f6b47cf21fcfd9f00d9a2)
