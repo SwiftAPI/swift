@@ -20,7 +20,7 @@ use Swift\DependencyInjection\ContainerInterface;
 use Swift\Events\EventDispatcherInterface;
 use Swift\HttpFoundation\Exception\NotFoundException;
 use Swift\Kernel\Event\OnKernelRouteEvent;
-use Swift\Kernel\Middleware\KernelMiddlewarePriorities;
+use Swift\Kernel\Middleware\KernelMiddlewareOrder;
 use Swift\Kernel\Middleware\MiddlewareInterface;
 use Swift\Router\Event\OnBeforeRouteEnterEvent;
 use Swift\Router\Route;
@@ -38,8 +38,8 @@ class RestMiddleware implements MiddlewareInterface {
     ) {
     }
     
-    public function getPriority(): int {
-        return KernelMiddlewarePriorities::REST;
+    public function getOrder(): int {
+        return KernelMiddlewareOrder::REST;
     }
     
     public function process(

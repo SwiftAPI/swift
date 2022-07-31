@@ -22,8 +22,8 @@ class CorsMiddleware implements MiddlewareInterface {
     ) {
     }
     
-    public function getPriority(): int {
-        return KernelMiddlewarePriorities::CORS;
+    public function getOrder(): int {
+        return KernelMiddlewareOrder::CORS;
     }
     
     public function process(

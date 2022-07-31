@@ -18,7 +18,7 @@ use Swift\Configuration\ConfigurationInterface;
 use Swift\DependencyInjection\Attributes\Autowire;
 use Swift\GraphQl\Kernel;
 use Swift\HttpFoundation\RequestMatcher;
-use Swift\Kernel\Middleware\KernelMiddlewarePriorities;
+use Swift\Kernel\Middleware\KernelMiddlewareOrder;
 use Swift\Kernel\Middleware\MiddlewareInterface;
 use Swift\Router\Types\RouteMethod;
 
@@ -31,8 +31,8 @@ class RequestMiddleware implements MiddlewareInterface {
     ) {
     }
     
-    public function getPriority(): int {
-        return KernelMiddlewarePriorities::GRAPHQL;
+    public function getOrder(): int {
+        return KernelMiddlewareOrder::GRAPHQL;
     }
     
     public function process( ServerRequestInterface $request, RequestHandlerInterface $handler ): ResponseInterface {

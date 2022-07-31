@@ -91,7 +91,7 @@ final class Kernel implements KernelInterface {
      * @return bool
      */
     public function isDebug(): bool {
-        return $this->configuration->get( 'app.debug', 'root' );
+        return $this->configuration->get( 'app.debug', 'app' );
     }
     
     /**

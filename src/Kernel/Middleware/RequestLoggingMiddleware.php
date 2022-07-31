@@ -38,8 +38,8 @@ final class RequestLoggingMiddleware implements MiddlewareInterface {
     ) {
     }
     
-    public function getPriority(): int {
-        return KernelMiddlewarePriorities::REQUEST_LOGGING;
+    public function getOrder(): int {
+        return KernelMiddlewareOrder::REQUEST_LOGGING;
     }
     
     public function process( ServerRequestInterface $request, RequestHandlerInterface $handler ): ResponseInterface {

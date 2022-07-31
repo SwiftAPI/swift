@@ -22,8 +22,8 @@ class DefaultTimeZoneMiddleware implements MiddlewareInterface {
     ) {
     }
     
-    public function getPriority(): int {
-        return KernelMiddlewarePriorities::TIMEZONE;
+    public function getOrder(): int {
+        return KernelMiddlewareOrder::TIMEZONE;
     }
     
     public function process(

@@ -14,10 +14,10 @@ namespace Swift\Kernel\Middleware;
 interface MiddlewareInterface extends \Psr\Http\Server\MiddlewareInterface {
     
     /**
-     * Priority of the middleware. The middleware will be sorted by this value.
+     * Order of the middleware. The middleware will be sorted by this value.
      *
      * @return int
      */
-    public function getPriority(): int;
+    public function getOrder(): int;
     
 }

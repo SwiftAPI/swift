@@ -30,8 +30,8 @@ class DeprecationMiddleware implements MiddlewareInterface {
     /**
      * @inheritDoc
      */
-    public function getPriority(): int {
-        return KernelMiddlewarePriorities::DEPRECATION;
+    public function getOrder(): int {
+        return KernelMiddlewareOrder::DEPRECATION;
     }
     
     /**
