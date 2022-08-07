@@ -23,7 +23,7 @@ use Swift\DependencyInjection\Attributes\DI;
  * can also be used if needed.
  *
  * @author Fabien Potencier <fabien@symfony.com>
- *@see flush()
+ * @see flush()
  *
  */
 #[DI( exclude: true, autowire: false )]

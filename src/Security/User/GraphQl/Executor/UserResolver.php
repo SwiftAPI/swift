@@ -12,7 +12,6 @@ namespace Swift\Security\User\GraphQl\Executor;
 
 
 use GraphQL\Type\Definition\ResolveInfo;
-use JetBrains\PhpStorm\ArrayShape;
 use Swift\DependencyInjection\Attributes\Autowire;
 use Swift\GraphQl\Exception\FieldUnAuthorizedException;
 use Swift\HttpFoundation\Response;

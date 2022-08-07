@@ -10,18 +10,14 @@
 
 namespace Swift\Kernel\Middleware;
 
-use Dibi\Exception;
 use Psr\Http\Message\ResponseInterface;
 use Psr\Http\Message\ServerRequestInterface;
 use Psr\Http\Server\RequestHandlerInterface;
 use Swift\Configuration\ConfigurationInterface;
 use Swift\DependencyInjection\Attributes\Autowire;
-use Swift\Kernel\Event\KernelRequestEvent;
 use Swift\Kernel\Utils\Environment;
 use Swift\Orm\EntityManagerInterface;
 use Swift\Router\Model\Entity\LogRequest;
-use Symfony\Component\EventDispatcher\EventDispatcher;
-use Symfony\Component\EventDispatcher\EventSubscriberInterface;
 use function React\Async\async;
 
 

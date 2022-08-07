@@ -13,8 +13,6 @@ namespace Swift\Kernel\RequestHandler;
 
 use Psr\Http\Message\ResponseInterface;
 use Psr\Http\Message\ServerRequestInterface;
-use Psr\Http\Server\MiddlewareInterface;
-use Psr\Http\Server\RequestHandlerInterface;
 
 class DecoratingRequestHandler implements \Psr\Http\Server\RequestHandlerInterface {
     

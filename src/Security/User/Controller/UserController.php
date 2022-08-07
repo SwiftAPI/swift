@@ -11,10 +11,8 @@
 namespace Swift\Security\User\Controller;
 
 use Swift\Controller\AbstractController;
-use Swift\Dbal\Exceptions\DatabaseException;
 use Swift\DependencyInjection\Attributes\Autowire;
 use Swift\HttpFoundation\Exception\BadRequestException;
-use Swift\HttpFoundation\Exception\InternalErrorException;
 use Swift\HttpFoundation\JsonResponse;
 use Swift\HttpFoundation\Response;
 use Swift\Orm\Entity\Arguments;

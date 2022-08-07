@@ -11,16 +11,10 @@
 namespace Swift\DependencyInjection\Attributes;
 
 
-/**
- * Class Autowire
- * @package Swift\DependencyInjection\Attributes
- */
 #[\Attribute( \Attribute::TARGET_CLASS | \Attribute::TARGET_METHOD | \Attribute::TARGET_PARAMETER | \Attribute::TARGET_PROPERTY )]
 class Autowire {
     
     /**
-     * Autowire constructor.
-     *
      * @param string|null $tag
      * @param string|null $serviceId
      */
@@ -43,7 +37,6 @@ class Autowire {
     public function getServiceId(): ?string {
         return $this->serviceId;
     }
-    
     
     
 }

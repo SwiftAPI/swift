@@ -66,14 +66,10 @@ class QueryFactory {
             
             if ( is_array( $value ) ) {
                 foreach ( $value as $valKey => $nestedValue ) {
-                    //$nestedValue = $this->typeTransformer->transformToDatabaseValue( $field->getType()->getName(), $nestedValue, $entity, $field );
-                    
                     $query->{$valKey > 0 ? 'or' : 'where'}( $classMeta->getEntity()->getDatabaseName() . '.' . $field->getDatabaseName() . ' = ?', $nestedValue );
                 }
                 continue;
             }
-            
-            //$value = $this->typeTransformer->transformToDatabaseValue( $field->getType()->getName(), $value, $entity, $field );
             
             $query->where( $classMeta->getEntity()->getDatabaseName() . '.' . $field->getDatabaseName(), ' = ', $value );
         }

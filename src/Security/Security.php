@@ -15,10 +15,7 @@ use Swift\Security\Authentication\Passport\PassportInterface;
 use Swift\Security\Authentication\Token\TokenInterface;
 use Swift\Security\User\UserInterface;
 
-/**
- * Class Security
- * @package Swift\Security
- */
+
 #[Autowire]
 class Security {
 

@@ -10,7 +10,6 @@
 
 namespace Swift\DependencyInjection\CompilerPass;
 
-use Foo\Listener\OnAfterAuthentication;
 use Swift\DependencyInjection\Helper\AttributeHelper;
 use Swift\DependencyInjection\Container;
 use Symfony\Component\DependencyInjection\Argument\TaggedIteratorArgument;

@@ -46,8 +46,6 @@ class RestMiddleware implements MiddlewareInterface {
         \Psr\Http\Message\ServerRequestInterface $request,
         \Psr\Http\Server\RequestHandlerInterface $handler,
     ): \Psr\Http\Message\ResponseInterface {
-        var_dump( $request->getAttributes() );
-        
         $route = ( $this->eventDispatcher->dispatch( new OnKernelRouteEvent( $request, $this->router->getCurrentRoute() ) ) )->getRoute();
         
         
