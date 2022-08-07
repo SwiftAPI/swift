@@ -23,6 +23,7 @@ use Swift\Security\Authentication\Passport\Passport;
 use Swift\Security\Authentication\Passport\PassportInterface;
 use Swift\Security\Authentication\Token\AuthenticatedToken;
 use Swift\Security\Authentication\Token\TokenInterface;
+use Swift\Security\User\Authentication\Passport\Stamp\LoginStamp;
 use Swift\Security\User\UserProviderInterface;
 
 /**
@@ -68,7 +69,7 @@ final class UserAuthenticator implements AuthenticatorInterface, AuthenticatorEn
             throw new AuthenticationException( 'No user found with given credentials' );
         }
         
-        return new Passport( $user, new PasswordCredentials( $password ) );
+        return new Passport( $user, new PasswordCredentials( $password ), [ new LoginStamp() ] );
     }
     
     /**

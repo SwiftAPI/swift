@@ -1,4 +1,4 @@
-<?php declare(strict_types=1);
+<?php declare( strict_types=1 );
 
 /*
  * This file is part of the Swift Framework
@@ -22,6 +22,7 @@ use Swift\Security\Authentication\Passport\Passport;
 use Swift\Security\Authentication\Passport\PassportInterface;
 use Swift\Security\Authentication\Token\AuthenticatedToken;
 use Swift\Security\Authentication\Token\TokenInterface;
+use Swift\Security\User\Authentication\Passport\Stamp\LoginStamp;
 use Swift\Security\User\UserProviderInterface;
 
 /**
@@ -30,7 +31,7 @@ use Swift\Security\User\UserProviderInterface;
  */
 #[Autowire]
 final class UserAuthenticator implements AuthenticatorInterface {
-
+    
     private array|null $parsed;
     
     /**
@@ -42,65 +43,66 @@ final class UserAuthenticator implements AuthenticatorInterface {
         private readonly UserProviderInterface $userProvider,
     ) {
     }
-
+    
     /**
      * Support Bearer tokens
      *
      * @inheritDoc
      */
     public function supports( \Psr\Http\Message\RequestInterface $request ): bool {
-        if ($request->getUri()->getPath() !== '/graphql') {
+        if ( $request->getUri()->getPath() !== '/graphql' ) {
             return false;
         }
-
-        return $request->getContent()->has('UserLogin');
+        
+        return $request->getContent()->has( 'UserLogin' );
     }
-
+    
     /**
      * @inheritDoc
      */
     public function authenticate( \Psr\Http\Message\RequestInterface $request ): PassportInterface {
-        $username = $request->getContent()->get('UserLogin')['username'] ?? null;
-        $password = $request->getContent()->get('UserLogin')['password'] ?? null;
-
-        if (!$username || !$password) {
-            throw new AuthenticationException('Invalid user credentials');
+        $username = $request->getContent()->get( 'UserLogin' )[ 'username' ] ?? null;
+        $password = $request->getContent()->get( 'UserLogin' )[ 'password' ] ?? null;
+        
+        if ( ! $username || ! $password ) {
+            throw new AuthenticationException( 'Invalid user credentials' );
         }
-
-        if (!$user = $this->userProvider->getUserByUsername($username)) {
-            throw new AuthenticationException('No user found with given credentials');
+        
+        if ( ! $user = $this->userProvider->getUserByUsername( $username ) ) {
+            throw new AuthenticationException( 'No user found with given credentials' );
         }
-
-        return new Passport($user, new PasswordCredentials( $password ));
+        
+        return new Passport( $user, new PasswordCredentials( $password ), [ new LoginStamp() ] );
     }
-
+    
     /**
      * @inheritDoc
      */
     public function createAuthenticatedToken( PassportInterface $passport ): TokenInterface {
         return new AuthenticatedToken(
-            user: $passport->getUser(),
-            scope: TokenInterface::SCOPE_ACCESS_TOKEN,
-            token: null,
+            user:            $passport->getUser(),
+            scope:           TokenInterface::SCOPE_ACCESS_TOKEN,
+            token:           null,
             isAuthenticated: true,
         );
     }
-
+    
     /**
      * @inheritDoc
      */
     public function onAuthenticationSuccess( \Psr\Http\Message\RequestInterface $request, TokenInterface $token ): ?ResponseInterface {
         return null;
     }
-
+    
     /**
      * @inheritDoc
      */
     public function onAuthenticationFailure( \Psr\Http\Message\RequestInterface $request, AuthenticationException $authenticationException ): ?ResponseInterface {
-        $response = new \stdClass();
+        $response          = new \stdClass();
         $response->message = $authenticationException->getMessage();
-        $response->code = $authenticationException->getCode();
-        return new JsonResponse($response, $authenticationException->getCode());
+        $response->code    = $authenticationException->getCode();
+        
+        return new JsonResponse( $response, $authenticationException->getCode() );
     }
-
+    
 }
