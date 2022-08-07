@@ -13,6 +13,7 @@ namespace Swift\Kernel\Middleware;
 
 class KernelMiddlewareOrder {
     
+    public const REQUEST_PARSING = - 80;
     public const TIMEZONE        = - 50;
     public const DEPRECATION     = - 50;
     public const CORS            = - 45;
