@@ -1,3 +1,11 @@
+## 0.2.14
+
+- New: Rate Limiting [See commit](https://github.com/SwiftAPI/swift/commit/37ecc1ccc25ae6e5f62ca1ee8bf4b4e2f045c503)
+- New: Login Throttling [See commit](https://github.com/SwiftAPI/swift/commit/ead6f738952278276482322af2132716a04c557a)
+- Add support for custom GraphQl validation rules + additional security settings [See commit](https://github.com/SwiftAPI/swift/commit/cb7df1d2b3f0e8804962ae37840445154f0993f7)
+- Fix: REQUEST_PARSING priority was missing in KernelMiddleware [See commit](https://github.com/SwiftAPI/swift/commit/627b33434cc4ba32bdfbdd0701d9dd44239c52d8)
+- Bump dependency versions [See commit](https://github.com/SwiftAPI/swift/commit/c9913666990b1882a204f37059e76abf963eca23)
+
 ## 0.2.13
 
 - Bump cycle/orm minimum version to v2.2.0 [See commit](https://github.com/SwiftAPI/swift/commit/60bd721d4e4d3461323e7df033138e48441a2929)
