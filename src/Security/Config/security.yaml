@@ -2,13 +2,13 @@ enable_firewalls: true
 
 firewalls:
   main:
-    # limit login attempts, defaults to 5 per minute. Set to 0 to disable throttling
-    login_throttling:
-      max_attempts: 5
     token:
       # Default time in which a token expires in hours
       validity: 24
 
+    # limit login attempts, defaults to 5 per minute. Set to 0 to disable throttling
+    login_throttling:
+      max_attempts: 5
 
 role_hierarchy:
   ROLE_GUEST:
@@ -22,3 +22,12 @@ access_decision_manager:
   allow_if_all_abstain: false
 
 access_control:
+
+rate_limit:
+  enabled: true
+  enable_default: true
+  default_limit: 10
+  ## Period in seconds. Default is 1 minute.
+  default_period: 60
+  default_strategy: sliding_window
+  rates:

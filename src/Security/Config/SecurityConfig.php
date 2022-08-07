@@ -144,6 +144,28 @@ class SecurityConfig extends ConfigurationScope implements ConfigurationScopeInt
                         ->end()
                     ->end()
                 ->end()
+            
+                ->arrayNode( 'rate_limit' )
+                    ->children()
+                        ->booleanNode( 'enabled' )->defaultFalse()->end()
+                        ->booleanNode( 'enable_default' )->defaultFalse()->end()
+                        ->integerNode( 'default_limit' )->defaultValue( 100 )->end()
+                        ->integerNode( 'default_period' )->defaultValue( 100 )->end()
+                        ->scalarNode( 'default_strategy' )->defaultValue('sliding_window')->cannotBeEmpty()->end()
+                        ->arrayNode('rates')
+                            ->useAttributeAsKey( 'name', false )
+                            ->arrayPrototype()
+                                ->children()
+                                    ->scalarNode( 'name' )->cannotBeEmpty()->end()
+                                    ->scalarNode( 'strategy' )->defaultValue('sliding_window')->cannotBeEmpty()->end()
+                                    ->integerNode( 'limit' )->defaultValue( 100 )->end()
+                                    ->integerNode( 'period' )->defaultValue( 60 )->end()
+                                ->end()
+                            ->end()
+                        ->end()
+                    ->end()
+                ->end()
+            
             ->end();
         
         foreach ($this->subScopeCollection->get('security') as $scope) {

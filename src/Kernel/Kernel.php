@@ -23,6 +23,7 @@ use Swift\HttpFoundation\Exception\BadRequestException;
 use Swift\HttpFoundation\Exception\InternalErrorException;
 use Swift\HttpFoundation\Exception\NotAuthorizedException;
 use Swift\HttpFoundation\Exception\NotFoundException;
+use Swift\HttpFoundation\Exception\TooManyRequestsException;
 use Swift\HttpFoundation\JsonResponse;
 use Swift\HttpFoundation\Response;
 use Swift\Kernel\Event\KernelOnBeforeShutdown;
@@ -82,6 +83,8 @@ final class Kernel implements KernelInterface {
             $response = new JsonResponse( [ 'message' => $this->isDebug() ? $exception->getMessage() : Response::$reasonPhrases[ Response::HTTP_INTERNAL_SERVER_ERROR ], 'code' => $exception->getCode() ], status: Response::HTTP_INTERNAL_SERVER_ERROR );
         } catch ( AccessDeniedException $exception ) {
             $response = new JsonResponse( [ 'message' => $exception->getMessage(), 'code' => $exception->getCode() ], Response::HTTP_FORBIDDEN );
+        } catch ( TooManyRequestsException $exception ) {
+            $response = $exception->makeResponse();
         }
         
         return $response;
