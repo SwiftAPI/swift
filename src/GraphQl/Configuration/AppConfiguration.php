@@ -24,6 +24,8 @@ class AppConfiguration implements \Swift\Configuration\ConfigurationSubScopeInte
                 ->children()
                     ->booleanNode('enabled')->defaultTrue()->end()
                     ->booleanNode('enable_introspection')->defaultTrue()->end()
+                    ->integerNode('max_query_complexity')->defaultNull()->end()
+                    ->integerNode('max_query_depth')->defaultNull()->end()
                 ->end()
             ->end();
         
@@ -35,6 +37,8 @@ class AppConfiguration implements \Swift\Configuration\ConfigurationSubScopeInte
             'graphql' => [
                 'enabled'              => true,
                 'enable_introspection' => true,
+                'max_query_complexity' => null,
+                'max_query_depth'      => null,
             ],
         ];
     }

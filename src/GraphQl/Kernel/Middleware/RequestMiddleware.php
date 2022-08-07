@@ -17,10 +17,9 @@ use Psr\Http\Server\RequestHandlerInterface;
 use Swift\Configuration\ConfigurationInterface;
 use Swift\DependencyInjection\Attributes\Autowire;
 use Swift\GraphQl\Kernel;
-use Swift\HttpFoundation\RequestMatcher;
+use Swift\GraphQl\Util;
 use Swift\Kernel\Middleware\KernelMiddlewareOrder;
 use Swift\Kernel\Middleware\MiddlewareInterface;
-use Swift\Router\Types\RouteMethod;
 
 #[Autowire]
 class RequestMiddleware implements MiddlewareInterface {
@@ -40,8 +39,7 @@ class RequestMiddleware implements MiddlewareInterface {
             return $handler->handle( $request );
         }
         
-        $matcher = new RequestMatcher( '/graphql/', null, [ RouteMethod::POST, RouteMethod::GET ] );
-        if ( $matcher->matches( $request ) ) {
+        if ( Util::isGraphQlRequest( $request ) ) {
             return $this->kernel->handle( $request );
         }
         

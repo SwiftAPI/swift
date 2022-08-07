@@ -18,5 +18,6 @@ class DiTags {
     public const GRAPHQL_RESOLVER = 'swift.graphql.schema_resolver';
     public const GRAPHQL_RESOLVER_MIDDLEWARE = 'swift.graphql.schema_resolver_middleware';
     public const GRAPHQL_SCHEMA_MIDDLEWARE = 'swift.graphql.schema_middleware';
+    public const GRAPHQL_SCHEMA_VALIDATOR_RULES_FACTORY = 'swift.graphql.schema_validator_rules_factory';
     
 }

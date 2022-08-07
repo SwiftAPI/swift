@@ -13,10 +13,15 @@ namespace Swift\GraphQl;
 use GraphQL\Error\DebugFlag;
 use GraphQL\Error\FormattedError;
 use GraphQL\GraphQL;
+use GraphQL\Validator\DocumentValidator;
 use GraphQL\Validator\Rules\DisableIntrospection;
+use GraphQL\Validator\Rules\QueryComplexity;
+use GraphQL\Validator\Rules\QueryDepth;
 use Psr\Http\Server\RequestHandlerInterface;
 use Swift\Configuration\ConfigurationInterface;
 use Swift\DependencyInjection\Attributes\Autowire;
+use Swift\GraphQl\DependencyInjection\DiTags;
+use Swift\GraphQl\Validator\Rules\QueryComplexityRateLimiter;
 use Swift\HttpFoundation\JsonResponse;
 
 /**
@@ -29,10 +34,14 @@ final class Kernel implements RequestHandlerInterface {
     /**
      * @param ConfigurationInterface $configuration
      * @param \Swift\GraphQl\Factory $factory
+     * @param iterable               $validationRulesFactories
      */
     public function __construct(
         private readonly ConfigurationInterface $configuration,
         private readonly Factory                $factory,
+        
+        #[Autowire( tag: DiTags::GRAPHQL_SCHEMA_VALIDATOR_RULES_FACTORY )]
+        private readonly iterable               $validationRulesFactories,
     ) {
     }
     
@@ -49,7 +58,7 @@ final class Kernel implements RequestHandlerInterface {
                 schema:          $this->factory->createSchema(),
                 source:          $request->getContent()->get( key: 'query' ) ?: null,
                 variableValues:  $request->getContent()->get( key: 'variables' ) ?: null,
-                validationRules: $this->getValidationRules(),
+                validationRules: $this->getValidationRules( $request ),
             );
             
             return $result->toArray( $debug );
@@ -59,16 +68,28 @@ final class Kernel implements RequestHandlerInterface {
     }
     
     /**
+     * @param \Psr\Http\Message\ServerRequestInterface $request
+     *
      * @return array
      */
-    private function getValidationRules(): array {
-        $rules = [];
-        
+    private function getValidationRules( \Psr\Http\Message\ServerRequestInterface $request ): array {
         if ( ! $this->configuration->get( 'graphql.enable_introspection', 'app' ) ) {
-            $rules[] = new DisableIntrospection();
+            DocumentValidator::addRule( new DisableIntrospection() );
+        }
+        if ( $complexity = $this->configuration->get( 'graphql.max_query_complexity', 'app' ) ) {
+            DocumentValidator::addRule( new QueryComplexity( $complexity ) );
+        }
+        if ( $depth = $this->configuration->get( 'graphql.max_query_depth', 'app' ) ) {
+            DocumentValidator::addRule( new QueryDepth( $depth ) );
+        }
+        foreach ($this->validationRulesFactories as $validationRulesFactory) {
+            foreach ($validationRulesFactory->create( $request ) as $validationRule) {
+                DocumentValidator::addRule( $validationRule );
+            }
         }
         
-        return $rules;
+        
+        return DocumentValidator::allRules();
     }
     
 }
