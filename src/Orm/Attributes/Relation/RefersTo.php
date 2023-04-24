@@ -27,6 +27,7 @@ use Swift\Orm\Mapping\Definition\Relation\EntityRelationType;
  */
 #[\Attribute( \Attribute::TARGET_PROPERTY ), DI( autowire: false )]
 #[NamedArgumentConstructor]
+#[\AllowDynamicProperties]
 final class RefersTo implements RelationFieldInterface {
     
     private readonly EntityRelationType $entityRelationType;

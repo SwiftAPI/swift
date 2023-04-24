@@ -21,6 +21,7 @@ use Swift\Security\Authorization\AuthorizationType;
  */
 #[Attribute(Attribute::TARGET_METHOD), DI(exclude: true)]
 #[Deprecated]
+#[\AllowDynamicProperties]
 class Query {
 
     /**

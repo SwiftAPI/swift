@@ -25,6 +25,7 @@ use Swift\Orm\Behavior\BaseModifier;
  *    - events - string or array. One or several events during which callable will be called
  */
 #[\Attribute( \Attribute::TARGET_CLASS | \Attribute::IS_REPEATABLE ), NamedArgumentConstructor]
+#[\AllowDynamicProperties]
 final class Hook extends BaseModifier {
     
     /** @var callable */

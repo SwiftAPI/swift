@@ -14,6 +14,7 @@ use Attribute;
 use Swift\Orm\Behavior\Event\MapperEvent;
 
 #[Attribute( flags: Attribute::TARGET_METHOD | Attribute::IS_REPEATABLE )]
+#[\AllowDynamicProperties]
 final class Listen {
     
     /**

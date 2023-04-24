@@ -20,6 +20,7 @@ use Swift\Security\Authorization\AuthorizationType;
  * @package Swift\Annotations\Annotation
  */
 #[Attribute( Attribute::TARGET_CLASS | Attribute::TARGET_METHOD )]
+#[\AllowDynamicProperties]
 class Route {
     
     public const GET     = RouteMethod::GET;

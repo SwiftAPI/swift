@@ -18,6 +18,7 @@ use Swift\DependencyInjection\Attributes\DI;
  * @package Swift\Orm\Attributes
  */
 #[Attribute(Attribute::TARGET_CLASS), DI(autowire: false)]
+#[\AllowDynamicProperties]
 final class Entity {
     
     /**

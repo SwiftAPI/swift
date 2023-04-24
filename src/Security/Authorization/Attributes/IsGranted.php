@@ -15,6 +15,7 @@ namespace Swift\Security\Authorization\Attributes;
  * @package Swift\Security\Authentication\Attributes
  */
 #[\Attribute(\Attribute::TARGET_CLASS, \Attribute::TARGET_METHOD)]
+#[\AllowDynamicProperties]
 class IsGranted {
 
     /**

@@ -18,6 +18,7 @@ use JetBrains\PhpStorm\ArrayShape;
  * Uses a version 4 (random) UUID
  */
 #[\Attribute( \Attribute::TARGET_CLASS ), NamedArgumentConstructor]
+#[\AllowDynamicProperties]
 final class Uuid4 extends Uuid {
     
     /**

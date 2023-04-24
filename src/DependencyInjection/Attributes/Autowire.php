@@ -12,29 +12,26 @@ namespace Swift\DependencyInjection\Attributes;
 
 
 #[\Attribute( \Attribute::TARGET_CLASS | \Attribute::TARGET_METHOD | \Attribute::TARGET_PARAMETER | \Attribute::TARGET_PROPERTY )]
+#[\AllowDynamicProperties]
 class Autowire {
     
-    /**
-     * @param string|null $tag
-     * @param string|null $serviceId
-     */
     public function __construct(
-        public ?string $tag = null,
-        public ?string $serviceId = null,
+        public string|null $tag = null,
+        public string|null $serviceId = null,
     ) {
     }
     
     /**
      * @return string|null
      */
-    public function getTag(): ?string {
+    public function getTag(): string|null {
         return $this->tag;
     }
     
     /**
      * @return string|null
      */
-    public function getServiceId(): ?string {
+    public function getServiceId(): string|null {
         return $this->serviceId;
     }
     

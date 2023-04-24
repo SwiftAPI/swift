@@ -32,6 +32,7 @@ use Swift\Orm\Behavior\SchemaModifierInterface;
  * }
  */
 #[\Attribute( \Attribute::TARGET_CLASS | \Attribute::IS_REPEATABLE ), NamedArgumentConstructor]
+#[\AllowDynamicProperties]
 final class EventListener implements SchemaModifierInterface {
     
     private string $role;

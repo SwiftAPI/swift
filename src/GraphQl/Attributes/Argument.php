@@ -20,6 +20,7 @@ use JetBrains\PhpStorm\Deprecated;
  */
 #[Attribute(Attribute::TARGET_PARAMETER)]
 #[Deprecated]
+#[\AllowDynamicProperties]
 class Argument {
 
     /**

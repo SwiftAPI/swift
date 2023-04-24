@@ -21,6 +21,7 @@ use Swift\DependencyInjection\Attributes\DI;
  */
 #[Attribute(Attribute::TARGET_PROPERTY|Attribute::TARGET_METHOD), DI(exclude: true)]
 #[Deprecated]
+#[\AllowDynamicProperties]
 class Field {
 
     /**

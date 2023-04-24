@@ -21,6 +21,7 @@ use JetBrains\PhpStorm\Deprecated;
     Attribute( Attribute::TARGET_CLASS, Attribute::TARGET_METHOD, Attribute::TARGET_PARAMETER),
     Deprecated(reason: 'Moved to new dedicated DependencyInjection component', replacement: \Swift\DependencyInjection\Attributes\DI::class)
 ]
+#[\AllowDynamicProperties]
 class Autowire extends \Swift\DependencyInjection\Attributes\DI {
 
 

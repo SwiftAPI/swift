@@ -23,6 +23,7 @@ use Swift\Orm\Mapping\Definition\Relation\EntityRelationType;
  */
 #[\Attribute( \Attribute::TARGET_PROPERTY ), DI( autowire: false )]
 #[NamedArgumentConstructor]
+#[\AllowDynamicProperties]
 final class ManyToMany implements RelationFieldInterface {
     
     private readonly EntityRelationType $entityRelationType;

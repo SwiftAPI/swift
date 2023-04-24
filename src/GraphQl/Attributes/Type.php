@@ -21,6 +21,7 @@ use Swift\DependencyInjection\Attributes\DI;
 #[Attribute(Attribute::TARGET_CLASS)]
 #[DI(exclude: true)]
 #[Deprecated]
+#[\AllowDynamicProperties]
 class Type {
     
     /**

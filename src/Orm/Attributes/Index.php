@@ -15,6 +15,7 @@ use Swift\DependencyInjection\Attributes\DI;
 use Swift\Orm\Mapping\Definition\IndexType;
 
 #[\Attribute(\Attribute::TARGET_CLASS | \Attribute::IS_REPEATABLE)]
+#[\AllowDynamicProperties]
 #[DI(autowire: false)]
 class Index {
     

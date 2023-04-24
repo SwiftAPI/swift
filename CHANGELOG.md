@@ -1,3 +1,7 @@
+## 0.2.15
+
+- Add ```#[\AllowDynamicProperties]``` to Attributes for PHP8.2 compatibility
+
 ## 0.2.14
 
 - New: Rate Limiting [See commit](https://github.com/SwiftAPI/swift/commit/37ecc1ccc25ae6e5f62ca1ee8bf4b4e2f045c503)

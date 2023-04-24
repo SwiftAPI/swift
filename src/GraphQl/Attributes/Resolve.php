@@ -15,6 +15,7 @@ use Swift\DependencyInjection\Attributes\DI;
 
 #[\Attribute( \Attribute::TARGET_METHOD )]
 #[DI( autowire: false )]
+#[\AllowDynamicProperties]
 class Resolve {
     
     public function __construct(

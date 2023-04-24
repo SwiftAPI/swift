@@ -15,6 +15,7 @@ use Cycle\Annotated\Annotation\Column;
 use Swift\DependencyInjection\Attributes\DI;
 
 #[Attribute( Attribute::TARGET_CLASS )]
+#[\AllowDynamicProperties]
 #[DI( autowire: false )]
 final class Embeddable {
     

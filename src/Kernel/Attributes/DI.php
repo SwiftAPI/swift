@@ -18,6 +18,7 @@ use JetBrains\PhpStorm\Deprecated;
  * @package Swift\Kernel\Attributes
  */
 #[Attribute(Attribute::TARGET_CLASS), Deprecated(reason: 'Moved to new dedicated DependencyInjection component', replacement: \Swift\DependencyInjection\Attributes\DI::class)]
+#[\AllowDynamicProperties]
 class DI extends \Swift\DependencyInjection\Attributes\DI {
 
 

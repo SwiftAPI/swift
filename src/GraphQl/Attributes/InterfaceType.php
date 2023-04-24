@@ -18,6 +18,7 @@ use JetBrains\PhpStorm\Deprecated;
  */
 #[\Attribute(\Attribute::TARGET_CLASS)]
 #[Deprecated]
+#[\AllowDynamicProperties]
 class InterfaceType {
 
     /**

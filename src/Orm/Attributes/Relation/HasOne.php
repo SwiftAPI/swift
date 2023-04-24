@@ -25,6 +25,7 @@ use Swift\Orm\Mapping\Definition\Relation\EntityRelationType;
  * @package Swift\Orm\Attributes
  */
 #[\Attribute( \Attribute::TARGET_PROPERTY ), DI( autowire: false )]
+#[\AllowDynamicProperties]
 #[NamedArgumentConstructor]
 final class HasOne implements RelationFieldInterface {
     

@@ -18,6 +18,7 @@ use Swift\DependencyInjection\Attributes\DI;
  * @package Swift\Event\Attribute
  */
 #[\Attribute(\Attribute::TARGET_METHOD), DI(exclude: true)]
+#[\AllowDynamicProperties]
 class ListenTo {
 
     /**

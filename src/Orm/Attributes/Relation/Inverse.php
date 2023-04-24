@@ -16,6 +16,7 @@ use Swift\Orm\Mapping\Definition\Relation\EntityRelationType;
 
 #[\Attribute(\Attribute::TARGET_PROPERTY), DI(autowire: false)]
 #[NamedArgumentConstructor]
+#[\AllowDynamicProperties]
 class Inverse {
     
     public function __construct(

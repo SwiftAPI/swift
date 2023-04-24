@@ -11,6 +11,7 @@
 namespace Swift\WebSocket\Attributes;
 
 #[\Attribute(\Attribute::TARGET_CLASS)]
+#[\AllowDynamicProperties]
 final class SocketRoute {
     
     /**
