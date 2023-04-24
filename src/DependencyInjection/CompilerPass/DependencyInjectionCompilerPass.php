@@ -40,6 +40,11 @@ class DependencyInjectionCompilerPass implements \Symfony\Component\DependencyIn
     private function processInitial( ContainerBuilder $container ): void {
         foreach ( $container->getDefinitions() as $definition ) {
             $reflection = $container->getReflectionClass( $definition->getClass() );
+            
+            if (!$reflection) {
+                continue;
+            }
+            
             $attributes = $this->getAttributes( $reflection );
             
             if ( ! empty( $attributes ) ) {
@@ -59,7 +64,7 @@ class DependencyInjectionCompilerPass implements \Symfony\Component\DependencyIn
                     array_map( callback: static fn( $tag ) => $definition->addTag( $tag ), array: $attributes[ 'tags' ] );
                 }
                 if ( ! empty( $attributes[ 'aliases' ] ) && is_array( $attributes[ 'aliases' ] ) ) {
-                    array_map( static function ( $alias ) use ( $container, $definition ) {
+                    array_map( static function( $alias ) use ( $container, $definition ) {
                         $definition->addTag( 'alias:' . $alias );
                         $container->setAlias( $alias, $definition->getClass() );
                     }, $attributes[ 'aliases' ] );
@@ -144,14 +149,14 @@ class DependencyInjectionCompilerPass implements \Symfony\Component\DependencyIn
         // Inherit settings form parent classes
         if ( $reflection->getParentClass() ) {
             $parentReflection = new ReflectionClass( $reflection->getParentClass()->getName() );
-            $arguments        = $this->getAttributes( reflection: $parentReflection, arguments: $arguments );
+            $arguments        = $parentReflection ? $this->getAttributes( reflection: $parentReflection, arguments: $arguments ) : [];
         }
         
         // Inherit settings from interfaces
         if ( $reflection->getInterfaces() ) {
             foreach ( $reflection->getInterfaces() as $interface ) {
                 $parentReflection = new ReflectionClass( $interface->getName() );
-                $arguments        = $this->getAttributes( reflection: $parentReflection, arguments: $arguments );
+                $arguments        = $parentReflection ? $this->getAttributes( reflection: $parentReflection, arguments: $arguments ) : [];
             }
         }
         
@@ -159,7 +164,7 @@ class DependencyInjectionCompilerPass implements \Symfony\Component\DependencyIn
         if ( $reflection->getTraits() ) {
             foreach ( $reflection->getTraits() as $trait ) {
                 $parentReflection = new ReflectionClass( $trait->getName() );
-                $arguments        = $this->getAttributes( reflection: $parentReflection, arguments: $arguments );
+                $arguments        = $parentReflection ? $this->getAttributes( reflection: $parentReflection, arguments: $arguments ) : [];
             }
         }
         
@@ -190,6 +195,10 @@ class DependencyInjectionCompilerPass implements \Symfony\Component\DependencyIn
     public function processSecondary( ContainerBuilder $container ): void {
         foreach ( $container->getDefinitions() as $definition ) {
             $reflection = $container->getReflectionClass( $definition->getClass() );
+            
+            if (!$reflection) {
+                continue;
+            }
             
             foreach ( $reflection->getMethods() as $reflectionMethod ) {
                 if ( ! empty( AttributeHelper::getAutowireAttributes( $reflectionMethod ) ) ) {
