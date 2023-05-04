@@ -10,21 +10,17 @@
 
 namespace Swift\Router;
 
-use Exception;
 use Swift\DependencyInjection\Attributes\DI;
 use Swift\HttpFoundation\Exception\NotFoundException;
 use Swift\HttpFoundation\RequestInterface;
 use Swift\Events\EventDispatcher;
 use Swift\DependencyInjection\Attributes\Autowire;
 use Swift\Router\Event\OnBeforeRoutesCompileEvent;
-use RuntimeException;
 use Swift\Router\MatchTypes\MatchTypeInterface;
 
-/**
- * Class Router
- * @package Swift\Router
- */
-#[Autowire, DI( aliases: [ RouterInterface::class . '  $router' ] )]
+
+#[Autowire]
+#[DI( aliases: [ RouterInterface::class . '  $router' ] )]
 class Router implements RouterInterface {
     
     private bool $isCompiled = false;
@@ -38,7 +34,7 @@ class Router implements RouterInterface {
     protected RoutesBag $routes;
     
     /**
-     * @var array Array of all named routes.
+     * @var \Swift\Router\RouteInterface[] Array of all named routes.
      */
     protected array $namedRoutes = [];
     
@@ -73,7 +69,7 @@ class Router implements RouterInterface {
     /**
      * Bind harvested routes to object
      *
-     * @throws Exception
+     * @throws \Exception
      */
     private function bindRoutes(): void {
         if ( empty( $this->routeCollection ) ) {
@@ -88,10 +84,7 @@ class Router implements RouterInterface {
     }
     
     /**
-     * Get route from current url
-     *
-     * @return RouteInterface
-     * @throws Exception
+     * @inheritDoc
      */
     public function getCurrentRoute(): RouteInterface {
         if ( isset( $this->currentRoute ) ) {
@@ -104,7 +97,7 @@ class Router implements RouterInterface {
         
         $this->currentRoute = $this->match( $this->request );
         
-        if ( is_null( $this->currentRoute ) ) {
+        if ( $this->currentRoute === null ) {
             throw new NotFoundException( 'Not found' );
         }
         
@@ -112,13 +105,9 @@ class Router implements RouterInterface {
     }
     
     /**
-     * Match a given Request Url against stored routes
-     *
-     * @param RequestInterface $request
-     *
-     * @return RouteInterface|null Matched Route object with information on success, false on failure (no match).
+     * @inheritDoc
      */
-    public function match( RequestInterface $request ): ?RouteInterface {
+    public function match( RequestInterface $request ): RouteInterface|null {
         foreach ( $this->routes as $handler ) {
             if ( $handler->matchesRequest( $request ) ) {
                 return $handler;
@@ -131,7 +120,7 @@ class Router implements RouterInterface {
     /**
      * Compile routes
      *
-     * @throws Exception
+     * @throws \Exception
      */
     private function compile(): void {
         $this->routeCollection = $this->collector->harvestRoutes();
@@ -150,9 +139,7 @@ class Router implements RouterInterface {
     }
     
     /**
-     * Retrieve array of all available routes
-     *
-     * @return RoutesBag
+     * @inheritDoc
      */
     public function getRoutes(): RoutesBag {
         if ( ! $this->isCompiled ) {
@@ -163,9 +150,7 @@ class Router implements RouterInterface {
     }
     
     /**
-     * Add multiple routes at once
-     *
-     * @param array $routes
+     * @inheritDoc
      */
     public function addRoutes( array $routes ): void {
         foreach ( $routes as $route ) {
@@ -174,26 +159,21 @@ class Router implements RouterInterface {
     }
     
     /**
-     * Add a route
-     *
-     * @param RouteInterface $route
+     * @inheritDoc
      */
     public function addRoute( RouteInterface $route ): void {
         $this->routes->set( $route->getName(), $route );
         
         if ( $route->getName() ) {
             if ( isset( $this->namedRoutes[ $route->getName() ] ) ) {
-                throw new RuntimeException( "Can not redeclare route '{$route->getName()}'" );
+                throw new \RuntimeException( "Can not redeclare route '{$route->getName()}'" );
             }
             $this->namedRoutes[ $route->getName() ] = $route;
         }
     }
     
     /**
-     * Set the base path.
-     * Useful if you are running your application from a subdirectory.
-     *
-     * @param string $basePath
+     * @inheritDoc
      */
     public function setBasePath( string $basePath ): void {
         $this->basePath = $basePath;
@@ -207,71 +187,52 @@ class Router implements RouterInterface {
     }
     
     /**
-     * Add named match types. It uses array_merge so keys can be overwritten.
-     *
-     * @param array $matchTypes The key is the name and the value is the regex.
+     * @inheritDoc
      */
     public function addMatchTypes( array $matchTypes ): void {
-        $this->matchTypes = array_merge( $this->matchTypes, $matchTypes );
+        $this->matchTypes = [ ...$this->matchTypes, ...$matchTypes ];
     }
     
     /**
-     * @param array $matchTypes
+     * @param MatchTypeInterface[] $matchTypes
      */
     public function setMatchTypes( array $matchTypes ): void {
         $this->matchTypes = $matchTypes;
     }
     
     /**
-     * @param string $routeName The name of the route.
-     * @param array  $params    @params Associative array of parameters to replace placeholders with.
-     *
-     * @return Route The Route object. If params are provided it will include the route with named parameters in place.
-     *
-     * @TODO: Make this method reverse route based on route name and params
+     * @inheritDoc
      */
-    public function generate( string $routeName, array $params = [] ): Route {
+    public function generate( string $routeName, array $params = [] ): GeneratedRoute {
+        if ( ! $this->isCompiled ) {
+            $this->compile();
+        }
+        
         // Check if named route exists
         if ( ! isset( $this->namedRoutes[ $routeName ] ) ) {
-            throw new RuntimeException( "Route '{$routeName}' does not exist." );
+            throw new \RuntimeException( "Route '{$routeName}' does not exist." );
         }
         
-        // Replace named parameters
         $route = $this->namedRoutes[ $routeName ];
         
-        // prepend base path to route url again
-        $url = $this->basePath . $route;
-        
-        if ( preg_match_all( '`(/|\.|)\[([^:\]]*+)(?::([^:\]]*+))?\](\?|)`', $route, $matches, PREG_SET_ORDER ) ) {
-            foreach ( $matches as $index => $match ) {
-                [ $block, $pre, $type, $param, $optional ] = $match;
-                
-                if ( $pre ) {
-                    $block = substr( $block, 1 );
-                }
-                
-                if ( isset( $params[ $param ] ) ) {
-                    // Part is found, replace for param value
-                    $url = str_replace( $block, $params[ $param ], $url );
-                } else if ( $optional && $index !== 0 ) {
-                    // Only strip preceding slash if it's not at the base
-                    $url = str_replace( $pre . $block, '', $url );
-                } else {
-                    // Strip match block
-                    $url = str_replace( $block, '', $url );
-                }
+        // Replace each named parameter in the pattern with its value
+        $replacer = static function( $match ) use ( $params ) {
+            $name = $match[ 1 ];
+            if ( array_key_exists( $name, $params ) ) {
+                return $params[ $name ];
+            } else {
+                return $match[ 0 ];  // Leave the construct unchanged
             }
-        }
+        };
         
-        return $url;
+        return new GeneratedRoute(
+            preg_replace_callback( '/\[.*?:(.*?)\]/', $replacer, $route->getFullPath() ),
+            $route,
+        );
     }
     
     /**
-     * Compile the regex for a given route (EXPENSIVE)
-     *
-     * @param string $route
-     *
-     * @return string
+     * @inheritDoc
      */
     public function compileRoute( string $route ): string {
         if ( preg_match_all( '`(/|\.|)\[([^:\]]*+)(?::([^:\]]*+))?\](\?|)`', $route, $matches, PREG_SET_ORDER ) ) {
@@ -327,7 +288,7 @@ class Router implements RouterInterface {
     /**
      * @inheritDoc
      */
-    public function getRoute( string $name ): ?RouteInterface {
+    public function getRoute( string $name ): RouteInterface|null {
         if ( ! $this->isCompiled ) {
             $this->compile();
         }
@@ -344,7 +305,7 @@ class Router implements RouterInterface {
     public function populateMatchTypes( #[Autowire( tag: DiTags::MATCH_TYPES )] iterable $matchTypes ): void {
         $matchTypes = iterator_to_array( $matchTypes );
         
-        foreach ( $matchTypes as /** @var MatchTypeInterface */ $matchType ) {
+        foreach ( $matchTypes as /** @var MatchTypeInterface $matchType */ $matchType ) {
             $this->matchTypes[ $matchType->getIdentifier() ] = $matchType;
         }
     }

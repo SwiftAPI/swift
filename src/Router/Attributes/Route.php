@@ -40,23 +40,23 @@ class Route {
      * Route constructor.
      *
      * @param \Swift\Router\Types\RouteMethod|\Swift\Router\Types\RouteMethod[] $method
-     * @param string                                                                    $route     The route for this method with a leading and closing slash
-     * @param string                                                                    $name      Make the route easy to find back in the router and allow for reversed routing
-     * @param array|string|null                                                         $authType
-     * @param array|string|null                                                         $isGranted Validate user is granted certain rights or status. More on this in de Security documentation
-     * @param array                                                                     $tags      Provide a route with certain tags. E.g. the Security component uses this to define a route as authentication endpoint
+     * @param string                                                            $route     The route for this method with a leading and closing slash
+     * @param string                                                            $name      Make the route easy to find back in the router and allow for reversed routing
+     * @param array|string|null                                                 $authType
+     * @param array|string|null                                                 $isGranted Validate user is granted certain rights or status. More on this in de Security documentation
+     * @param array                                                             $tags      Provide a route with certain tags. E.g. the Security component uses this to define a route as authentication endpoint
      */
     #[Pure]
     public function __construct(
-        public RouteMethod|array                                                  $method,
-        public string                                                                 $route,
-        public string                                                                 $name,
-        public array|string|null                                                      $authType = null,
-        public array|string|null                                                      $isGranted = null,
-        public array                                                                  $tags = [],
+        public RouteMethod|array $method,
+        public string            $route,
+        public string            $name,
+        public array|string|null $authType = null,
+        public array|string|null $isGranted = null,
+        public array             $tags = [],
     ) {
         $this->method = is_array( $this->method ) ? $this->method : [ $this->method ];
-        if ( ! is_null( $this->authType ) ) {
+        if ( $this->authType !== null ) {
             $this->authType = is_array( $this->authType ) ? $this->authType : explode( '|', $this->authType );
             
             foreach ( $this->authType as $authLevelItem ) {

@@ -23,14 +23,14 @@ interface RouteInterface {
      *
      * @return string|null
      */
-    public function getFullPath(): ?string;
+    public function getFullPath(): string|null;
 
     /**
      * Get full route regex including controller base
      *
      * @return string|null
      */
-    public function getFullRegex(): ?string;
+    public function getFullRegex(): string|null;
 
     /**
      * Checks whether a given HTTPMethod applies for this route
@@ -53,12 +53,12 @@ interface RouteInterface {
     /**
      * @return string|null
      */
-    public function getName(): ?string;
+    public function getName(): string|null;
 
     /**
      * @param string|null $name
      */
-    public function setName( ?string $name ): void;
+    public function setName( string|null $name ): void;
 
     /**
      * @return string
@@ -71,7 +71,7 @@ interface RouteInterface {
     public function setRegex( string $regex ): void;
 
     /**
-     * @return array
+     * @return \Swift\Router\Types\RouteMethod[]
      */
     public function getMethods(): array;
 
@@ -93,12 +93,12 @@ interface RouteInterface {
     /**
      * @return string|null
      */
-    public function getAction(): ?string;
+    public function getAction(): string|null;
 
     /**
      * @param string|null $action
      */
-    public function setAction( ?string $action ): void;
+    public function setAction( string|null $action ): void;
 
     /**
      * @return RouteParameterBag

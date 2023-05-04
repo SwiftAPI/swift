@@ -18,10 +18,7 @@ use Swift\Router\MatchTypes\MatchTypeInterface;
 use Swift\Router\Types\RouteMethod;
 use Swift\Security\Authorization\AuthorizationType;
 
-/**
- * Class ControllerRoute
- * @package Swift\Router
- */
+
 #[DI( exclude: true )]
 class ControllerRoute implements RouteInterface {
     
@@ -49,7 +46,6 @@ class ControllerRoute implements RouteInterface {
      * @param array                             $isGranted
      * @param array                             $tags
      */
-    #[Pure]
     public function __construct(
         private string|null $name,
         private string      $regex,
@@ -134,7 +130,7 @@ class ControllerRoute implements RouteInterface {
      * @return string|null
      */
     #[Pure]
-    public function getFullPath(): ?string {
+    public function getFullPath(): string|null {
         return $this->regex ?? null;
     }
     
@@ -143,7 +139,7 @@ class ControllerRoute implements RouteInterface {
      *
      * @return string|null
      */
-    public function getFullRegex(): ?string {
+    public function getFullRegex(): string|null {
         $route = $this->getFullPath();
         
         foreach ( $this->getParamsFromPath( true ) as $parameter ) {
@@ -240,7 +236,7 @@ class ControllerRoute implements RouteInterface {
     /**
      * @param string|null $name
      */
-    public function setName( ?string $name ): void {
+    public function setName( string|null $name ): void {
         $this->name = $name;
     }
     
@@ -261,14 +257,14 @@ class ControllerRoute implements RouteInterface {
     /**
      * @return string|null
      */
-    public function getControllerBase(): ?string {
+    public function getControllerBase(): string|null {
         return $this->regex ?? null;
     }
     
     /**
      * @param string|null $controllerBase
      */
-    public function setControllerBase( ?string $controllerBase ): void {
+    public function setControllerBase( string|null $controllerBase ): void {
         $this->regex = $controllerBase ?? '';
     }
     
@@ -296,14 +292,14 @@ class ControllerRoute implements RouteInterface {
     /**
      * @return string|null
      */
-    public function getAction(): ?string {
+    public function getAction(): string|null {
         return $this->action;
     }
     
     /**
      * @param string|null $action
      */
-    public function setAction( ?string $action ): void {
+    public function setAction( string|null $action ): void {
         $this->action = $action;
     }
     
