@@ -1,3 +1,7 @@
+## 0.2.16
+
+- Bump dependency versions
+
 ## 0.2.15
 
 - Add ```#[\AllowDynamicProperties]``` to Attributes for PHP8.2 compatibility
