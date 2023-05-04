@@ -3,6 +3,7 @@
 - Bump dependency versions
 - Add map(), filter(), any(), all() to ArrayCollection and ResultCollection in ORM
 - Remove deprecated Attributes from GraphQL extension
+- Remove deprecated HTTPRequest class from Router extension
 
 ## 0.2.15
 
