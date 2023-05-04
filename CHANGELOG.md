@@ -5,6 +5,7 @@
 - Remove deprecated Attributes from GraphQL extension
 - Remove deprecated HTTPRequest class from Router extension
 - Add reversed routing, named route generation (route name to route path) to Router extension
+- Add route generation command to Router extension
 
 ## 0.2.15
 
