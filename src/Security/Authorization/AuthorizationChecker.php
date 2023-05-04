@@ -37,14 +37,14 @@ class AuthorizationChecker implements AuthorizationCheckerInterface {
     /**
      * @inheritDoc
      */
-    public function isGranted( array $attributes, mixed $subject = null, string $strategy = null ): bool {
+    public function isGranted( array $attributes, mixed $subject = null, string|null $strategy = null ): bool {
         return $this->accessDecisionManager->decide($this->security->getToken(), $subject, $attributes, $strategy);
     }
 
     /**
      * @inheritDoc
      */
-    public function denyUnlessGranted( array $attributes, mixed $subject = null, string $strategy = null ): void {
+    public function denyUnlessGranted( array $attributes, mixed $subject = null, string|null $strategy = null ): void {
         if (!$this->isGranted($attributes, $subject, $strategy)) {
             throw new AccessDeniedException('', Response::HTTP_UNAUTHORIZED);
         }

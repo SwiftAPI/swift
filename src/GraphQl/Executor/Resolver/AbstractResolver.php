@@ -20,7 +20,7 @@ use Swift\Security\Security;
 use Swift\Security\User\UserInterface;
 
 #[Autowire]
-class AbstractResolver implements ResolverInterface {
+abstract class AbstractResolver implements ResolverInterface {
     
     protected \Swift\HttpFoundation\RequestInterface $request;
     protected AuthorizationCheckerInterface $authorizationChecker;
@@ -59,18 +59,18 @@ class AbstractResolver implements ResolverInterface {
     /**
      * @return UserInterface|null
      */
-    public function getCurrentUser(): ?UserInterface {
+    public function getCurrentUser(): UserInterface|null {
         return $this->security->getUser();
     }
     
-    public function getSecurityToken(): ?TokenInterface {
+    public function getSecurityToken(): TokenInterface|null {
         return $this->security->getToken();
     }
     
     /**
      * @inheritDoc
      */
-    public function denyAccessUnlessGranted( array $attributes, mixed $subject = null, string $strategy = null ): void {
+    public function denyAccessUnlessGranted( array $attributes, mixed $subject = null, string|null $strategy = null ): void {
         $this->authorizationChecker->denyUnlessGranted( $attributes, $subject, $strategy );
     }
     

@@ -10,13 +10,7 @@
 
 namespace Swift\Orm\Entity;
 
-use Swift\GraphQl\Attributes\InputType;
 
-/**
- * Class Arguments
- * @package Swift\Orm\Entity
- */
-#[InputType]
 class Arguments extends \Swift\Dbal\Arguments\Arguments {
 
 

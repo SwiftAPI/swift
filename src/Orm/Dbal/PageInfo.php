@@ -12,10 +12,7 @@ namespace Swift\Orm\Dbal;
 
 use Swift\DependencyInjection\Attributes\DI;
 
-/**
- * Class PageInfo
- * @package Swift\Orm
- */
+
 #[DI(autowire: false)]
 class PageInfo {
 

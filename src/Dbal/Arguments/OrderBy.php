@@ -11,7 +11,6 @@
 namespace Swift\Dbal\Arguments;
 
 
-use Swift\GraphQl\Attributes\Field;
 use Swift\Orm\Mapping\Definition\Entity;
 
 class OrderBy implements ArgumentInterface {

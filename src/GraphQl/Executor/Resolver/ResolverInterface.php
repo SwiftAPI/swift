@@ -26,9 +26,9 @@ interface ResolverInterface {
     /**
      * @return UserInterface|null
      */
-    public function getCurrentUser(): ?UserInterface;
+    public function getCurrentUser(): UserInterface|null;
     
-    public function getSecurityToken(): ?TokenInterface;
+    public function getSecurityToken(): TokenInterface|null;
     
     /**
      * Throw exception when access denied
@@ -41,6 +41,6 @@ interface ResolverInterface {
      *
      * @throws AccessDeniedException
      */
-    public function denyAccessUnlessGranted( array $attributes, mixed $subject = null, string $strategy = null ): void;
+    public function denyAccessUnlessGranted( array $attributes, mixed $subject = null, string|null $strategy = null ): void;
     
 }

@@ -10,20 +10,13 @@
 
 namespace Swift\Router\Model\Entity;
 
-use stdClass;
-use Swift\GraphQl\Attributes\Field as GraphQlField;
-use Swift\GraphQl\Attributes\Type;
-use Swift\GraphQl\Types\Type as GraphQlType;
 use Swift\Orm\Entity\AbstractEntity;
 use Swift\Orm\Attributes\Entity;
 use Swift\Orm\Attributes\Field;
 use Swift\Orm\Types\FieldTypes;
 
-/**
- * Class LogRequest
- * @package Swift\Router\Model\Entity
- */
-#[Entity( table: 'log_request' ), Type]
+
+#[Entity( table: 'log_request' )]
 class LogRequest extends AbstractEntity {
 
     /**
@@ -57,16 +50,16 @@ class LogRequest extends AbstractEntity {
     protected string $method;
 
     /**
-     * @var stdClass $headers
+     * @var \stdClass $headers
      */
     #[Field( name: 'headers', type: FieldTypes::JSON )]
-    protected stdClass $headers;
+    protected \stdClass $headers;
 
     /**
-     * @var stdClass|null $body
+     * @var \stdClass|null $body
      */
-    #[Field( name: 'body', type: FieldTypes::JSON ), GraphQlField(type: GraphQlType::STDCLASS)]
-    protected ?stdClass $body;
+    #[Field( name: 'body', type: FieldTypes::JSON )]
+    protected \stdClass|null $body;
 
     /**
      * @var int $code
@@ -140,28 +133,28 @@ class LogRequest extends AbstractEntity {
     /**
      * @return \stdClass
      */
-    public function getHeaders(): stdClass {
+    public function getHeaders(): \stdClass {
         return $this->headers;
     }
     
     /**
      * @param \stdClass $headers
      */
-    public function setHeaders( stdClass $headers ): void {
+    public function setHeaders( \stdClass $headers ): void {
         $this->headers = $headers;
     }
     
     /**
      * @return \stdClass|null
      */
-    public function getBody(): ?stdClass {
+    public function getBody(): \stdClass|null {
         return $this->body;
     }
     
     /**
      * @param \stdClass|null $body
      */
-    public function setBody( ?stdClass $body ): void {
+    public function setBody( \stdClass|null $body ): void {
         $this->body = $body;
     }
     

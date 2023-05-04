@@ -10,18 +10,13 @@
 
 namespace Swift\Dbal\Arguments;
 
-use Swift\GraphQl\Attributes\Field;
-use Swift\GraphQl\Attributes\InputType;
 use Swift\Orm\Mapping\Definition\Entity;
 
-/**
- * Class Arguments
- * @package Swift\Orm\Arguments
- */
-#[InputType]
+
 class Arguments {
     
-    #[Field( type: ArgumentDirection::class )] protected ArgumentDirection $direction;
+    
+    private ArgumentDirection $direction;
     
     /**
      * Arguments constructor.
@@ -34,9 +29,9 @@ class Arguments {
      * @param \Swift\Dbal\Arguments\ArgumentInterface[]      $arguments
      */
     public function __construct(
-        #[Field] protected int|null $offset = 0,
-        #[Field( defaultValue: 25 )] protected int|null $limit = 0,
-        #[Field] protected string|null $orderBy = null,
+        protected int|null $offset = 0,
+        protected int|null $limit = 0,
+        protected string|null $orderBy = null,
         protected string|null $groupBy = null,
         ArgumentDirection|string $direction = ArgumentDirection::ASC,
         protected array $arguments = [],
@@ -78,14 +73,16 @@ class Arguments {
     /**
      * @return int|null
      */
-    public function getOffset(): ?int {
+    public function getOffset(): int|null {
         return $this->offset;
     }
     
     /**
      * @param int|null $offset
+     *
+     * @return \Swift\Dbal\Arguments\Arguments
      */
-    public function setOffset( ?int $offset ): self {
+    public function setOffset( int|null $offset ): self {
         $this->offset = $offset;
         
         $didMatch = false;
@@ -118,14 +115,14 @@ class Arguments {
     /**
      * @return int|null
      */
-    public function getLimit(): ?int {
+    public function getLimit(): int|null {
         return $this->limit;
     }
     
     /**
      * @param int|null $limit
      */
-    public function setLimit( ?int $limit ): self {
+    public function setLimit( int|null $limit ): self {
         $this->limit = $limit;
         
         $didMatch = false;
@@ -145,15 +142,17 @@ class Arguments {
     /**
      * @return string|null
      */
-    public function getOrderBy(): ?string {
+    public function getOrderBy(): string|null {
         return $this->orderBy;
     }
     
     /**
-     * @param string|null                                 $orderBy
+     * @param string|null                             $orderBy
      * @param \Swift\Dbal\Arguments\ArgumentDirection $direction
+     *
+     * @return \Swift\Dbal\Arguments\Arguments
      */
-    public function setOrderBy( ?string $orderBy, ArgumentDirection $direction = ArgumentDirection::ASC ): self {
+    public function setOrderBy( string|null $orderBy, ArgumentDirection $direction = ArgumentDirection::ASC ): self {
         $this->orderBy = $orderBy;
         $this->direction = $direction;
         
@@ -173,6 +172,8 @@ class Arguments {
     
     /**
      * @param \Swift\Dbal\Arguments\ArgumentDirection $direction
+     *
+     * @return \Swift\Dbal\Arguments\Arguments
      */
     public function setDirection( ArgumentDirection $direction ): self {
         $this->setOrderBy( $this->orderBy, $direction );
@@ -183,14 +184,14 @@ class Arguments {
     /**
      * @return string|null
      */
-    public function getGroupBy(): ?string {
+    public function getGroupBy(): string|null {
         return $this->groupBy;
     }
     
     /**
      * @param string|null $groupBy
      */
-    public function setGroupBy( ?string $groupBy ): self {
+    public function setGroupBy( string|null $groupBy ): self {
         $this->groupBy = $groupBy;
         
         $didMatch = false;

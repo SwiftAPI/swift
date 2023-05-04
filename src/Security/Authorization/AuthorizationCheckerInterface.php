@@ -27,7 +27,7 @@ interface AuthorizationCheckerInterface {
      *
      * @return bool
      */
-    public function isGranted( array $attributes, mixed $subject = null, string $strategy = null ): bool;
+    public function isGranted( array $attributes, mixed $subject = null, string|null $strategy = null ): bool;
 
     /**
      * Validate whether given subject should be available
@@ -41,6 +41,6 @@ interface AuthorizationCheckerInterface {
      *
      * @throws AccessDeniedException
      */
-    public function denyUnlessGranted( array $attributes, mixed $subject = null, string $strategy = null ): void;
+    public function denyUnlessGranted( array $attributes, mixed $subject = null, string|null $strategy = null ): void;
 
 }

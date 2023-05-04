@@ -10,17 +10,9 @@
 
 namespace Swift\Dbal\Arguments;
 
-use Swift\GraphQl\Attributes\Field;
-use Swift\GraphQl\Attributes\InputType;
-use Swift\GraphQl\Utils;
 use Swift\Orm\Entity\Arguments;
-use TypeError;
 
-/**
- * Class ArgumentsType
- * @package Swift\Dbal\Arguments
- */
-#[InputType( name: 'Arguments' )]
+
 class ArgumentsType {
 
     /**
@@ -35,22 +27,16 @@ class ArgumentsType {
      * @param string|null $direction
      */
     public function __construct(
-        #[Field( description: 'Number of edges to load' )] public int|null $first = null,
-        #[Field( description: 'Number of edges to load in reverse' )] public int|null $last = null,
-        #[Field( description: 'Load all edges before cursor' )] public string|null $before = null,
-        #[Field( description: 'Load all edges after cursor' )] public string|null $after = null,
-        #[Field( description: 'Order edges by one of the options' )] public string|null $orderBy = null,
+        public int|null $first = null,
+        public int|null $last = null,
+        public string|null $before = null,
+        public string|null $after = null,
+        public string|null $orderBy = null,
         public string|null $groupBy = null,
-        #[Field( type: ArgumentDirection::class, description: 'Sorting direction. Note that backward pagination will automatically be DESC' )] public string|null $direction = null,
+        public string|null $direction = null,
     ) {
-        if (is_null($this->first) && is_null($this->last)) {
+        if ( ($this->first === null) &&( $this->last === null) ) {
             $this->first = 25;
-        }
-        if ($this->before) {
-            $this->before = Utils::decodeCursor($this->before);
-        }
-        if ($this->after) {
-            $this->after = Utils::decodeCursor($this->after);
         }
     }
 

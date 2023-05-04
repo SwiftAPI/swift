@@ -11,9 +11,8 @@
 namespace Swift\Dbal\Arguments;
 
 
-use Swift\GraphQl\Attributes\Field;
+use Swift\Orm\Attributes\Field;
 use Swift\Orm\Mapping\Definition\Entity;
-use Swift\Dbal\QueryBuilder;
 
 class GroupBy implements ArgumentInterface {
     

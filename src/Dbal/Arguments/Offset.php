@@ -12,7 +12,6 @@ namespace Swift\Dbal\Arguments;
 
 
 use Swift\Orm\Mapping\Definition\Entity;
-use Swift\Dbal\QueryBuilder;
 
 class Offset implements ArgumentInterface {
     
