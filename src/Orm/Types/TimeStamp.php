@@ -10,23 +10,10 @@
 
 namespace Swift\Orm\Types;
 
-use Swift\Orm\Mapping\Definition\Field;
-use Swift\Orm\Dbal\TableQuery;
 
-/**
- * Class TimeStamp
- * @package Swift\Orm\Types
- */
 final class TimeStamp implements TypeInterface {
 
     public const TIMESTAMP = 'timestamp';
-
-    /**
-     * @inheritDoc
-     */
-    public function getSqlDeclaration( Field $field, TableQuery $query ): string {
-        return 'timestamp';
-    }
 
     public function transformToPhpValue( mixed $value ): \DateTime {
         if ( $value instanceof \Dibi\DateTime ) {

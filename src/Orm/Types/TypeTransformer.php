@@ -13,18 +13,14 @@ namespace Swift\Orm\Types;
 use Swift\DependencyInjection\Attributes\Autowire;
 use Swift\Kernel\KernelDiTags;
 
-/**
- * Class TypeTransformer
- * @package Swift\Orm\Types
- */
 #[Autowire]
 class TypeTransformer {
     
     /** @var TypeInterface[] $types */
     private array $types;
     
-    public function getType( string $typeName ): ?TypeInterface {
-        return $this->types[ strtolower($typeName) ] ?? new UnknownType( $typeName );
+    public function getType( string $typeName ): TypeInterface|null {
+        return $this->types[ strtolower( $typeName ) ] ?? new UnknownType( $typeName );
     }
     
     #[Autowire]
@@ -42,8 +38,8 @@ class TypeTransformer {
                 );
             }
             
-            $this->types[ strtolower($type->getName()) ] = $type;
-            $this->types[ $type::class ]     = $type;
+            $this->types[ strtolower( $type->getName() ) ] = $type;
+            $this->types[ $type::class ]                   = $type;
         }
     }
     

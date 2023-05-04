@@ -11,21 +11,11 @@
 namespace Swift\Orm\Types;
 
 
-use Swift\Orm\Mapping\Definition\Field;
-use Swift\Orm\Dbal\TableQuery;
-
 final class UnknownType implements TypeInterface {
 
     public function __construct(
         private readonly string $name = 'unknown',
     ) {
-    }
-
-    /**
-     * @inheritDoc
-     */
-    public function getSqlDeclaration( Field $field, TableQuery $query ): string {
-        return $this->name !== 'unknown' ? $this->name : sprintf( 'varchar(%s)', $field->getLength() ?? 255 );
     }
 
     public function transformToPhpValue( mixed $value ): mixed {

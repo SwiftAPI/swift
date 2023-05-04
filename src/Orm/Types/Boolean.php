@@ -10,23 +10,11 @@
 
 namespace Swift\Orm\Types;
 
-use Swift\Orm\Mapping\Definition\Field;
-use Swift\Orm\Dbal\TableQuery;
 
-/**
- * Class Bool
- * @package Swift\Orm\Types
- */
+
 final class Boolean implements TypeInterface {
     
     public const BOOL = 'bool';
-
-    /**
-     * @inheritDoc
-     */
-    public function getSqlDeclaration( Field $field, TableQuery $query ): string {
-        return sprintf( 'tinyint(%s)', $field->getLength() ?? 2 );
-    }
 
     public function transformToPhpValue( mixed $value ): bool {
         return (bool) $value;

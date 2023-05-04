@@ -13,10 +13,7 @@ namespace Swift\Orm\Types;
 use Swift\DependencyInjection\Attributes\DI;
 use Swift\Kernel\KernelDiTags;
 
-/**
- * Interface TypeInterface
- * @package Swift\Orm\Types
- */
+
 #[DI( tags: [ KernelDiTags::ENTITY_TYPE ] )]
 interface TypeInterface {
     

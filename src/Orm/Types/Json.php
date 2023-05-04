@@ -10,26 +10,13 @@
 
 namespace Swift\Orm\Types;
 
-use stdClass;
-use Swift\Orm\Mapping\Definition\Field;
-use Swift\Orm\Dbal\TableQuery;
 
-/**
- * Class Json
- * @package Swift\Orm\Types
- */
+
 final class Json implements TypeInterface {
 
     public const JSON = 'json';
 
-    /**
-     * @inheritDoc
-     */
-    public function getSqlDeclaration( Field $field, TableQuery $query ): string {
-        return 'longtext';
-    }
-
-    public function transformToPhpValue( mixed $value ): ?stdClass {
+    public function transformToPhpValue( mixed $value ): ?\stdClass {
         return ( new \Swift\Serializer\Json( $value ) )->modeObject()->unSerialize();
     }
 

@@ -16,18 +16,14 @@ use Traversable;
 
 /**
  * @template T
- *
- * Class ResultSet
- * @package Swift\Orm\Collection
+ * @template-covariant U
  */
 #[DI( autowire: false )]
 final class ArrayCollection extends \ArrayIterator implements ArrayCollectionInterface {
     
     /**
-     * ResultSet constructor.
-     *
      * @param array<T> $array
-     * @param int   $flags
+     * @param int      $flags
      */
     public function __construct(
         array $array = [],
@@ -37,7 +33,7 @@ final class ArrayCollection extends \ArrayIterator implements ArrayCollectionInt
     }
     
     /**
-     * @param \Swift\Orm\Dbal\EntityResultInterface $value
+     * @param T $value
      *
      * @return void
      */
@@ -51,6 +47,9 @@ final class ArrayCollection extends \ArrayIterator implements ArrayCollectionInt
         $this[] = $value;
     }
     
+    /**
+     * @inheritDoc
+     */
     public function addMany( array $values ): void {
         foreach ( $values as $value ) {
             $this[] = $value;
@@ -58,18 +57,22 @@ final class ArrayCollection extends \ArrayIterator implements ArrayCollectionInt
     }
     
     /**
-     * Get count of results in set
-     *
-     * @return int
+     * @inheritDoc
      */
     public function getCount(): int {
         return $this->count();
     }
     
+    /**
+     * @inheritDoc
+     */
     public function getFirst(): EntityResultInterface|null {
         return $this[ 0 ] ?? null;
     }
     
+    /**
+     * @inheritDoc
+     */
     public function getLast(): EntityResultInterface|null {
         if ( $this->count() < 1 ) {
             return null;
@@ -80,6 +83,58 @@ final class ArrayCollection extends \ArrayIterator implements ArrayCollectionInt
     
     /**
      * @inheritDoc
+     */
+    public function map( callable $callback ): self {
+        $result = [];
+        foreach ( $this as $key => $value ) {
+            $result[ $key ] = $callback( $value, $key );
+        }
+        
+        return new self( $result );
+    }
+    
+    /**
+     * @inheritDoc
+     */
+    public function filter( callable $predicate ): self {
+        $result = [];
+        foreach ( $this as $key => $value ) {
+            if ( $predicate( $value, $key ) ) {
+                $result[ $key ] = $value;
+            }
+        }
+        
+        return new self( $result );
+    }
+    
+    /**
+     * @inheritDoc
+     */
+    public function any( callable $predicate ): bool {
+        foreach ( $this as $key => $value ) {
+            if ( $predicate( $value, $key ) ) {
+                return true;
+            }
+        }
+        
+        return false;
+    }
+    
+    /**
+     * @inheritDoc
+     */
+    public function all( callable $predicate ): bool {
+        foreach ( $this as $key => $value ) {
+            if ( ! $predicate( $value, $key ) ) {
+                return false;
+            }
+        }
+        
+        return true;
+    }
+    
+    /**
+     * @return \ArrayIterator<T>
      */
     public function getIterator(): Traversable {
         return new \ArrayIterator( $this );

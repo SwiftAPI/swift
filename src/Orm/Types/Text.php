@@ -11,19 +11,10 @@
 namespace Swift\Orm\Types;
 
 
-use Swift\Orm\Mapping\Definition\Field;
-use Swift\Orm\Dbal\TableQuery;
 
 final class Text implements TypeInterface {
 
     public const TEXT = 'text';
-
-    /**
-     * @inheritDoc
-     */
-    public function getSqlDeclaration( Field $field, TableQuery $query ): string {
-        return sprintf( 'varchar(%s)', $field->getLength() ?? 255 );
-    }
 
     public function transformToPhpValue( mixed $value ): string {
         return (string) $value;

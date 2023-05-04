@@ -10,10 +10,7 @@
 
 namespace Swift\Orm\Types;
 
-/**
- * Class FieldTypes
- * @package Swift\Orm\Types
- */
+
 enum FieldTypes: string {
 
     case UNKNOWN = 'unknown';

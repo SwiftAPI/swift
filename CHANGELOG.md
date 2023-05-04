@@ -1,6 +1,7 @@
 ## 0.2.16
 
 - Bump dependency versions
+- Add map(), filter(), any(), all() to ArrayCollection and ResultCollection in ORM
 
 ## 0.2.15
 

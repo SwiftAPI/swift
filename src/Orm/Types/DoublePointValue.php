@@ -11,26 +11,17 @@
 namespace Swift\Orm\Types;
 
 
-use Swift\Orm\Mapping\Definition\Field;
-use Swift\Orm\Dbal\TableQuery;
 
 final class DoublePointValue implements TypeInterface {
 
     public const DOUBLE = 'double';
 
-    /**
-     * @inheritDoc
-     */
-    public function getSqlDeclaration( Field $field, TableQuery $query ): string {
-        return 'double';
+    public function transformToPhpValue( mixed $value ): float|null {
+        return $value === null ? null : (double) $value;
     }
 
-    public function transformToPhpValue( mixed $value ): ?float {
-        return is_null($value) ? null : (double) $value;
-    }
-
-    public function transformToDatabaseValue( mixed $value ): ?float {
-        return is_null($value) ? null : (double) $value;
+    public function transformToDatabaseValue( mixed $value ): float|null {
+        return $value === null ? null : (double) $value;
     }
 
     public function getName(): string {

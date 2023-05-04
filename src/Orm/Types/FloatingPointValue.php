@@ -11,19 +11,10 @@
 namespace Swift\Orm\Types;
 
 
-use Swift\Orm\Mapping\Definition\Field;
-use Swift\Orm\Dbal\TableQuery;
 
 final class FloatingPointValue implements TypeInterface {
 
     public const FLOAT = 'float';
-
-    /**
-     * @inheritDoc
-     */
-    public function getSqlDeclaration( Field $field, TableQuery $query ): string {
-        return 'float';
-    }
 
     public function transformToPhpValue( mixed $value ): ?float {
         return is_null($value) ? null : (float) $value;

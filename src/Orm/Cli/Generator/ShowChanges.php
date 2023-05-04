@@ -55,7 +55,7 @@ class ShowChanges implements GeneratorInterface {
         }
         
         if ( $this->changes === [] ) {
-            $this->output->writeln( '<fg=yellow>no database changes has been detected</fg=yellow>' );
+            $this->output->writeln( '<fg=yellow>no database changes have been detected</fg=yellow>' );
             
             return $registry;
         }

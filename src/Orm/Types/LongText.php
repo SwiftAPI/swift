@@ -11,19 +11,10 @@
 namespace Swift\Orm\Types;
 
 
-use Swift\Orm\Mapping\Definition\Field;
-use Swift\Orm\Dbal\TableQuery;
 
 final class LongText implements TypeInterface {
 
     public const LONGTEXT = 'longtext';
-
-    /**
-     * @inheritDoc
-     */
-    public function getSqlDeclaration( Field $field, TableQuery $query ): string {
-        return 'longtext';
-    }
 
     public function transformToPhpValue( mixed $value ): string {
         return (string) $value;

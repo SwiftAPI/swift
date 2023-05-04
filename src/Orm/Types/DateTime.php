@@ -10,23 +10,11 @@
 
 namespace Swift\Orm\Types;
 
-use Swift\Orm\Mapping\Definition\Field;
-use Swift\Orm\Dbal\TableQuery;
 
-/**
- * Class DateTime
- * @package Swift\Orm\Types
- */
+
 final class DateTime implements TypeInterface {
 
     public const DATETIME = 'datetime';
-
-    /**
-     * @inheritDoc
-     */
-    public function getSqlDeclaration( Field $field, TableQuery $query ): string {
-        return 'datetime';
-    }
 
     public function transformToPhpValue( mixed $value ): \DateTimeInterface {
         if ($value instanceof \DateTimeInterface) {

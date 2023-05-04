@@ -99,16 +99,7 @@ class EntityManager implements EntityManagerInterface {
     }
     
     /**
-     * Fetch all rows matching given state and arguments
-     *
-     * @template T
-     *
-     * @param class-string<T>                                                            $entity
-     * @param array|stdClass                                                             $state
-     * @param \Swift\Orm\Entity\Arguments|\Swift\Dbal\Arguments\ArgumentInterface[]|null $arguments
-     * @param bool                                                                       $exceptionOnNotFound
-     *
-     * @return \Swift\Orm\Dbal\ResultCollectionInterface<T>
+     * @inheritDoc
      */
     public function findMany( string $entity, array|stdClass $state = [], Arguments|array|null $arguments = null, bool $exceptionOnNotFound = false ): \Swift\Orm\Dbal\ResultCollectionInterface {
         if ( is_array( $arguments ) ) {
@@ -137,9 +128,7 @@ class EntityManager implements EntityManagerInterface {
     }
     
     /**
-     * Method to delete a row from the database
-     *
-     * @param \Swift\Orm\Entity\EntityInterface $entity
+     * @inheritDoc
      */
     public function delete( EntityInterface $entity ): void {
         $this->entityManager->delete( $entity );
@@ -153,6 +142,8 @@ class EntityManager implements EntityManagerInterface {
     }
     
     /**
+     * @inheritDoc
+     *
      * @throws \Throwable
      */
     public function run( bool $throwException = true ): StateInterface {
