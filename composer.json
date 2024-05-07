@@ -2,6 +2,7 @@
   "name": "swift-api/swift",
   "type": "library",
   "description": "Simple and fast API framework",
+  "version": "v0.2.18",
   "keywords": [
     "api",
     "framework",
