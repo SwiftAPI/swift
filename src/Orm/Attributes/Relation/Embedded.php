@@ -17,7 +17,6 @@ use Swift\DependencyInjection\Attributes\DI;
 
 #[DI( autowire: false )]
 #[Attribute( Attribute::TARGET_PROPERTY )]
-#[\AllowDynamicProperties]
 #[NamedArgumentConstructor]
 final class Embedded extends Relation {
     

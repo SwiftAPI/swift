@@ -20,7 +20,6 @@ use Ramsey\Uuid\UuidInterface;
  * namespace ID and a name
  */
 #[\Attribute( \Attribute::TARGET_CLASS ), NamedArgumentConstructor]
-#[\AllowDynamicProperties]
 final class Uuid5 extends Uuid {
     
     /**

@@ -58,7 +58,7 @@ class DatabaseConfig extends ConfigurationScope implements ConfigurationScopeInt
     /**
      * @inheritDoc
      */
-    public function getConfigTreeBuilder() {
+    public function getConfigTreeBuilder(): \Symfony\Component\Config\Definition\Builder\TreeBuilder {
         $config = new TreeBuilder( 'database' );
         
         $rootNode = $config->getRootNode();

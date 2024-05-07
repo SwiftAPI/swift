@@ -10,6 +10,7 @@
 
 namespace Swift\Logging\Handler;
 
+use Monolog\LogRecord;
 use Swift\Dbal\Exceptions\DatabaseException;
 use Swift\DependencyInjection\Attributes\Autowire;
 use Swift\Logging\Entity\LogEntity;
@@ -23,34 +24,34 @@ use Swift\Orm\EntityManagerInterface;
  */
 #[Autowire]
 class DbHandler extends AbstractProcessingHandler {
-    
+
     /**
      * DBHandler constructor.
      *
      * @param \Swift\Orm\EntityManagerInterface $entityManager
-     * @param SystemLogger                      $systemLogger
+     * @param SystemLogger $systemLogger
      */
     public function __construct(
         private readonly EntityManagerInterface $entityManager,
         private readonly SystemLogger           $systemLogger
     ) {
-        
+
         parent::__construct();
     }
-    
+
     /**
-     * @param array $record
+     * @param LogRecord $record
      */
-    protected function write( array $record ): void {
+    protected function write( \Monolog\LogRecord $record ): void {
         try {
             $log = new LogEntity();
-            $log->setChannel( $record[ 'channel' ] );
-            $log->setMessage( $record[ 'message' ] );
-            $log->setLevel( $record[ 'level' ] );
-            $log->setLevelName( $record[ 'level_name' ] );
-            $log->setContext( $record[ 'context' ] );
-            $log->setDatetime( $record[ 'datetime' ]->format( 'Y-m-d H:i:s' ) );
-            
+            $log->setChannel( $record->channel );
+            $log->setMessage( $record->message );
+            $log->setLevel( $record->level->value );
+            $log->setLevelName( $record->level->getName() );
+            $log->setContext( (object) $record->context );
+            $log->setDatetime( $record->datetime->format( 'Y-m-d H:i:s' ) );
+
             $this->entityManager->persist( $log );
             $this->entityManager->run();
         } catch ( DatabaseException $exception ) {

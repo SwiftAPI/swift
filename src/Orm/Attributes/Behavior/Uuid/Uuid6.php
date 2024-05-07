@@ -20,7 +20,6 @@ use Ramsey\Uuid\Type\Hexadecimal;
  * and the current time
  */
 #[\Attribute( \Attribute::TARGET_CLASS ), NamedArgumentConstructor]
-#[\AllowDynamicProperties]
 final class Uuid6 extends Uuid {
     
     /**

@@ -39,7 +39,6 @@ use Swift\Orm\Behavior\RegistryModifier;
  * The MANUAL rule provides for the completely manual configuration of an entity property and entity versioning.
  */
 #[\Attribute( \Attribute::TARGET_CLASS ), NamedArgumentConstructor]
-#[\AllowDynamicProperties]
 final class OptimisticLock extends BaseModifier {
     
     public const RULE_MICROTIME = Listener::RULE_MICROTIME;

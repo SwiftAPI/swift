@@ -21,7 +21,6 @@ use Ramsey\Uuid\Type\Integer as IntegerObject;
  * identifier, host ID, clock sequence, and the current time
  */
 #[\Attribute( \Attribute::TARGET_CLASS ), NamedArgumentConstructor]
-#[\AllowDynamicProperties]
 final class Uuid2 extends Uuid {
     
     /**

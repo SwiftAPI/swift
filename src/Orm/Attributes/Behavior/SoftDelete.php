@@ -31,7 +31,6 @@ use Swift\Orm\Behavior\RegistryModifier;
  *     different from the one specified in the behavior parameters, an exception will be thrown.
  */
 #[\Attribute( \Attribute::TARGET_CLASS ), NamedArgumentConstructor]
-#[\AllowDynamicProperties]
 final class SoftDelete extends BaseModifier {
     
     private ?string $column = null;

@@ -30,13 +30,13 @@ class DateTimeType extends \GraphQL\Type\Definition\CustomScalarType {
      * @phpcsSuppress SlevomatCodingStandard.TypeHints.PropertyTypeHint.MissingNativeTypeHint
      * @var string
      */
-    public $name = self::NAME;
+    public string $name = self::NAME;
     
     /**
      * @phpcsSuppress SlevomatCodingStandard.TypeHints.PropertyTypeHint.MissingNativeTypeHint
      * @var string|null
      */
-    public $description = self::DESCRIPTION;
+    public string|null $description = self::DESCRIPTION;
     
     public function __construct() {
         parent::__construct(

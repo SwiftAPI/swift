@@ -24,7 +24,7 @@ class QueryComplexityRateLimiter extends \GraphQL\Validator\Rules\QueryComplexit
         parent::__construct( 999999 );
     }
     
-    public function getVisitor( ValidationContext $context ) {
+    public function getVisitor( ValidationContext $context ): array {
         $visitor = parent::getVisitor( $context );
         
         $visitor[ NodeKind::OPERATION_DEFINITION ][ 'leave' ] = function ( OperationDefinitionNode $operationDefinition ) use ( $visitor ) {

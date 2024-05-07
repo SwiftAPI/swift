@@ -16,6 +16,8 @@ namespace Swift\DependencyInjection\Attributes;
 class DI {
     
     /**
+     * DI constructor.
+     *
      * @param array $tags
      * @param bool  $shared
      * @param bool  $exclude

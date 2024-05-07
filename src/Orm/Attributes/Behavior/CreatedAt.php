@@ -30,7 +30,6 @@ use Swift\Orm\Behavior\RegistryModifier;
  *
  */
 #[\Attribute( \Attribute::TARGET_CLASS ), NamedArgumentConstructor]
-#[\AllowDynamicProperties]
 final class CreatedAt extends BaseModifier {
     
     private ?string $column = null;

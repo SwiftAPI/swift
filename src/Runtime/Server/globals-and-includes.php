@@ -10,7 +10,7 @@
 
 
 if (!defined('INCLUDE_DIR')) {
-    define('INCLUDE_DIR', dirname(__DIR__, 6));
+    define('INCLUDE_DIR', dirname(__DIR__, 5));
 }
 if (!defined('SWIFT_ROOT')) {
     define('SWIFT_ROOT', dirname(__DIR__, 2));
@@ -20,7 +20,7 @@ if (!defined('SWIFT_ROOT')) {
  * Define the application's minimum supported PHP version as a constant so it can be referenced within the application.
  */
 if (!defined('SWIFT_MINIMUM_PHP')) {
-    define( "SWIFT_MINIMUM_PHP", '8.1.0' );
+    define( "SWIFT_MINIMUM_PHP", '8.2.0' );
 }
 
 if (version_compare(PHP_VERSION, SWIFT_MINIMUM_PHP, '<')) {

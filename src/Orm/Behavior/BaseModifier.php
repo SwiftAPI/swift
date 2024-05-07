@@ -15,6 +15,7 @@ use Cycle\ORM\Entity\Behavior\Dispatcher\ListenerProvider;
 use Cycle\ORM\SchemaInterface;
 use Cycle\Schema\Registry;
 
+#[\AllowDynamicProperties]
 abstract class BaseModifier implements SchemaModifierInterface {
     
     protected string $role;

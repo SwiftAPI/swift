@@ -12,6 +12,7 @@ namespace Swift\Orm\Attributes\Relation;
 
 use Swift\Orm\Mapping\Definition\Relation\EntityRelationType;
 
+#[\AllowDynamicProperties]
 abstract class Relation implements RelationInterface, RelationFieldInterface {
     
     // relation type

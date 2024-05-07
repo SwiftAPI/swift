@@ -32,7 +32,7 @@ abstract class Command extends CommandInterface {
 		// ...
 	}
 
-	protected function execute(InputInterface $input, OutputInterface $output) {
+	protected function execute(InputInterface $input, OutputInterface $output): int {
 		// ...
 
 		return 0;

@@ -1,3 +1,8 @@
+## 0.2.17
+
+- Bump dependency versions
+- Bump minimum PHP to 8.2
+
 ## 0.2.16
 
 - Bump dependency versions

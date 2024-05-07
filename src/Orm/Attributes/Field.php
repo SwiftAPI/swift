@@ -20,8 +20,8 @@ use InvalidArgumentException;
  * @package Swift\Orm\Attributes
  */
 #[Attribute( Attribute::TARGET_PROPERTY )]
-#[\AllowDynamicProperties]
 #[DI( autowire: false )]
+#[\AllowDynamicProperties]
 final class Field {
     
     public string|object $type;

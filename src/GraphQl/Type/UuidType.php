@@ -20,22 +20,22 @@ use Ramsey\Uuid\Uuid;
 use Ramsey\Uuid\UuidInterface;
 
 class UuidType extends \GraphQL\Type\Definition\CustomScalarType {
-    
-    public const         NAME           = 'UUID';
-    private const        DESCRIPTION    = 'The `UUID` scalar type represents a UUID';
-    
+
+    public const         NAME = 'UUID';
+    private const        DESCRIPTION = 'The `UUID` scalar type represents a UUID';
+
     /**
      * @phpcsSuppress SlevomatCodingStandard.TypeHints.PropertyTypeHint.MissingNativeTypeHint
      * @var string
      */
-    public $name = self::NAME;
-    
+    public string $name = self::NAME;
+
     /**
      * @phpcsSuppress SlevomatCodingStandard.TypeHints.PropertyTypeHint.MissingNativeTypeHint
      * @var string|null
      */
-    public $description = self::DESCRIPTION;
-    
+    public string|null $description = self::DESCRIPTION;
+
     public function __construct() {
         parent::__construct(
             [
@@ -44,33 +44,33 @@ class UuidType extends \GraphQL\Type\Definition\CustomScalarType {
             ]
         );
     }
-    
+
     public function serialize( mixed $value ): string {
         if ( ! $value instanceof UuidInterface ) {
             throw new InvariantViolation(
                 'UUID is not an instance of: ' . UuidInterface::class . ' ' . Utils::printSafe( $value )
             );
         }
-        
+
         return $value->toString();
     }
-    
+
     public function parseValue( mixed $value ): UuidInterface {
         if ( ! is_string( $value ) ) {
             throw new InvalidArgumentException();
         }
-        
+
         return Uuid::fromString( $value );
     }
-    
+
     /** @param mixed[]|null $variables */
     public function parseLiteral( Node $valueNode, ?array $variables = null ): ?UuidInterface {
         if ( ! $valueNode instanceof StringValueNode ) {
             return null;
         }
-        
+
         return $this->parseValue( $valueNode->value );
     }
-    
-    
+
+
 }
